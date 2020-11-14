@@ -7,6 +7,8 @@ from class_class import ClassClass
 
 
 class Core(QtWidgets.QWidget):
+    OFFSET_MAGNET = 5
+
     def __init__(self):
 
         super().__init__()
@@ -20,13 +22,15 @@ class Core(QtWidgets.QWidget):
         self.arrow_menu = False
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
+        self.magnet_lines = []
         self.__init_ui__()
 
     def __init_ui__(self):
         self.showMaximized()
         self.setWindowTitle("shemer")
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.setStyleSheet("background-color: white")
+        self.setStyleSheet("background-color: white; "
+                           "QPushButton {border: 1px solid white; border-radius: 5%}")
 
     def self_menu_show(self):
         pos = (self.mouse_x, self.mouse_y)
@@ -45,7 +49,7 @@ class Core(QtWidgets.QWidget):
 
     def arrow_menu_show(self, arrow):
         context_menu = QtWidgets.QMenu()
-
+        context_menu.addAction("Изменить цвет", lambda: self.change_arrow_color(arrow))
         context_menu.addAction('Удалить стрелку', lambda: self.delete_arrow(arrow),
                                shortcut=QtCore.Qt.Key_D)
         context_menu.setStyleSheet(
@@ -54,6 +58,20 @@ class Core(QtWidgets.QWidget):
             f"border: 1px solid black;"
         )
         context_menu.exec_(QtGui.QCursor.pos())
+
+    def change_arrow_color(self, arrow):
+        color = QtWidgets.QColorDialog(self)
+        color.setStyleSheet("border : 2px solid blue;")
+        color.getColor(
+            parent=self,
+
+        )
+        try:
+            color_hex = color.name().lstrip("#")
+            color_rgb = tuple(int(color_hex[i:i + 2], 16) for i in (0, 2, 4))
+            arrow.color = color_rgb
+        except Exception:
+            pass
 
     def delete_arrow(self, arrow):
         widgets = self.arrows[arrow]
@@ -88,33 +106,66 @@ class Core(QtWidgets.QWidget):
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
         if 0 <= x <= event.source().OFFSET + 5 and 0 <= y <= event.source().OFFSET + 5:
             self.drag_or_resize = 1
-        elif event.source().size().width() - event.source().OFFSET - 5\
+            event.source().show_size_or_pos_label()
+        elif event.source().size().width() - event.source().OFFSET - 5 \
                 <= x <= \
                 event.source().size().width() + 5 and \
-                event.source().size().height() - event.source().OFFSET -5 \
+                event.source().size().height() - event.source().OFFSET - 5 \
                 <= y <= \
                 event.source().size().height() + 5:
             self.drag_or_resize = 2
+            event.source().show_size_or_pos_label()
 
         event.accept()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
+        self.magnet_lines = []
         event.pos()
         event.pos().x() - event.source().size().width() // 2,
         event.pos().y() - event.source().size().height() // 2
         event.setDropAction(QtCore.Qt.MoveAction)
         event.accept()
         self.drag_or_resize = 0
+        [widget.hide_size_or_pos_label() for widget in self.widgets]
 
     def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
+        obj = event.source()
+        modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
+        shift_pressed = (modifier_pressed & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.drag_or_resize == 1:
-            event.source().move(event.pos().x() - event.source().OFFSET // 2,
-                                event.pos().y() - event.source().OFFSET // 2)
+            event.source().move(event.pos().x() - obj.OFFSET // 2, event.pos().y() - obj.OFFSET // 2)
+            x, y, _, _, x_mod, y_mod, widgets = self.drag_magnet_checker(obj)
+
+            if shift_pressed:
+                if not x_mod:
+                    x = max(x - x % (self.OFFSET_MAGNET * 2), 0)
+                if not y_mod:
+                    y = max(y - y % (self.OFFSET_MAGNET * 2), 0)
+            self.set_coords_on_widgets(widgets, event, x, y)
+            event.source().move_event(x, y)
             event.source().update_arrows()
         elif self.drag_or_resize == 2:
-            x, y = event.pos().x() - event.source().pos().x(), \
-                   event.pos().y() - event.source().pos().y()
+            obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets = \
+                self.resize_magnet_checker(obj, event.pos())
+            x, y = obj_x2 - obj_x1, obj_y2 - obj_y1
+            if shift_pressed:
+                if not x_mod:
+                    x = max(x - x % (self.OFFSET_MAGNET * 2), 0)
+                if not y_mod:
+                    y = max(y - y % (self.OFFSET_MAGNET * 2), 0)
+            self.set_coords_on_widgets(widgets, event, x, y)
             event.source().resize_event(x, y)
+
+    def set_coords_on_widgets(self, widgets, event, x, y):
+        [widget.hide_size_or_pos_label() for widget in self.widgets]
+        for widget, (way_x, way_y) in widgets.items():
+            widget.show_size_or_pos_label()
+            widget.set_size_or_pos_label(
+                "{} {}".format(str(str(abs((x + event.source().width() // 2) - way_x)
+                                       if way_x else '') + '↔') if way_x else '',
+                               str(str(abs((y + event.source().height() // 2) - way_y)
+                                       if way_y else '') + '↕') if way_y else '')
+            )
 
     @staticmethod
     def check_on_arrow(x1, y1, x2, y2, x3, y3):
@@ -127,8 +178,137 @@ class Core(QtWidgets.QWidget):
         h = s / ab
         return h
 
+    def resize_magnet_checker(self, obj, pos):
+        self.magnet_lines = []
+        obj_x1 = obj.x()
+        obj_y1 = obj.y()
+        obj_x2 = pos.x()
+        obj_y2 = pos.y()
+        x_mod = y_mod = False
+        widgets = {}
+        for widget in self.widgets:
+            way_x = way_y = None
+            if widget == obj:
+                continue
+            x1, y1 = widget.geometry().x(), widget.geometry().y()
+            x2, y2 = x1 + widget.geometry().width(), y1 + widget.geometry().height()
+            if x1 - self.OFFSET_MAGNET <= obj_x2 <= x1 + self.OFFSET_MAGNET:
+                obj_x2 = x1
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - self.OFFSET_MAGNET <= obj_x2 <= x2 + self.OFFSET_MAGNET:
+                obj_x2 = x2
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
+                ))
+            if y1 - self.OFFSET_MAGNET <= obj_y2 <= y1 + self.OFFSET_MAGNET:
+                obj_y2 = y1
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y2 - self.OFFSET_MAGNET <= obj_y2 <= y2 + self.OFFSET_MAGNET:
+                obj_y2 = y2
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+
+            if way_y or way_x:
+                widgets[widget] = way_x, way_y
+        return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
+
+    def drag_magnet_checker(self, obj):
+        self.magnet_lines = []
+        obj_x1 = obj.x()
+        obj_y1 = obj.y()
+        obj_x2 = obj_x1 + obj.geometry().width()
+        obj_y2 = obj_y1 + obj.geometry().height()
+        x_mod = y_mod = False
+        # widget: x, y
+        widgets = {}
+        for widget in self.widgets:
+            way_x = way_y = None
+            if widget == obj:
+                continue
+            x1, y1 = widget.geometry().x(), widget.geometry().y()
+            x2, y2 = x1 + widget.geometry().width(), y1 + widget.geometry().height()
+            if x1 - self.OFFSET_MAGNET <= obj_x1 <= x1 + self.OFFSET_MAGNET:
+                obj_x1 = x1
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x1 - self.OFFSET_MAGNET <= obj_x2 <= x1 + self.OFFSET_MAGNET:
+                obj_x1 = x1 - obj.geometry().width()
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - self.OFFSET_MAGNET <= obj_x1 <= x2 + self.OFFSET_MAGNET:
+                obj_x1 = x2
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, obj_x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - self.OFFSET_MAGNET <= obj_x2 <= x2 + self.OFFSET_MAGNET:
+                obj_x1 = x2 - obj.geometry().width()
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
+                ))
+            if y1 - self.OFFSET_MAGNET <= obj_y1 <= y1 + self.OFFSET_MAGNET:
+                obj_y1 = y1
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y1 - self.OFFSET_MAGNET <= obj_y2 <= y1 + self.OFFSET_MAGNET:
+                obj_y1 = y1 - obj.geometry().height()
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y2 - self.OFFSET_MAGNET <= obj_y1 <= y2 + self.OFFSET_MAGNET:
+                obj_y1 = y2
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+            if y2 - self.OFFSET_MAGNET <= obj_y2 <= y2 + self.OFFSET_MAGNET:
+                obj_y1 = y2 - obj.geometry().height()
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+
+            if way_y or way_x:
+                widgets[widget] = way_x, way_y
+        return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
+
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.button() == QtCore.Qt.RightButton:
+            if self.active_arrow:
+                self.active_arrow.obj1.arrows.pop \
+                    (self.active_arrow.obj1.arrows.index(self.active_arrow))
+                self.arrows.pop(self.active_arrow)
+                self.active_arrow = None
+                return
             for arrow in self.arrows:
                 if arrow.start_pos and arrow.end_pos:
                     x1, y1 = arrow.start_pos
@@ -140,34 +320,40 @@ class Core(QtWidgets.QWidget):
             self.self_menu_show()
 
         for widget in self.widgets:
-            try:
-                widget.resize_angle.hide()
-                widget.drag_angle.hide()
-            except Exception as e:
-                pass
+            widget.hide_angles()
         self.setFocus()
 
     def add_arrow(self, arrow):
         self.arrows[arrow] = {"obj1": arrow.obj1, "obj2": arrow.obj2}
 
+    def change_mouse_pos(self, x, y):
+        self.mouse_x, self.mouse_y = x, y
+
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         qp = QPainter()
         qp.begin(self)
-        qp.setPen(QPen(QColor(0, 0, 0), 3))
+        qp.setRenderHint(QPainter.Antialiasing)
+
         for arrow in self.arrows.keys():
+            qp.setPen(QPen(QColor(*arrow.color), 2))
             end = (self.mouse_x, self.mouse_y)
             qp.drawLine(arrow.generate_draw_objects(end))
             if arrow.need_arrow:
                 arrows = arrow.create_arrow(end)
                 qp.drawLine(arrows[0])
                 qp.drawLine(arrows[1])
+        pen = QPen(QColor(100, 100, 100), 1, )
+        pen.setStyle(QtCore.Qt.DashLine)
+        qp.setPen(pen)
+
+        for line in self.magnet_lines:
+            qp.drawLine(line)
         qp.end()
         self.update()
 
     def delete_widget(self, sender):
         if sender in self.widgets:
             self.widgets.pop(self.widgets.index(sender))
-        print(self.widgets)
         del sender
 
 

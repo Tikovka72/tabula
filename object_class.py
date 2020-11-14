@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QAction
+from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QAction, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal
 from PyQt5.QtGui import QDrag, QContextMenuEvent, QCursor, QMouseEvent
 
@@ -13,6 +13,7 @@ class LineEdit(QLineEdit):
         self.background_color = "white"
         self.background_color_menu = "white"
         self.background_color_menu_selected = "rgb(128, 166, 255)"
+        self.setMouseTracking(True)
         self.__init_ui__()
 
     def __init_ui__(self):
@@ -27,6 +28,7 @@ class LineEdit(QLineEdit):
         self.menu = QMenu(self)
         self.menu.addAction("Копировать", self.copy, shortcut="Ctrl+C")
         self.menu.addAction("Дублировать объект", self.parent().copy_self)
+        self.menu.addAction("На задний план", self.on_back)
         self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
         self.menu.addAction("Добавить связь", self.parent().add_arrow_f)
         self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
@@ -43,6 +45,9 @@ class LineEdit(QLineEdit):
             "};"
         )
 
+    def on_back(self):
+        self.parent().on_back()
+
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
             self.parent().show_angles()
@@ -50,6 +55,12 @@ class LineEdit(QLineEdit):
 
     def self_menu_show(self):
         self.menu.exec_(QCursor.pos())
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        self.change_parent_mouse_pos(event)
+
+    def change_parent_mouse_pos(self, event: QMouseEvent):
+        self.parent().change_parent_mouse_pos(event, need_offset=True)
 
 
 class ObjectClass(QWidget):
@@ -77,6 +88,19 @@ class ObjectClass(QWidget):
         self.edit_line_font.setPixelSize(int(self.edit_line.size().height() * self.FONT_SIZE_FACTOR))
         self.edit_line.setFont(self.edit_line_font)
         self.edit_line.setAlignment(Qt.AlignCenter)
+
+        self.size_or_pos_label = QLabel(self)
+        self.size_or_pos_label.setText("")
+        self.size_or_pos_label_font = self.size_or_pos_label.font()
+        self.size_or_pos_label_font.setPixelSize(12)
+        self.size_or_pos_label.setFont(self.size_or_pos_label_font)
+        self.size_or_pos_label.setStyleSheet("background-color: rgb(200, 200, 200); padding: 3px")
+        self.size_or_pos_label.adjustSize()
+
+        self.size_or_pos_label.move(
+            self.width() // 2 - self.size_or_pos_label.width() // 2,
+            self.height() // 2 - self.size_or_pos_label.height() // 2
+        )
 
         self.drag_angle = QWidget(self)
         self.drag_angle.setGeometry(0, 0, self.OFFSET, self.OFFSET)
@@ -110,15 +134,18 @@ class ObjectClass(QWidget):
                 obj1, obj2 = objects.get("obj1", None), objects.get("obj2", None),
             else:
                 return
-            print(obj1, obj2)
             if obj1 and obj1 != self:
                 obj1.arrows.pop(obj1.arrows.index(arrow))
             elif obj2 and obj2 != self:
                 obj2.arrows.pop(obj2.arrows.index(arrow))
             self.parent().arrows.pop(arrow)
         self.arrows = []
+        self.parent().widgets.pop(self.parent().widgets.index(self))
         self.setEnabled(False)
         self.hide()
+
+    def on_back(self):
+        [(widget.raise_()) if widget != self else ... for widget in self.parent().widgets]
 
     def resize_event(self, x, y):
         x = max(x, self.STANDARD_SIZE[0])
@@ -132,7 +159,28 @@ class ObjectClass(QWidget):
         self.resize_angle.setGeometry(self.size().width() - self.OFFSET,
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
+        self.show_size_or_pos_label()
+        self.set_size_or_pos_label(f"{x}x{y}")
         self.update_arrows()
+
+    def move_event(self, x, y):
+        self.move(x, y)
+        self.show_size_or_pos_label()
+        self.set_size_or_pos_label(f"{x}x{y}")
+
+    def set_size_or_pos_label(self, text):
+        self.size_or_pos_label.setText(text)
+        self.size_or_pos_label.adjustSize()
+        self.size_or_pos_label.move(
+            self.width() // 2 - self.size_or_pos_label.width() // 2,
+            self.height() // 2 - self.size_or_pos_label.height() // 2
+        )
+
+    def hide_size_or_pos_label(self):
+        self.size_or_pos_label.hide()
+
+    def show_size_or_pos_label(self):
+        self.size_or_pos_label.show()
 
     def add_arrow_f(self, need_arrow=False):
         arrow = Arrow(need_arrow=need_arrow)
@@ -152,10 +200,24 @@ class ObjectClass(QWidget):
             drag.setMimeData(mime)
             drag.setHotSpot(event.pos())
             drag.exec_(Qt.MoveAction)
+        else:
+            self.change_parent_mouse_pos(event)
+
+    def change_parent_mouse_pos(self, event, need_offset=False):
+        self.parent().change_mouse_pos(self.x() + event.x() + (self.OFFSET if need_offset else 0),
+                                       self.y() + event.y() + (self.OFFSET if need_offset else 0))
 
     def show_angles(self):
-        self.resize_angle.show()
-        self.drag_angle.show()
+        if self.resize_angle:
+            self.resize_angle.show()
+        if self.drag_angle:
+            self.drag_angle.show()
+
+    def hide_angles(self):
+        if self.resize_angle:
+            self.resize_angle.hide()
+        if self.drag_angle:
+            self.drag_angle.hide()
 
     def mouseReleaseEvent(self, event):
         if self.underMouse():

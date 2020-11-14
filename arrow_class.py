@@ -5,6 +5,8 @@ from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPolygon
 from numpy import arctan2
 
+# from class_class import ClassClass
+
 
 class Arrow:
     def __init__(self, start_pos=None, end_pos=None, color=(0, 0, 0), need_arrow=False):
@@ -86,3 +88,44 @@ class Arrow:
         elif end_pos:
             start, end = self.get_start_pos_and_end_pos_by_end_pos(end_pos)
             return QLine(*start, *end)
+
+
+class ArrowForClass(Arrow):
+    def __init__(self, start_pos=None, end_pos=None, color=(0, 0, 0), need_arrow=False):
+        super().__init__(start_pos=start_pos, end_pos=end_pos, color=color, need_arrow=need_arrow)
+
+    def set_start_and_end_pos_by_obj(self):
+        if not (self.obj1 and self.obj2):
+            return
+        print(type(self.obj1))
+        width1 = self.obj1.size().width()
+        height1 = self.obj1.size().height()
+        x1, y1 = self.obj1.pos().x(), self.obj1.pos().y()
+        up_dot1 = x1 + width1 // 2, y1
+        bottom_dot1 = x1 + width1 // 2, y1 + height1
+        left_dot1 = x1, y1 + height1 // 2
+        right_dot1 = x1 + width1, y1 + height1 // 2
+
+        width2 = self.obj2.size().width()
+        height2 = self.obj2.size().height()
+        x2, y2 = self.obj2.pos().x(), self.obj2.pos().y()
+        up_dot2 = x2 + width2 // 2, y2
+        bottom_dot2 = x2 + width2 // 2, y2 + height2
+        left_dot2 = x2, y2 + height2 // 2
+        right_dot2 = x2 + width2, y2 + height2 // 2
+        possible_lines = {
+            up_dot1: (bottom_dot2, left_dot2, right_dot2),
+            bottom_dot1: (up_dot2, left_dot2, right_dot2),
+            left_dot1: (up_dot2, bottom_dot2, right_dot2),
+            right_dot1: (up_dot2, bottom_dot2, left_dot2),
+        }
+        min_ = float("inf")
+        dots_min = (0, 0), (0, 0)
+        for obj1_el, obj2_els in possible_lines.items():
+            for obj2_el in obj2_els:
+                distance = ((obj2_el[0] - obj1_el[0]) ** 2 + (obj2_el[1] - obj1_el[1]) ** 2) ** 0.5
+                if distance < min_:
+                    min_ = distance
+                    dots_min = obj1_el, obj2_el
+        self.start_pos, self.end_pos = dots_min
+        return dots_min
