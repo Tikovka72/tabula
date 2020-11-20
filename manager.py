@@ -290,6 +290,6 @@ class Manager:
         self.mouse.change_y(y)
 
     def set_new_zero_point_pos(self, x, y):
-        self.zero_point_dot.move_event(x, y)
+        # self.zero_point_dot.move_event(x, y)
         self.zero_point_dot.set_zero(x, y)
 

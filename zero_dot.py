@@ -5,9 +5,10 @@ class ZeroPointDotWidget(QtWidgets.QWidget):
     def __init__(self, parent, manager=None):
         super().__init__(parent=parent)
         self.parent = parent
-        self.zero = 0, 0
+        self.zero = self.parent.STANDARD_SIZE[0] // 2, self.parent.STANDARD_SIZE[1] // 2
         self.manager = manager
         self.pos()
+        self.center = 0, 0
         self.__init_ui__()
 
     def __init_ui__(self):
@@ -29,6 +30,9 @@ class ZeroPointDotWidget(QtWidgets.QWidget):
 
     def set_zero(self, x, y):
         self.zero = x, y
+
+    def get_zero(self):
+        return self.zero
 
     def move_animation(self, end_pos):
         self.anim = ZeroDotAndGridAnimation(self, b"geometry", self.manager)

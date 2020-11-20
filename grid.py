@@ -6,8 +6,10 @@ import time
 
 class Grid:
     def __init__(self, color=(200, 200, 200), line=QtCore.Qt.DashLine, show=False, core_size=None,
-                 step=20, offset=(20, 20), zero_pos: ZeroPointDotWidget = None):
+                 step=20, offset=(20, 20), zero_pos: ZeroPointDotWidget = None,
+                 special_lines_color=(150, 150, 150)):
         self.color = color
+        self.special_lines_color = special_lines_color
         self.line = line
         self.zero_pos = zero_pos
         self.pen = QtGui.QPen(QtGui.QColor(*self.color), 1)
@@ -36,7 +38,7 @@ class Grid:
         if self.grid:
             qp.drawLines(*self.grid)
         if special_lines:
-            pen = QtGui.QPen(QtGui.QColor(50, 50, 50), self.pen.width())
+            pen = QtGui.QPen(QtGui.QColor(*self.special_lines_color), self.pen.width())
             qp.setPen(pen)
             qp.drawLines(*special_lines)
 

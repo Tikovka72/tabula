@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QPainter, QColor, QPen
+from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QPainter, QColor, QPen, QResizeEvent
 
 from object_class import ObjectClass
 from class_class import ClassClass
@@ -9,6 +10,8 @@ from utils import check_on_arrow
 
 
 class Core(QtWidgets.QWidget):
+    STANDARD_SIZE = 640, 480
+
     def __init__(self):
         super().__init__()
         self.manager = Manager(self)
@@ -21,21 +24,27 @@ class Core(QtWidgets.QWidget):
     def __init_ui__(self):
         self.setWindowTitle("shemer")
         self.setMinimumSize(640, 480)
-        self.resize(1, 1)
+        self.resize(*self.STANDARD_SIZE)
+        self.showMaximized()
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setStyleSheet("background-color: white; "
                            "QPushButton {border: 1px solid white; border-radius: 5%}")
         self.setFocus()
 
-    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+    def resizeEvent(self, a0) -> None:
         super().resizeEvent(a0)
         self.update()
         x, y = self.manager.zero_point_dot.get_pos()
+        x -= self.manager.zero_point_dot.get_zero()[0]
+        y -= self.manager.zero_point_dot.get_zero()[1]
         new_x, new_y = a0.size().width() // 2, a0.size().height() // 2
-        [widget.move_event(widget.x() + (new_x - x), widget.y() + (new_y - y), show_pos=False)
+        [widget.move_event(widget.x() + new_x - self.manager.zero_point_dot.get_zero()[0],
+                           widget.y() + new_y - self.manager.zero_point_dot.get_zero()[1],
+                           show_pos=False)
          for widget in self.manager.get_all_widgets()]
-
         self.manager.set_new_zero_point_pos(new_x, new_y)
+        self.manager.zero_point_dot.move_event(new_x + x,
+                                               new_y + y)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
         self.manager.grid.change_grid_size(a0.size().width(), a0.size().height())
@@ -149,9 +158,9 @@ class Core(QtWidgets.QWidget):
 
             if shift_pressed:
                 if not x_mod:
-                    x = x - x % (self.OFFSET_MAGNET * 2)
+                    x = x - x % (self.manager.OFFSET_MAGNET * 2)
                 if not y_mod:
-                    y = y - y % (self.OFFSET_MAGNET * 2)
+                    y = y - y % (self.manager.OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
             self.manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().move_event(x, y, fact_pos=True)
@@ -197,7 +206,9 @@ if __name__ == "__main__":
     try:
         app = QtWidgets.QApplication(sys.argv)
         shemer_app = Core()
-        shemer_app.showMaximized()
+        # shemer_app.showMaximized()
+        shemer_app.show()
+
         sys.exit(app.exec())
     except Exception as e:
         print(e)
