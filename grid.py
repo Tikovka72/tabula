@@ -1,0 +1,82 @@
+from PyQt5 import QtCore, QtGui
+
+from zero_dot import ZeroPointDotWidget
+import time
+
+
+class Grid:
+    def __init__(self, color=(200, 200, 200), line=QtCore.Qt.DashLine, show=False, core_size=None,
+                 step=20, offset=(20, 20), zero_pos: ZeroPointDotWidget = None):
+        self.color = color
+        self.line = line
+        self.zero_pos = zero_pos
+        self.pen = QtGui.QPen(QtGui.QColor(*self.color), 1)
+        self.pen.setStyle(self.line)
+        self.show = show
+        self.core_size = core_size
+        self.step = step
+        self.offset_x, self.offset_y = offset
+        self.grid = self.generate_grid()
+
+    def generate_grid(self):
+        if not self.core_size:
+            return []
+        lines = []
+        for x in range(self.offset_x, self.core_size[0] + 1, self.step):
+            lines.append(QtCore.QLine(x, 0, x, self.core_size[0]))
+        for y in range(self.offset_y, self.core_size[1] + 1, self.step):
+            lines.append(QtCore.QLine(0, y, self.core_size[0], y))
+        return lines
+
+    def draw(self, qp: QtGui.QPainter):
+        if not self.show or not self.grid:
+            return
+        qp.setPen(self.pen)
+        special_lines = self.get_special_lines()
+        if self.grid:
+            qp.drawLines(*self.grid)
+        if special_lines:
+            pen = QtGui.QPen(QtGui.QColor(50, 50, 50), self.pen.width())
+            qp.setPen(pen)
+            qp.drawLines(*special_lines)
+
+    def change_grid_size(self, x, y):
+        self.core_size = x, y
+        self.grid = self.generate_grid()
+
+    def regenerate_grid(self):
+        self.grid = self.generate_grid()
+
+    def toggle_show(self):
+        self.show = not self.show
+        if self.show:
+            self.set_offset_by_zero_point()
+            self.regenerate_grid()
+
+    def change_offset(self, offset_x=20, offset_y=20):
+        self.offset_x, self.offset_y = offset_x, offset_y
+
+    def get_offset(self):
+        return self.offset_x, self.offset_y
+
+    def get_step(self):
+        return self.step
+
+    def change_step(self, step):
+        if step > 0:
+            self.step = step
+
+    def get_step(self):
+        return self.step
+
+    def get_special_lines(self):
+        zero = self.zero_pos.get_pos()
+
+        return list(filter(
+            lambda line: True if line.x1() == line.x2() == zero[0] or line.y1() == line.y2() == zero[
+                1] else False, self.grid))
+
+    def set_offset_by_zero_point(self):
+        self.offset_x = self.zero_pos.get_pos()[0] % self.step
+        self.offset_y = self.zero_pos.get_pos()[1] % self.step
+
