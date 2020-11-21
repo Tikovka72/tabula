@@ -8,7 +8,6 @@ class ZeroPointDotWidget(QtWidgets.QWidget):
         self.zero = self.parent.STANDARD_SIZE[0] // 2, self.parent.STANDARD_SIZE[1] // 2
         self.manager = manager
         self.pos()
-        self.center = 0, 0
         self.__init_ui__()
 
     def __init_ui__(self):

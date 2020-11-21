@@ -143,14 +143,12 @@ class ObjectClass(QWidget):
         self.setMouseTracking(True)
         self.zero_dot = zero_dot
         self.arrows = []
-        self.fact_pos = 0, 0
         if pos:
             self.move(*pos)
         self.__init_ui__()
 
     def __init_ui__(self):
         self.resize(*self.STANDARD_SIZE)
-        self.fact_pos = self.x(), self.y()
 
         self.edit_line = LineEdit(self)
         self.edit_line.setText("Sample text")
@@ -237,9 +235,6 @@ class ObjectClass(QWidget):
 
         self.anim.start()
 
-    def set_new_fact_pos(self, x, y):
-        self.fact_pos = x, y
-
     def call_back_size_width(self, width):
         self.resize_event(width, self.height(), False)
 
@@ -250,15 +245,14 @@ class ObjectClass(QWidget):
         return self.width(), self.height()
 
     def call_back_pos_x(self, x):
-        self.move_event(self.zero_dot.get_pos()[0] + x, self.y(), False)
-        self.set_new_fact_pos(x, self.y())
+        self.move_event(self.zero_dot.get_pos()[0] + x - self.width() // 2, self.y(), False)
 
     def call_back_pos_y(self, y):
-        self.move_event(self.x(), self.zero_dot.get_pos()[1] + y, False)
-        self.set_new_fact_pos(self.x(), y)
+        self.move_event(self.x(), self.zero_dot.get_pos()[1] + y - self.height() // 2, False)
 
     def call_set_pos(self):
-        return -self.zero_dot.get_pos()[0] + self.x(), -self.zero_dot.get_pos()[1] + self.y()
+        return -self.zero_dot.get_pos()[0] + self.x() + self.width() // 2, \
+               -self.zero_dot.get_pos()[1] + self.y() + self.height() // 2
 
     def call_back_text_size(self, size):
         self.edit_line.change_text_size(size)
@@ -286,23 +280,25 @@ class ObjectClass(QWidget):
         self.hide()
 
     def copy_self(self):
-        copy = ObjectClass(self.parent(), self.manager)
+        copy = ObjectClass(self.parent(), self.manager, self.zero_dot)
         copy.resize_event(self.width(), self.height())
         copy.edit_line.setText(self.edit_line.text())
-        copy.move(self.geometry().x() + self.geometry().width() // 2 - 10,
-                  self.geometry().y() + self.geometry().height() + 10)
+        copy.move_event(self.geometry().x() + self.geometry().width() // 2 - 10,
+                        self.geometry().y() + self.geometry().height() + 10, show_pos=False)
         copy.hide_size_or_pos_label()
-        self.manager.add_widget(copy)
+        self.manager.add_widget(widget=copy)
         copy.show()
 
     def on_back(self):
-        [(widget.raise_()) if widget != self else ... for widget in self.manager.widgets.keys()]
+        self.lower()
 
     def change_parent_mouse_pos(self, event, need_offset=False):
         self.manager.change_mouse_pos(self.x() + event.x() + (self.OFFSET if need_offset else 0),
                                       self.y() + event.y() + (self.OFFSET if need_offset else 0))
 
     def resize_event(self, x, y, show_size=True):
+        if x < 1 or y < 1:
+            return
         self.resize(x, y)
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.size().height() - self.OFFSET * 2)
@@ -314,14 +310,12 @@ class ObjectClass(QWidget):
             self.set_size_or_pos_label(f"{x}x{y}")
         self.update_arrows()
 
-    def move_event(self, x, y, show_pos=True, fact_pos=False):
+    def move_event(self, x, y, show_pos=True):
         self.move(x, y)
         if show_pos:
             self.show_size_or_pos_label()
-            self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0]}x{y - self.zero_dot.get_pos()[1]}")
-        if fact_pos:
-            self.set_new_fact_pos(x, y)
-        # self.update_arrows()
+            self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0] + self.width() // 2} "
+                                       f"{y - self.zero_dot.get_pos()[1] + self.height() // 2}")
 
     def moveEvent(self, a0) -> None:
         self.move(a0.pos().x(), a0.pos().y())

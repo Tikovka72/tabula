@@ -1,12 +1,10 @@
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPainter, QColor, QPen, QResizeEvent
+from PyQt5.QtGui import QPainter, QColor, QPen
 
-from object_class import ObjectClass
-from class_class import ClassClass
 from manager import Manager
 from utils import check_on_arrow
+from constants import NONE, DRAG, RESIZE
 
 
 class Core(QtWidgets.QWidget):
@@ -15,8 +13,7 @@ class Core(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.manager = Manager(self)
-        self.drag_or_resize = 0
-        self.arrow_menu = False
+        # self.arrow_menu = False
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.__init_ui__()
@@ -88,15 +85,15 @@ class Core(QtWidgets.QWidget):
                 (grid_offset[1] + (event.pos().y() - y)) % self.manager.grid.get_step())
             self.manager.grid.regenerate_grid()
             self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.x() +
-                                           (event.pos().x() - x),
-                                           self.manager.zero_point_dot.y() +
-                                           (event.pos().y() - y))
+                                                   (event.pos().x() - x),
+                                                   self.manager.zero_point_dot.y() +
+                                                   (event.pos().y() - y))
         self.manager.change_mouse_pos(event.x(), event.y())
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         if not self.hasFocus():
             return
-        if event.key() == QtCore.Qt.Key_R:
+        if event.key() in (QtCore.Qt.Key_R, 1050):
             [widget.return_to_fact_pos() for widget in self.manager.get_all_widgets()]
             self.manager.zero_point_dot.return_to_zero()
             self.manager.grid.set_offset_by_zero_point()
@@ -135,7 +132,7 @@ class Core(QtWidgets.QWidget):
     def dragEnterEvent(self, event):
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
         if 0 <= x <= event.source().OFFSET + 5 and 0 <= y <= event.source().OFFSET + 5:
-            self.drag_or_resize = 1
+            self.manager.set_dor(DRAG)
             event.source().show_size_or_pos_label()
         elif event.source().size().width() - event.source().OFFSET - 5 \
                 <= x <= \
@@ -143,7 +140,7 @@ class Core(QtWidgets.QWidget):
                 event.source().size().height() - event.source().OFFSET - 5 \
                 <= y <= \
                 event.source().size().height() + 5:
-            self.drag_or_resize = 2
+            self.manager.set_dor(RESIZE)
             event.source().show_size_or_pos_label()
 
         event.accept()
@@ -152,7 +149,7 @@ class Core(QtWidgets.QWidget):
         obj = event.source()
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
         shift_pressed = (modifier_pressed & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
-        if self.drag_or_resize == 1:
+        if self.manager.get_dor() == DRAG:
             event.source().move(event.pos().x() - obj.OFFSET // 2, event.pos().y() - obj.OFFSET // 2)
             x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
 
@@ -163,9 +160,9 @@ class Core(QtWidgets.QWidget):
                     y = y - y % (self.manager.OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
             self.manager.set_coords_on_widgets(widgets, event, x, y)
-            event.source().move_event(x, y, fact_pos=True)
+            event.source().move_event(x, y)
             event.source().update_arrows()
-        elif self.drag_or_resize == 2:
+        elif self.manager.get_dor() == RESIZE:
             obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets = \
                 self.manager.resize_magnet_checker(obj, event.pos())
             x, y = obj_x2 - obj_x1, obj_y2 - obj_y1
@@ -180,7 +177,7 @@ class Core(QtWidgets.QWidget):
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         self.manager.drop_magnet_lines()
         event.accept()
-        self.drag_or_resize = 0
+        self.manager.set_dor(NONE)
         [widget.hide_size_or_pos_label() for widget in self.manager.get_all_widgets()]
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
@@ -206,7 +203,6 @@ if __name__ == "__main__":
     try:
         app = QtWidgets.QApplication(sys.argv)
         shemer_app = Core()
-        # shemer_app.showMaximized()
         shemer_app.show()
 
         sys.exit(app.exec())

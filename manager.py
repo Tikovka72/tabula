@@ -17,6 +17,7 @@ class Manager:
         # ObjectClass: {in: Arrow, out: Arrow}
         self.widgets = {}
         self.magnet_lines = []
+        self.drag_or_resize = 0
         self.active_arrow = None
         self.zero_point_dot = ZeroPointDotWidget(parent=self.core, manager=self)
         self.zero_point_dot.setGeometry(self.core.width() // 2, self.core.height() // 2, 1, 1)
@@ -25,8 +26,10 @@ class Manager:
         self.mouse = Mouse()
         # self.core.showMaximized()
 
-    def add_widget(self, pos):
-        widget = ObjectClass(self.core, self, pos=pos, zero_dot=self.zero_point_dot)
+    def add_widget(self, pos=None, widget=None):
+        if widget is None:
+            widget = ObjectClass(self.core, self, pos=pos if pos else (0, 0),
+                                 zero_dot=self.zero_point_dot)
         widget.show()
         self.widgets[widget] = {"in": [], "out": []}
 
@@ -290,6 +293,12 @@ class Manager:
         self.mouse.change_y(y)
 
     def set_new_zero_point_pos(self, x, y):
-        # self.zero_point_dot.move_event(x, y)
         self.zero_point_dot.set_zero(x, y)
+
+    def get_dor(self):
+        return self.drag_or_resize
+
+    def set_dor(self, dor):
+        self.drag_or_resize = dor
+
 
