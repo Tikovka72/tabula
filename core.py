@@ -13,13 +13,14 @@ class Core(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.manager = Manager(self)
-        # self.arrow_menu = False
+        self.arrow_menu = False
+        self.mouse_nearest_lines = []
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.__init_ui__()
 
     def __init_ui__(self):
-        self.setWindowTitle("shemer")
+        self.setWindowTitle("tabula")
         self.setMinimumSize(640, 480)
         self.resize(*self.STANDARD_SIZE)
         self.showMaximized()
@@ -148,17 +149,23 @@ class Core(QtWidgets.QWidget):
     def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
         obj = event.source()
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
-        shift_pressed = (modifier_pressed & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
+        shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.manager.get_dor() == DRAG:
             event.source().move(event.pos().x() - obj.OFFSET // 2, event.pos().y() - obj.OFFSET // 2)
             x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
 
             if shift_pressed:
                 if not x_mod:
-                    x = x - x % (self.manager.OFFSET_MAGNET * 2)
+                    x = x - (x - self.manager.zero_point_dot.get_pos()[0]) \
+                        % (self.manager.OFFSET_MAGNET * 2)
                 if not y_mod:
-                    y = y - y % (self.manager.OFFSET_MAGNET * 2)
+                    y = y - (y - self.manager.zero_point_dot.get_pos()[1]) \
+                        % (self.manager.OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
+            if self.manager.grid.show:
+                x, y, widgets = self.manager.check_and_set_grid_magnet_lines_for_resizing(
+                    obj, x, y, x_mod, y_mod, widgets
+                )
             self.manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().move_event(x, y)
             event.source().update_arrows()
@@ -176,6 +183,7 @@ class Core(QtWidgets.QWidget):
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         self.manager.drop_magnet_lines()
+        self.manager.grid.clear_special_lines()
         event.accept()
         self.manager.set_dor(NONE)
         [widget.hide_size_or_pos_label() for widget in self.manager.get_all_widgets()]
@@ -202,8 +210,8 @@ class Core(QtWidgets.QWidget):
 if __name__ == "__main__":
     try:
         app = QtWidgets.QApplication(sys.argv)
-        shemer_app = Core()
-        shemer_app.show()
+        tabula_app = Core()
+        tabula_app.show()
 
         sys.exit(app.exec())
     except Exception as e:

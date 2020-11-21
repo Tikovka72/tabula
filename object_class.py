@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QAction, QLabel, QCheckBox, QSlider
+from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
-from PyQt5.QtGui import QDrag, QContextMenuEvent, QCursor, QMouseEvent, QWheelEvent
+from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 
 from arrow_class import Arrow
 from settings import Settings
@@ -124,8 +124,8 @@ class LineEdit(QLineEdit):
     def settings_show(self):
         self.parent().settings_show()
 
-    def resize(self, x, y) -> None:
-        super().resize(x, y)
+    def resize(self, *size) -> None:
+        super().resize(*size)
         self.update_text_size()
 
 
@@ -143,6 +143,8 @@ class ObjectClass(QWidget):
         self.setMouseTracking(True)
         self.zero_dot = zero_dot
         self.arrows = []
+        self.anim = QPropertyAnimation(self, b"geometry")
+        self.anim.setDuration(300)
         if pos:
             self.move(*pos)
         self.__init_ui__()
@@ -228,8 +230,6 @@ class ObjectClass(QWidget):
                              self.y() - self.zero_dot.get_pos()[1] + self.zero_dot.zero[1]))
 
     def move_animation(self, end_pos):
-        self.anim = QPropertyAnimation(self, b"geometry")
-        self.anim.setDuration(300)
         self.anim.setStartValue(QRect(self.x(), self.y(), self.width(), self.height()))
         self.anim.setEndValue(QRect(*end_pos, self.width(), self.height()))
 

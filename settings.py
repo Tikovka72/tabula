@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QWheelEvent
 
-from utils import isdig
+from utils import isdig, pass_f
 
 
 class Settings(QtWidgets.QDialog):
@@ -21,9 +21,10 @@ class Settings(QtWidgets.QDialog):
                      standard_values=None, int_only=None,
                      default_values_to_return=None, call_back=None, call_update_all=None):
             super().__init__(parent)
-            self.parent: Settings = parent
+            self.parent = parent
             self.n = n
             self.size = size
+            _ = name, standard_values, int_only, default_values_to_return, call_back, call_update_all
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -46,10 +47,11 @@ class Settings(QtWidgets.QDialog):
                      standard_values=None, int_only=None,
                      default_values_to_return=None, call_back=None, call_update_all=None):
             super().__init__(parent)
-            self.parent: Settings = parent
+            self.parent = parent
             self.n = n
             self.name = name
             self.size = size
+            _ = standard_values, int_only, default_values_to_return, call_back, call_update_all
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -63,7 +65,9 @@ class Settings(QtWidgets.QDialog):
             self.text.setFont(f)
             self.text.adjustSize()
             self.text.move(
-                self.width() // 2 - self.text.width() // 2, self.height() // 2 - self.text.height() // 2)
+                self.width() // 2 - self.text.width() // 2,
+                self.height() // 2 - self.text.height() // 2
+            )
 
     class SettTwoLineEdit(QtWidgets.QWidget):
         VALUES_N = 2
@@ -82,15 +86,15 @@ class Settings(QtWidgets.QDialog):
                      call_back: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent)
-            self.parent: Settings = parent
+            self.parent = parent
             self.n = n
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
             self.size = size
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
-                len(default_values_to_return) == self.VALUES_N else (None, None)
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (None, None)
+                len(default_values_to_return) == self.VALUES_N else (pass_f, pass_f)
+            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
@@ -202,7 +206,7 @@ class Settings(QtWidgets.QDialog):
                      call_back: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent)
-            self.parent: Settings = parent
+            self.parent = parent
             self.n = n
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
@@ -210,7 +214,7 @@ class Settings(QtWidgets.QDialog):
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (None, None)
+            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
@@ -318,7 +322,7 @@ class Settings(QtWidgets.QDialog):
                      call_back: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent)
-            self.parent: Settings = parent
+            self.parent = parent
             self.n = n
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
@@ -326,7 +330,7 @@ class Settings(QtWidgets.QDialog):
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (None, None)
+            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, None)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
@@ -432,4 +436,3 @@ class Settings(QtWidgets.QDialog):
         super().show()
         for sett in self.settings_obj:
             sett.update()
-

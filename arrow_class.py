@@ -1,11 +1,8 @@
 import math
 
-from PyQt5 import QtWidgets
 from PyQt5.QtCore import QLine
-from PyQt5.QtGui import QPolygon, QPainter
+from PyQt5.QtGui import QPainter
 from numpy import arctan2
-
-# from class_class import ClassClass
 
 
 class Arrow:
@@ -17,9 +14,9 @@ class Arrow:
         self.obj2 = None
         self.need_arrow = need_arrow
 
-    def set_start_and_end_pos_by_obj(self):
-        if not (self.obj1 and self.obj2):
-            return
+    def get_data_about_object1(self):
+        if not self.obj1:
+            return 0, 0, 0, 0, 0, 0, 0, 0
         width1 = self.obj1.size().width()
         height1 = self.obj1.size().height()
         x1, y1 = self.obj1.pos().x(), self.obj1.pos().y()
@@ -27,7 +24,12 @@ class Arrow:
         bottom_dot1 = x1 + width1 // 2, y1 + height1
         left_dot1 = x1, y1 + height1 // 2
         right_dot1 = x1 + width1, y1 + height1 // 2
+        return width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1, \
 
+
+    def get_data_about_object2(self):
+        if not self.obj2:
+            return 0, 0, 0, 0, 0, 0, 0, 0
         width2 = self.obj2.size().width()
         height2 = self.obj2.size().height()
         x2, y2 = self.obj2.pos().x(), self.obj2.pos().y()
@@ -35,6 +37,17 @@ class Arrow:
         bottom_dot2 = x2 + width2 // 2, y2 + height2
         left_dot2 = x2, y2 + height2 // 2
         right_dot2 = x2 + width2, y2 + height2 // 2
+        return width2, height2, x2, y2, up_dot2, bottom_dot2, left_dot2, right_dot2
+
+    def set_start_and_end_pos_by_obj(self):
+        if not (self.obj1 and self.obj2):
+            return
+
+        width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
+            self.get_data_about_object1()
+        width2, height2, x2, y2, up_dot2, bottom_dot2, left_dot2, right_dot2 = \
+            self.get_data_about_object2()
+
         possible_lines = {
             up_dot1: (bottom_dot2, left_dot2, right_dot2),
             bottom_dot1: (up_dot2, left_dot2, right_dot2),
@@ -54,13 +67,8 @@ class Arrow:
 
     def get_start_pos_and_end_pos_by_end_pos(self, end_pos: tuple):
         if self.obj1:
-            width1 = self.obj1.size().width()
-            height1 = self.obj1.size().height()
-            x1, y1 = self.obj1.pos().x(), self.obj1.pos().y()
-            up_dot1 = x1 + width1 // 2, y1
-            bottom_dot1 = x1 + width1 // 2, y1 + height1
-            left_dot1 = x1, y1 + height1 // 2
-            right_dot1 = x1 + width1, y1 + height1 // 2
+            width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
+                self.get_data_about_object1()
             min_ = float("inf")
             dots_min = (0, 0), (0, 0)
             for start_pos in [up_dot1, bottom_dot1, left_dot1, right_dot1]:
