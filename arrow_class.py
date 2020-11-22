@@ -6,7 +6,7 @@ from numpy import arctan2
 
 
 class Arrow:
-    def __init__(self, start_pos=None, end_pos=None, color=(0, 0, 0), need_arrow=False):
+    def __init__(self, start_pos=None, end_pos=None, color="#000000", need_arrow=False):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color

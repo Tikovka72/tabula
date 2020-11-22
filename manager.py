@@ -113,7 +113,7 @@ class Manager:
         color.setStyleSheet("border : 2px solid blue;")
         color = color.getColor()
         if color.isValid():
-            arrow.color = color.red(), color.green(), color.blue()
+            arrow.color = color.name()
 
     def set_coords_on_widgets(self, widgets, event, x, y):
         [widget.hide_size_or_pos_label() for widget in self.get_all_widgets()]

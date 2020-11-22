@@ -4,14 +4,14 @@ from zero_dot import ZeroPointDotWidget
 
 
 class Grid:
-    def __init__(self, color=(200, 200, 200), line=QtCore.Qt.DashLine, show=False, core_size=None,
+    def __init__(self, color="#C8C8C8", line=QtCore.Qt.DashLine, show=False, core_size=None,
                  step=20, offset=(20, 20), zero_pos: ZeroPointDotWidget = None,
-                 special_lines_color=(150, 150, 150)):
+                 special_lines_color="#969696"):
         self.color = color
         self.special_lines_color = special_lines_color
         self.line = line
         self.zero_pos = zero_pos
-        self.pen = QtGui.QPen(QtGui.QColor(*self.color), 1)
+        self.pen = QtGui.QPen(QtGui.QColor(self.color), 1)
         self.pen.setStyle(self.line)
         self.show = show
         self.core_size = core_size
@@ -40,7 +40,7 @@ class Grid:
             qp.drawLines(*self.grid["x"])
         if self.grid.get("y", []):
             qp.drawLines(*self.grid["y"])
-        pen = QtGui.QPen(QtGui.QColor(*self.special_lines_color), self.pen.width())
+        pen = QtGui.QPen(QtGui.QColor(self.special_lines_color), self.pen.width())
         pen.setStyle(self.line)
         qp.setPen(pen)
         if special_lines.get("x", []):

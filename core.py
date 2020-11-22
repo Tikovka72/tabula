@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 
 from manager import Manager
 from utils import check_on_arrow
-from constants import NONE, DRAG, RESIZE
+from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR
 
 
 class Core(QtWidgets.QWidget):
@@ -194,10 +194,10 @@ class Core(QtWidgets.QWidget):
         qp.setRenderHint(QPainter.Antialiasing)
         self.manager.grid.draw(qp)
         for arrow in self.manager.get_all_arrows():
-            qp.setPen(QPen(QColor(*arrow.color), 2))
+            qp.setPen(QPen(QColor(arrow.color), 2))
             end = self.manager.get_mouse_pos()
             arrow.draw(qp, end_pos=end)
-        pen = QPen(QColor(100, 100, 100), 1)
+        pen = QPen(QColor(MAGNET_LINES_COLOR), 1)
         pen.setStyle(QtCore.Qt.DashLine)
         qp.setPen(pen)
         mls = self.manager.get_magnet_lines()
