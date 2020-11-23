@@ -3,7 +3,6 @@ from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
 from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 
 from arrow_class import Arrow
-from settings import Settings
 from zero_dot import ZeroPointDotWidget
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 from settings_widget import SettingsWindow
@@ -197,21 +196,23 @@ class ObjectClass(QWidget):
         self.resize_angle.setStyleSheet("background-color: black")
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
                                                   name="Размер и расположение объекта")
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit, name="Размер",
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
+                                                  name="Размер",
                                                   standard_values=(
-                                                  self.size().width(), self.size().height()),
+                                                      self.size().width(), self.size().height()),
                                                   int_only=True,
                                                   default_values_to_return=(self.size().width(),
                                                                             self.size().height()),
                                                   call_back=(self.call_back_size_width,
                                                              self.call_back_size_height),
                                                   call_update_all=self.call_set_size)
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit, name="Положение",
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
+                                                  name="Положение",
                                                   standard_values=(self.x(), self.y()),
                                                   int_only=True,
                                                   default_values_to_return=(self.x(), self.y()),
                                                   call_back=(
-                                                  self.call_back_pos_x, self.call_back_pos_y),
+                                                      self.call_back_pos_x, self.call_back_pos_y),
                                                   call_update_all=self.call_set_pos)
         self.manager.settings_window.add_settings(self, SettingsWindow.Line)
         self.manager.settings_window.add_settings(self, SettingsWindow.Title, name="Текст")
@@ -221,7 +222,7 @@ class ObjectClass(QWidget):
                                                                    self.edit_line.get_text_size()),
                                                   int_only=True,
                                                   default_values_to_return=(
-                                                  True, self.edit_line.get_text_size()),
+                                                      True, self.edit_line.get_text_size()),
                                                   call_back=(self.call_back_text_auto,
                                                              self.call_back_text_size),
                                                   call_update_all=self.call_set_text_size)

@@ -4,6 +4,23 @@ from PyQt5.QtGui import QWheelEvent
 from utils import pass_f, isdig
 
 
+class BackButton(QtWidgets.QPushButton):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.text_field = QtWidgets.QLabel(self)
+
+    def setText(self, text: str) -> None:
+        self.text_field.setText(text)
+        self.text_field.adjustSize()
+        self.text_field.move(self.width() // 2 - self.text_field.width() // 2 - 1,
+                             self.height() // 2 - self.text_field.height() // 2 - 1)
+        self.update()
+
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(a0)
+        self.setText(self.text_field.text())
+
+
 class SettingsWindow(QtWidgets.QWidget):
     MENU_SIZE_X = 300
     STANDARD_SIZE = 300, 400
@@ -401,12 +418,36 @@ class SettingsWindow(QtWidgets.QWidget):
     def __init_ui__(self):
         self.widget = QtWidgets.QWidget(self)
         self.widget.setStyleSheet("background-color: white")
+        self.anim = QtCore.QPropertyAnimation(self, b"geometry")
+        self.anim.setDuration(300)
+        self.hide_menu_button = BackButton(self.parent())
+        self.hide_menu_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
+                                            "border-radius: 15%;}"
+                                            "QPushButton::hover {background-color: #eee}")
+        self.hide_menu_button.setText("→")
+        self.hide_menu_button.show()
+        self.hide_menu_button.clicked.connect(self.toggle_show)
         self.set_geometry()
 
     def set_geometry(self):
         self.setGeometry(self.parent().width() - self.MENU_SIZE_X, 0,
                          self.MENU_SIZE_X, self.parent().height())
         self.widget.setGeometry(0, 0, self.width(), self.height())
+        self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
+
+    def toggle_show(self):
+        if self.x() == self.parent().width():
+            self.move_animation((self.parent().width() - self.MENU_SIZE_X, 0))
+            self.hide_menu_button.setText("→")
+        else:
+            self.move_animation((self.parent().width(), 0))
+            self.hide_menu_button.setText("←")
+
+    def move_animation(self, end_pos):
+        self.anim.setStartValue(QtCore.QRect(self.x(), self.y(), self.width(), self.height()))
+        self.anim.setEndValue(QtCore.QRect(*end_pos, self.width(), self.height()))
+
+        self.anim.start()
 
     def add_settings(self, obj, sett,
                      name="",
@@ -451,6 +492,11 @@ class SettingsWindow(QtWidgets.QWidget):
         for _, sett in self.objects.values():
             if sett and not sett[0].isHidden():
                 [s.hide() for s in sett]
+        self.hide_menu_button.show()
 
     def mouseReleaseEvent(self, a0: QtGui.QMouseEvent) -> None:
         pass
+
+    def raise_(self) -> None:
+        super().raise_()
+        self.hide_menu_button.raise_()
