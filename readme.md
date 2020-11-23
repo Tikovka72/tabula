@@ -1,2 +1,2 @@
-# Shemer
-Приложение для составления схем вашего проекта
+# Tabula
+App for creating schemes
