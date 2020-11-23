@@ -112,7 +112,7 @@ class Core(QtWidgets.QWidget):
             self.manager.grid.regenerate_grid()
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() == QtCore.Qt.RightButton and self.hasFocus():
+        if event.button() == QtCore.Qt.RightButton:
             if self.manager.get_active_arrow():
                 self.manager.delete_arrow(self.manager.get_active_arrow())
                 self.manager.toggle_active_arrow()
@@ -125,8 +125,19 @@ class Core(QtWidgets.QWidget):
                     if -3 < check_on_arrow(x1, y1, x2, y2, x3, y3) < 3:
                         self.arrow_menu_show(arrow)
                         return
-            self.self_menu_show()
 
+            if self.hasFocus():
+                self.self_menu_show()
+        elif event.button() == QtCore.Qt.LeftButton:
+            for arrow in self.manager.get_all_arrows():
+                if arrow.start_pos and arrow.end_pos:
+                    x1, y1 = arrow.start_pos
+                    x2, y2 = arrow.end_pos
+                    x3, y3 = event.pos().x(), event.pos().y()
+                    if -3 < check_on_arrow(x1, y1, x2, y2, x3, y3) < 3:
+                        arrow.set_focus()
+                        return
+            self.manager.clear_focus_arrows()
         for widget in self.manager.get_all_widgets():
             widget.hide_angles()
         self.manager.clear_focus()
@@ -203,7 +214,7 @@ class Core(QtWidgets.QWidget):
         qp.setRenderHint(QPainter.Antialiasing)
         self.manager.grid.draw(qp)
         for arrow in self.manager.get_all_arrows():
-            qp.setPen(QPen(QColor(arrow.color), 2))
+            qp.setPen(QPen(QColor(arrow.get_color()), 2))
             end = self.manager.get_mouse_pos()
             arrow.draw(qp, end_pos=end)
         pen = QPen(QColor(MAGNET_LINES_COLOR), 1)

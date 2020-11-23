@@ -395,7 +395,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.objects = {parent: [0, []]}
+        self.objects = {parent: [1, []]}
         self.__init_ui__()
 
     def __init_ui__(self):
@@ -428,8 +428,8 @@ class SettingsWindow(QtWidgets.QWidget):
                                              call_update_all=call_update_all))
             self.objects[obj][0] += 1
         else:
-            self.objects[obj] = [1, [sett(self,
-                                          0,
+            self.objects[obj] = [2, [sett(self,
+                                          1,
                                           name=name,
                                           standard_values=standard_values,
                                           int_only=int_only,
@@ -451,3 +451,6 @@ class SettingsWindow(QtWidgets.QWidget):
         for _, sett in self.objects.values():
             if sett and not sett[0].isHidden():
                 [s.hide() for s in sett]
+
+    def mouseReleaseEvent(self, a0: QtGui.QMouseEvent) -> None:
+        pass

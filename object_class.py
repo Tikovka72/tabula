@@ -116,10 +116,13 @@ class LineEdit(QLineEdit):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
+            self.parent().manager.settings_window.hide_all_sett()
+            self.parent().manager.clear_focus()
+            self.parent().manager.clear_focus_arrows()
             self.parent().show_angles()
             self.parent().check_and_set_arrow()
             self.parent().hide_size_or_pos_label()
-            self.parent().manager.settings_window.hide_all_sett()
+
             self.parent().manager.settings_window.show_sett(self.parent())
 
     def self_menu_show(self):

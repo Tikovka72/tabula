@@ -15,6 +15,8 @@ class Arrow:
         self.color = color
         self.obj1 = None
         self.obj2 = None
+        self.selected = False
+        self.selected_color = "#aaaaaa"
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
 
@@ -110,6 +112,17 @@ class Arrow:
         s1 = int(end[0] + 20 * math.sin(ul - 40)), int(end[1] + 20 * math.cos(ul - 40))
         s2 = int(end[0] + 20 * math.sin(ul + 40)), int(end[1] + 20 * math.cos(ul + 40))
         return QLine(*s1, *end), QLine(*s2, *end)
+
+    def set_focus(self):
+        self.selected = True
+
+    def clear_focus(self):
+        self.selected = False
+
+    def get_color(self):
+        if self.selected:
+            return self.selected_color
+        return self.color
 
     def draw(self, qp: QPainter, end_pos=None):
         if self.end_pos:

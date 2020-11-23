@@ -351,4 +351,7 @@ class Manager:
         return x, y, widgets
 
     def clear_focus(self):
-        [w.clearFocus() for w in self.widgets]
+        [(w.clearFocus(), w.hide_angles()) for w in self.widgets]
+
+    def clear_focus_arrows(self):
+        [arr.clear_focus() for arr in self.arrows]
