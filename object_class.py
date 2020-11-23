@@ -6,6 +6,7 @@ from arrow_class import Arrow
 from settings import Settings
 from zero_dot import ZeroPointDotWidget
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
+from settings_widget import SettingsWindow
 
 
 class LineEdit(QLineEdit):
@@ -13,7 +14,7 @@ class LineEdit(QLineEdit):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.text_size_menu = 12     # px
+        self.text_size_menu = 12  # px
         self.border_radius = 5  # %
         self.border_size = 1
         self.text_size = None
@@ -41,7 +42,6 @@ class LineEdit(QLineEdit):
         self.menu.addAction("Дублировать объект", self.parent().copy_self)
         self.menu.addAction("На задний план", self.on_back)
         self.menu.addSeparator()
-        self.menu.addAction("Настройки", self.settings_show)
         self.menu.addAction("Добавить связь",
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
         line_menu = self.menu.addMenu("Добавить связь...")
@@ -119,6 +119,8 @@ class LineEdit(QLineEdit):
             self.parent().show_angles()
             self.parent().check_and_set_arrow()
             self.parent().hide_size_or_pos_label()
+            self.parent().manager.settings_window.hide_all_sett()
+            self.parent().manager.settings_window.show_sett(self.parent())
 
     def self_menu_show(self):
         self.menu.exec_(QCursor.pos())
@@ -128,9 +130,6 @@ class LineEdit(QLineEdit):
 
     def change_parent_mouse_pos(self, event: QMouseEvent):
         self.parent().change_parent_mouse_pos(event, need_offset=True)
-
-    def settings_show(self):
-        self.parent().settings_show()
 
     def resize(self, *size) -> None:
         super().resize(*size)
@@ -156,6 +155,7 @@ class ObjectClass(QWidget):
         if pos:
             self.move(*pos)
         self.__init_ui__()
+        self.manager.settings_window.raise_()
 
     def __init_ui__(self):
         self.resize(*self.STANDARD_SIZE)
@@ -192,46 +192,48 @@ class ObjectClass(QWidget):
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
         self.resize_angle.setStyleSheet("background-color: black")
-        self.settings = Settings(self, self.edit_line.text())
-        self.settings.add_settings(Settings.Title, name="Размер и расположение объекта")
-
-        self.settings.add_settings(Settings.SettTwoLineEdit, name="Размер",
-                                   standard_values=(self.size().width(), self.size().height()),
-                                   int_only=True,
-                                   default_values_to_return=(self.size().width(),
-                                                             self.size().height()),
-                                   call_back=(self.call_back_size_width, self.call_back_size_height),
-                                   call_update_all=self.call_set_size)
-        self.settings.add_settings(Settings.SettTwoLineEdit, name="Положение",
-                                   standard_values=(self.x(), self.y()),
-                                   int_only=True,
-                                   default_values_to_return=(self.x(), self.y()),
-                                   call_back=(self.call_back_pos_x, self.call_back_pos_y),
-                                   call_update_all=self.call_set_pos)
-        self.settings.add_settings(Settings.Line)
-        self.settings.add_settings(Settings.Title, name="Текст")
-        self.settings.add_settings(Settings.SettCheckboxLineEdit, name="Размер шрифта",
-                                   standard_values=(("Авто", True),
-                                                    self.edit_line.get_text_size()),
-                                   int_only=True,
-                                   default_values_to_return=(True, self.edit_line.get_text_size()),
-                                   call_back=(self.call_back_text_auto, self.call_back_text_size),
-                                   call_update_all=self.call_set_text_size)
-        self.settings.add_settings(Settings.Line)
-        self.settings.add_settings(Settings.Title, name="Рамка")
-        self.settings.add_settings(Settings.SettTwoLineEdit, name="Размер и радиус рамки",
-                                   standard_values=self.edit_line.get_border(),
-                                   int_only=True,
-                                   default_values_to_return=(0, 1),
-                                   call_back=(self.call_back_border_size,
-                                              self.call_back_border_radius),
-                                   call_update_all=self.call_set_border)
-        self.settings.add_settings(Settings.Line)
-
-        self.settings.add_settings(Settings.Title, name="Линии")
-
-    def settings_show(self):
-        self.settings.show()
+        self.manager.settings_window.add_settings(self, SettingsWindow.Title,
+                                                  name="Размер и расположение объекта")
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit, name="Размер",
+                                                  standard_values=(
+                                                  self.size().width(), self.size().height()),
+                                                  int_only=True,
+                                                  default_values_to_return=(self.size().width(),
+                                                                            self.size().height()),
+                                                  call_back=(self.call_back_size_width,
+                                                             self.call_back_size_height),
+                                                  call_update_all=self.call_set_size)
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit, name="Положение",
+                                                  standard_values=(self.x(), self.y()),
+                                                  int_only=True,
+                                                  default_values_to_return=(self.x(), self.y()),
+                                                  call_back=(
+                                                  self.call_back_pos_x, self.call_back_pos_y),
+                                                  call_update_all=self.call_set_pos)
+        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.manager.settings_window.add_settings(self, SettingsWindow.Title, name="Текст")
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckboxLineEdit,
+                                                  name="Размер шрифта",
+                                                  standard_values=(("Авто", True),
+                                                                   self.edit_line.get_text_size()),
+                                                  int_only=True,
+                                                  default_values_to_return=(
+                                                  True, self.edit_line.get_text_size()),
+                                                  call_back=(self.call_back_text_auto,
+                                                             self.call_back_text_size),
+                                                  call_update_all=self.call_set_text_size)
+        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.manager.settings_window.add_settings(self, SettingsWindow.Title, name="Рамка")
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
+                                                  name="Размер и радиус рамки",
+                                                  standard_values=self.edit_line.get_border(),
+                                                  int_only=True,
+                                                  default_values_to_return=(0, 1),
+                                                  call_back=(self.call_back_border_size,
+                                                             self.call_back_border_radius),
+                                                  call_update_all=self.call_set_border)
+        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.manager.settings_window.show_sett(self)
 
     def return_to_fact_pos(self):
         self.move_animation((self.x() - self.zero_dot.get_pos()[0] + self.zero_dot.zero[0],
@@ -317,6 +319,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{x}x{y}")
         self.update_arrows()
+        self.manager.settings_window.update_obj_settings(self)
 
     def move_event(self, x, y, show_pos=True):
         self.move(x, y)
@@ -324,6 +327,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0] + self.width() // 2} "
                                        f"{y - self.zero_dot.get_pos()[1] + self.height() // 2}")
+        self.manager.settings_window.update_obj_settings(self)
 
     def moveEvent(self, a0) -> None:
         self.move(a0.pos().x(), a0.pos().y())

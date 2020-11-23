@@ -25,8 +25,8 @@ class Core(QtWidgets.QWidget):
         self.resize(*self.STANDARD_SIZE)
         self.showMaximized()
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.setStyleSheet("background-color: white; "
-                           "QPushButton {border: 1px solid white; border-radius: 5%}")
+        self.setObjectName("core")
+        self.setStyleSheet("QWidget#core {background-color: white}")
         self.setFocus()
 
     def resizeEvent(self, a0) -> None:
@@ -46,6 +46,7 @@ class Core(QtWidgets.QWidget):
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
         self.manager.grid.change_grid_size(a0.size().width(), a0.size().height())
+        self.manager.settings_window.set_geometry()
 
     def self_menu_show(self):
         pos = self.manager.get_mouse_pos()
@@ -72,7 +73,7 @@ class Core(QtWidgets.QWidget):
         context_menu.exec_(QtGui.QCursor.pos())
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.buttons() == QtCore.Qt.RightButton:
+        if event.buttons() == QtCore.Qt.LeftButton and self.hasFocus():
             x, y = self.manager.get_mouse_pos()
             [widget.move_event(
                 widget.x() + (event.pos().x() - x), widget.y() +
@@ -111,7 +112,7 @@ class Core(QtWidgets.QWidget):
             self.manager.grid.regenerate_grid()
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.button() == QtCore.Qt.RightButton:
+        if event.button() == QtCore.Qt.RightButton and self.hasFocus():
             if self.manager.get_active_arrow():
                 self.manager.delete_arrow(self.manager.get_active_arrow())
                 self.manager.toggle_active_arrow()
@@ -128,13 +129,18 @@ class Core(QtWidgets.QWidget):
 
         for widget in self.manager.get_all_widgets():
             widget.hide_angles()
+        self.manager.clear_focus()
         self.setFocus()
+        self.manager.settings_window.hide_all_sett()
 
     def dragEnterEvent(self, event):
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
         if 0 <= x <= event.source().OFFSET + 5 and 0 <= y <= event.source().OFFSET + 5:
             self.manager.set_dor(DRAG)
             event.source().show_size_or_pos_label()
+            event.source().show_angles()
+            self.manager.settings_window.hide_all_sett()
+            self.manager.settings_window.show_sett(event.source())
         elif event.source().size().width() - event.source().OFFSET - 5 \
                 <= x <= \
                 event.source().size().width() + 5 and \
@@ -143,6 +149,9 @@ class Core(QtWidgets.QWidget):
                 event.source().size().height() + 5:
             self.manager.set_dor(RESIZE)
             event.source().show_size_or_pos_label()
+            event.source().show_angles()
+            self.manager.settings_window.hide_all_sett()
+            self.manager.settings_window.show_sett(event.source())
 
         event.accept()
 

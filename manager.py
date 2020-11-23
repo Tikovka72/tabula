@@ -5,6 +5,7 @@ from zero_dot import ZeroPointDotWidget
 from grid import Grid
 from object_class import ObjectClass
 from mouse import Mouse
+from settings_widget import SettingsWindow
 
 
 class Manager:
@@ -24,7 +25,7 @@ class Manager:
         self.grid = Grid(show=True, core_size=(self.core.width(), self.core.height()),
                          zero_pos=self.zero_point_dot)
         self.mouse = Mouse()
-        # self.core.showMaximized()
+        self.settings_window = SettingsWindow(self.core)
 
     def add_widget(self, pos=None, widget=None):
         if widget is None:
@@ -348,3 +349,6 @@ class Manager:
                 self.grid.add_line_to_special_lines(y_right)
 
         return x, y, widgets
+
+    def clear_focus(self):
+        [w.clearFocus() for w in self.widgets]
