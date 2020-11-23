@@ -4,15 +4,19 @@ from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
 from numpy import arctan2
 
+from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
+
 
 class Arrow:
-    def __init__(self, start_pos=None, end_pos=None, color="#000000", need_arrow=False):
+    def __init__(self, start_pos=None, end_pos=None, color="#000000", need_arrow=False,
+                 arrow_type=FROM_AND_TO_NEAREST_LINE):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
         self.obj1 = None
         self.obj2 = None
         self.need_arrow = need_arrow
+        self.arrow_type = arrow_type
 
     def get_data_about_object1(self):
         if not self.obj1:
@@ -39,10 +43,7 @@ class Arrow:
         right_dot2 = x2 + width2, y2 + height2 // 2
         return width2, height2, x2, y2, up_dot2, bottom_dot2, left_dot2, right_dot2
 
-    def set_start_and_end_pos_by_obj(self):
-        if not (self.obj1 and self.obj2):
-            return
-
+    def set_start_and_end_ntn(self):
         width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
             self.get_data_about_object1()
         width2, height2, x2, y2, up_dot2, bottom_dot2, left_dot2, right_dot2 = \
@@ -65,19 +66,39 @@ class Arrow:
         self.start_pos, self.end_pos = dots_min
         return dots_min
 
+    def set_start_and_end_ctc(self):
+        center1 = self.obj1.x() + self.obj1.width() // 2, self.obj1.y() + self.obj1.height() // 2
+        center2 = self.obj2.x() + self.obj2.width() // 2, self.obj2.y() + self.obj2.height() // 2
+        self.start_pos, self.end_pos = center1, center2
+        return center1, center2
+
+    def set_start_and_end_pos_by_obj(self):
+        if not (self.obj1 and self.obj2):
+            return
+        return ARROW_TYPES[self.arrow_type]["set_sae"](self)
+
+    def get_start_and_end_ntn(self, end_pos: tuple):
+        width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
+            self.get_data_about_object1()
+        min_ = float("inf")
+        dots_min = (0, 0), (0, 0)
+        for start_pos in [up_dot1, bottom_dot1, left_dot1, right_dot1]:
+            distance = ((end_pos[0] - start_pos[0]) ** 2 +
+                        (end_pos[1] - start_pos[1]) ** 2) ** 0.5
+            if distance < min_:
+                min_ = distance
+                dots_min = start_pos, end_pos
+        return dots_min
+
+    def get_start_and_end_ctc(self, end_pos: tuple):
+        center1 = self.obj1.x() + self.obj1.width() // 2, \
+                  self.obj1.y() + self.obj1.height() // 2
+        return center1, end_pos
+
     def get_start_pos_and_end_pos_by_end_pos(self, end_pos: tuple):
         if self.obj1:
-            width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
-                self.get_data_about_object1()
-            min_ = float("inf")
-            dots_min = (0, 0), (0, 0)
-            for start_pos in [up_dot1, bottom_dot1, left_dot1, right_dot1]:
-                distance = ((end_pos[0] - start_pos[0]) ** 2 +
-                            (end_pos[1] - start_pos[1]) ** 2) ** 0.5
-                if distance < min_:
-                    min_ = distance
-                    dots_min = start_pos, end_pos
-            return dots_min
+            return ARROW_TYPES[self.arrow_type]["get_saebep"](self, end_pos)
+        return (0, 0), (0, 0)
 
     def create_arrow(self, end_pos=None):
         if self.start_pos:
@@ -102,3 +123,11 @@ class Arrow:
             if self.need_arrow:
                 ar1, ar2 = self.create_arrow(end_pos=end_pos)
                 qp.drawLines(ar1, ar2)
+
+
+ARROW_TYPES = {
+    FROM_AND_TO_CENTER: {"set_sae": Arrow.set_start_and_end_ctc,
+                         "get_saebep": Arrow.get_start_and_end_ctc},
+    FROM_AND_TO_NEAREST_LINE: {"set_sae": Arrow.set_start_and_end_ntn,
+                               "get_saebep": Arrow.get_start_and_end_ntn},
+}

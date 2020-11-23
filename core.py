@@ -72,7 +72,7 @@ class Core(QtWidgets.QWidget):
         context_menu.exec_(QtGui.QCursor.pos())
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
-        if event.buttons() == QtCore.Qt.LeftButton:
+        if event.buttons() == QtCore.Qt.RightButton:
             x, y = self.manager.get_mouse_pos()
             [widget.move_event(
                 widget.x() + (event.pos().x() - x), widget.y() +

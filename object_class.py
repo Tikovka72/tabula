@@ -5,6 +5,7 @@ from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 from arrow_class import Arrow
 from settings import Settings
 from zero_dot import ZeroPointDotWidget
+from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 
 
 class LineEdit(QLineEdit):
@@ -35,12 +36,19 @@ class LineEdit(QLineEdit):
         self.customContextMenuRequested.connect(self.self_menu_show)
         self.menu = QMenu(self)
         self.menu.addAction("Копировать текст", self.copy, shortcut="Ctrl+C")
+        self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
+        self.menu.addSeparator()
         self.menu.addAction("Дублировать объект", self.parent().copy_self)
         self.menu.addAction("На задний план", self.on_back)
+        self.menu.addSeparator()
         self.menu.addAction("Настройки", self.settings_show)
-        self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
-        self.menu.addAction("Добавить связь", self.parent().add_arrow_f)
+        self.menu.addAction("Добавить связь",
+                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
+        line_menu = self.menu.addMenu("Добавить связь...")
+        line_menu.addAction("от центра до центра",
+                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
         self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
+        self.menu.addSeparator()
         self.menu.addAction("Удалить", self.parent().del_self)
         self.menu.setStyleSheet(
             "QMenu {"
@@ -346,8 +354,8 @@ class ObjectClass(QWidget):
             self.manager.toggle_active_arrow()
             arrow.set_start_and_end_pos_by_obj()
 
-    def add_arrow_f(self, need_arrow=False):
-        arrow = Arrow(need_arrow=need_arrow)
+    def add_arrow_f(self, need_arrow=False, arrow_type=FROM_AND_TO_NEAREST_LINE):
+        arrow = Arrow(need_arrow=need_arrow, arrow_type=arrow_type)
         self.manager.toggle_active_arrow(arrow)
         self.manager.add_arrow(arrow)
         self.manager.set_obj1_arrow(arrow, self)
