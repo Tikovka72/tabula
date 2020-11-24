@@ -26,7 +26,7 @@ class Grid:
         lines_x = []
         lines_y = []
         for x in range(self.offset_x, self.core_size[0] + 1, self.step):
-            lines_y.append(QtCore.QLine(x, 0, x, self.core_size[0]))
+            lines_y.append(QtCore.QLine(x, 0, x, self.core_size[1]))
         for y in range(self.offset_y, self.core_size[1] + 1, self.step):
             lines_x.append(QtCore.QLine(0, y, self.core_size[0], y))
         return {"x": lines_x, "y": lines_y}
