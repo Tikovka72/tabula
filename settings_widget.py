@@ -434,7 +434,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.objects = {parent: [1, []]}
+        self.objects = {parent: [2, []]}
         self.show_ = True
         self.__init_ui__()
 
@@ -499,8 +499,8 @@ class SettingsWindow(QtWidgets.QWidget):
                                              call_update_all=call_update_all))
             self.objects[obj][0] += 1
         else:
-            self.objects[obj] = [2, [sett(self,
-                                          1,
+            self.objects[obj] = [3, [sett(self,
+                                          2,
                                           name=name,
                                           standard_values=standard_values,
                                           int_only=int_only,
