@@ -52,3 +52,4 @@ class ZeroDotAndGridAnimation(QtCore.QPropertyAnimation):
         if self.manager.grid.show:
             self.manager.grid.set_offset_by_zero_point()
             self.manager.grid.regenerate_grid()
+            self.manager.settings_window.update_obj_settings(self.manager.core)

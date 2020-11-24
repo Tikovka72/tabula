@@ -19,3 +19,11 @@ def check_on_arrow(x1, y1, x2, y2, x3, y3):
 
 def pass_f(*args, **kwargs):
     _ = args, kwargs
+
+
+def test(func):
+    def func_start_and_stop(*args, **kwargs):
+        print(f"start {func}")
+        func(*args, **kwargs)
+        print(f"end {func}")
+    return func_start_and_stop

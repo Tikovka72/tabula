@@ -33,6 +33,8 @@ class Manager:
                                  zero_dot=self.zero_point_dot)
         widget.show()
         self.widgets[widget] = {"in": [], "out": []}
+        self.settings_window.hide_all_sett()
+        self.settings_window.show_sett(widget)
 
     def add_arrow(self, arrow):
         self.arrows[arrow] = {"obj1": arrow.obj1, "obj2": arrow.obj2}

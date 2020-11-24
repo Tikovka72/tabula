@@ -244,7 +244,8 @@ class SettingsWindow(QtWidgets.QWidget):
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
                      call_back: tuple = tuple(),
-                     call_update_all=None):
+                     call_update_all=None,
+                     lock_line_edit=True):
             super().__init__(parent)
             self.parent = parent
             self.n = n
@@ -256,6 +257,7 @@ class SettingsWindow(QtWidgets.QWidget):
                 len(default_values_to_return) == self.VALUES_N else (None, None)
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
+            self.lock_line_edit = lock_line_edit
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -290,15 +292,16 @@ class SettingsWindow(QtWidgets.QWidget):
             self.value2.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value2.height() // 2)
             self.value2.textChanged.connect(self.value2_changed)
-            if self.value1:
+            if self.value1 and self.lock_line_edit:
                 self.value2.setEnabled(False)
             self.show()
 
         def value1_changed(self):
-            if self.value1.isChecked():
-                self.value2.setEnabled(False)
-            else:
-                self.value2.setEnabled(True)
+            if self.lock_line_edit:
+                if self.value1.isChecked():
+                    self.value2.setEnabled(False)
+                else:
+                    self.value2.setEnabled(True)
             if self.call_back[0]:
                 self.call_back[0](self.value1_get())
 
@@ -306,7 +309,7 @@ class SettingsWindow(QtWidgets.QWidget):
             new_value2 = "".join([i if (i.isdigit() if self.int_only else True)
                                   else "" for i in self.value2.text()])
             self.value2_set(new_value2)
-            if self.call_back[1] and not self.value1_get():
+            if self.call_back[1] and (not self.value1_get() and self.lock_line_edit or True):
                 self.call_back[1](self.value2_get())
 
         def value1_get(self):
@@ -344,6 +347,13 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.value2.setText(
                     str(int(self.value2.text() if self.value2.text() else
                             self.standard_values[1]) + p))
+
+        def update(self) -> None:
+            super().update()
+            if self.call_update_all:
+                value1, value2 = self.call_update_all()
+                self.value1_set(value1)
+                self.value2_set(value2)
 
     class SettOneLineEdit(QtWidgets.QWidget):
         VALUES_N = 1
@@ -486,7 +496,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      int_only=False,
                      default_values_to_return=tuple(),
                      call_back=tuple(),
-                     call_update_all=None):
+                     call_update_all=None, **kwargs):
         if obj in self.objects:
             self.objects[obj][1].append(sett(self,
                                              self.objects[obj][0],
@@ -496,7 +506,7 @@ class SettingsWindow(QtWidgets.QWidget):
                                              size=size,
                                              default_values_to_return=default_values_to_return,
                                              call_back=call_back,
-                                             call_update_all=call_update_all))
+                                             call_update_all=call_update_all, **kwargs))
             self.objects[obj][0] += 1
         else:
             self.objects[obj] = [3, [sett(self,
@@ -507,7 +517,7 @@ class SettingsWindow(QtWidgets.QWidget):
                                           size=size,
                                           default_values_to_return=default_values_to_return,
                                           call_back=call_back,
-                                          call_update_all=call_update_all)]]
+                                          call_update_all=call_update_all, **kwargs)]]
 
     def show_sett(self, obj) -> None:
         for sett in self.objects[obj][1]:
