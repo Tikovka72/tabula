@@ -4,10 +4,32 @@ from PyQt5.QtGui import QWheelEvent
 from utils import pass_f, isdig
 
 
+class Label(QtWidgets.QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        effect = QtWidgets.QGraphicsColorizeEffect(self)
+        self.setGraphicsEffect(effect)
+        self.color = ((0, 0, 0), (255, 255, 255))
+        self.color_selected = 0
+        self.anim = QtCore.QPropertyAnimation(effect, b"color")
+        self.anim.setDuration(300)
+
+    def change_color(self):
+        self.anim.setStartValue(QtGui.QColor(*self.color[self.color_selected]))
+        self.anim.setEndValue(QtGui.QColor(*self.color[abs(self.color_selected - 1)]))
+        self.color_selected = abs(self.color_selected - 1)
+        self.anim.start()
+
+    def setText(self, a0: str) -> None:
+        self.change_color()
+        super().setText(a0)
+        self.change_color()
+
+
 class BackButton(QtWidgets.QPushButton):
     def __init__(self, parent):
         super().__init__(parent)
-        self.text_field = QtWidgets.QLabel(self)
+        self.text_field = Label(self)
 
     def setText(self, text: str) -> None:
         self.text_field.setText(text)
@@ -413,6 +435,7 @@ class SettingsWindow(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.objects = {parent: [1, []]}
+        self.show_ = True
         self.__init_ui__()
 
     def __init_ui__(self):
@@ -430,10 +453,16 @@ class SettingsWindow(QtWidgets.QWidget):
         self.set_geometry()
 
     def set_geometry(self):
-        self.setGeometry(self.parent().width() - self.MENU_SIZE_X, 0,
-                         self.MENU_SIZE_X, self.parent().height())
-        self.widget.setGeometry(0, 0, self.width(), self.height())
-        self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
+        if self.show_:
+            self.setGeometry(self.parent().width() - self.MENU_SIZE_X, 0,
+                             self.MENU_SIZE_X, self.parent().height())
+            self.widget.setGeometry(0, 0, self.width(), self.height())
+            self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
+        else:
+            self.setGeometry(self.parent().width(), 0,
+                             self.MENU_SIZE_X, self.parent().height())
+            self.widget.setGeometry(0, 0, self.width(), self.height())
+            self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
 
     def toggle_show(self):
         if self.x() == self.parent().width():
@@ -442,6 +471,7 @@ class SettingsWindow(QtWidgets.QWidget):
         else:
             self.move_animation((self.parent().width(), 0))
             self.hide_menu_button.setText("←")
+        self.show_ = not self.show_
 
     def move_animation(self, end_pos):
         self.anim.setStartValue(QtCore.QRect(self.x(), self.y(), self.width(), self.height()))
