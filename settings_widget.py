@@ -327,10 +327,10 @@ class SettingsWindow(QtWidgets.QWidget):
 
         def value1_set(self, value):
             if value:
-                if not self.value1:
+                if not self.value1.isChecked():
                     self.value1.toggle()
             else:
-                if self.value1:
+                if self.value1.isChecked():
                     self.value1.toggle()
 
         def value2_set(self, value):

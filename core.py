@@ -142,11 +142,13 @@ class Core(QtWidgets.QWidget):
                 show_pos=False
             )
                 for widget in self.manager.get_all_widgets()]
-            grid_offset = self.manager.grid.get_offset()
-            self.manager.grid.change_offset(
-                (grid_offset[0] + (event.pos().x() - x)) % self.manager.grid.get_step(),
-                (grid_offset[1] + (event.pos().y() - y)) % self.manager.grid.get_step())
-            self.manager.grid.regenerate_grid()
+
+            if self.manager.grid.show:
+                grid_offset = self.manager.grid.get_offset()
+                self.manager.grid.change_offset(
+                    (grid_offset[0] + (event.pos().x() - x)) % self.manager.grid.get_step(),
+                    (grid_offset[1] + (event.pos().y() - y)) % self.manager.grid.get_step())
+                self.manager.grid.regenerate_grid()
             self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.x() +
                                                    (event.pos().x() - x),
                                                    self.manager.zero_point_dot.y() +
