@@ -4,12 +4,17 @@ from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
 from numpy import arctan2
 
+from settings_widget import SettingsWindow
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 
 
 class Arrow:
-    def __init__(self, start_pos=None, end_pos=None, color="#000000", need_arrow=False,
+    def __init__(self, manager=None, start_pos=None, end_pos=None, color="#000000",
+                 need_arrow=False,
                  arrow_type=FROM_AND_TO_NEAREST_LINE):
+        if not manager:
+            exit(1)
+        self.manager = manager
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
@@ -19,6 +24,8 @@ class Arrow:
         self.selected_color = "#aaaaaa"
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
+        self.manager.settings_window.add_settings(self, SettingsWindow.Title,
+                                                  name="Положение стрелки")
 
     def get_data_about_object1(self):
         if not self.obj1:
@@ -115,6 +122,8 @@ class Arrow:
 
     def set_focus(self):
         self.selected = True
+        self.manager.settings_window.hide_all_sett()
+        self.manager.settings_window.show_sett(self)
 
     def clear_focus(self):
         self.selected = False

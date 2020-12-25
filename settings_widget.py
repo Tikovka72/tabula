@@ -123,6 +123,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size: tuple,
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
+                     min_max_values: tuple = tuple(),
                      call_back: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent)
@@ -136,6 +137,7 @@ class SettingsWindow(QtWidgets.QWidget):
                 len(default_values_to_return) == self.VALUES_N else (pass_f, pass_f)
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
+            self.min_max_values = min_max_values
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -168,6 +170,11 @@ class SettingsWindow(QtWidgets.QWidget):
             new_value1 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
                                           if self.int_only else True)
                                   else "" for i, sym in enumerate(self.value1.text())])
+            if self.int_only:
+                if self.min_max_values:
+                    if not self.min_max_values[0][0] <= int(new_value1) <= self.min_max_values[0][1]:
+                        print(123)
+                        new_value1 = str(self.standard_values[0])
             self.value1.setText(new_value1)
             if self.call_back[0]:
                 self.call_back[0](self.value1_get())
@@ -176,6 +183,10 @@ class SettingsWindow(QtWidgets.QWidget):
             new_value2 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
                                           if self.int_only else True)
                                   else "" for i, sym in enumerate(self.value2.text())])
+            if self.int_only:
+                if self.min_max_values:
+                    if not self.min_max_values[1][0] <= int(new_value2) <= self.min_max_values[1][1]:
+                        new_value2 = str(self.standard_values[1])
             self.value2.setText(new_value2)
             if self.call_back[1]:
                 self.call_back[1](self.value2_get())

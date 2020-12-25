@@ -363,7 +363,7 @@ class ObjectClass(QWidget):
             arrow.set_start_and_end_pos_by_obj()
 
     def add_arrow_f(self, need_arrow=False, arrow_type=FROM_AND_TO_NEAREST_LINE):
-        arrow = Arrow(need_arrow=need_arrow, arrow_type=arrow_type)
+        arrow = Arrow(manager=self.manager, need_arrow=need_arrow, arrow_type=arrow_type)
         self.manager.toggle_active_arrow(arrow)
         self.manager.add_arrow(arrow)
         self.manager.set_obj1_arrow(arrow, self)
