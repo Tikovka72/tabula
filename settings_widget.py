@@ -381,6 +381,81 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.value1_set(value1)
                 self.value2_set(value2)
 
+    class SettCheckbox(QtWidgets.QWidget):
+        VALUES_N = 1
+        SIZE = (450, 20)
+        OFFSET = 10
+        FIELDS_SIZE = 50, 20
+        STANDARD_SIZE = 150, 40
+
+        def __init__(self, parent,
+                     n: int,
+                     name: str,
+                     standard_values: tuple,
+                     size: tuple,
+                     int_only: bool,
+                     default_values_to_return: tuple = tuple(),
+                     call_back: tuple = tuple(),
+                     call_update_all=None):
+            super().__init__(parent)
+            self.parent = parent
+            self.n = n
+            self.name = name
+            self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
+            self.size = size
+            self.default_values_to_return = default_values_to_return if \
+                len(default_values_to_return) == self.VALUES_N else (None, None)
+            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
+            self.call_update_all = call_update_all
+            self.__init_ui__()
+
+        def __init_ui__(self):
+            self.resize(*self.size)
+            self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
+                      + self.SIZE[1] * self.n)
+            self.text = QtWidgets.QLabel(self)
+            self.text.setText(str(self.name))
+            self.text.adjustSize()
+            self.text.move(self.OFFSET, self.height() // 2 - self.text.height() // 2)
+
+            value1 = (None, None)
+            if self.standard_values:
+                value1 = self.standard_values[0]
+            self.value1 = QtWidgets.QCheckBox(self)
+            self.value1.resize(*self.FIELDS_SIZE)
+            self.value1.setText(str(value1[0]))
+            if value1[1]:
+                if not self.value1.isChecked():
+                    self.value1.toggle()
+            else:
+                if self.value1.isChecked():
+                    self.value1.toggle()
+            self.value1.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
+                             self.height() // 2 - self.value1.height() // 2)
+            self.value1.stateChanged.connect(self.value1_changed)
+            self.show()
+
+        def value1_changed(self):
+            if self.call_back[0]:
+                self.call_back[0](self.value1_get())
+
+        def value1_get(self):
+            return self.value1.isChecked()
+
+        def value1_set(self, value):
+            if value:
+                if not self.value1.isChecked():
+                    self.value1.toggle()
+            else:
+                if self.value1.isChecked():
+                    self.value1.toggle()
+
+        def update(self) -> None:
+            super().update()
+            if self.call_update_all:
+                value1 = self.call_update_all()
+                self.value1_set(value1)
+
     class SettOneLineEdit(QtWidgets.QWidget):
         VALUES_N = 1
         SIZE = (450, 20)

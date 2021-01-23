@@ -297,12 +297,13 @@ class Core(QtWidgets.QWidget):
         self.update()
 
 
-if __name__ == "__main__":
-    try:
-        app = QtWidgets.QApplication(sys.argv)
-        tabula_app = Core()
-        tabula_app.show()
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
-        sys.exit(app.exec())
-    except Exception as e:
-        print(e)
+
+if __name__ == "__main__":
+    sys.excepthook = except_hook
+    app = QtWidgets.QApplication(sys.argv)
+    tabula_app = Core()
+    tabula_app.show()
+    sys.exit(app.exec())

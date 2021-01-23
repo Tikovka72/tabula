@@ -45,7 +45,19 @@ class Arrow:
                                                   call_back=(self.call_back_x2,
                                                              self.call_back_y2),
                                                   call_update_all=self.call_set_xy2)
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckbox,
+                                                  name="Стрелка",
+                                                  standard_values=(("вкл", True), ),
+                                                  default_values_to_return=(True, ),
+                                                  call_back=(self.call_back_arrow, ),
+                                                  call_update_all=self.call_set_arrow)
         self.manager.settings_window.show_sett(self)
+
+    def call_back_arrow(self, need):
+        self.need_arrow = need
+
+    def call_set_arrow(self):
+        return self.need_arrow
 
     def call_back_x1(self, x1):
         if not self.start_pos or not self.obj1:
