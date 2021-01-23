@@ -1,4 +1,4 @@
-﻿from PyQt5 import QtWidgets, QtGui, QtCore
+﻿from PyQt5 import QtWidgets, QtGui, QtCore, sip
 from PyQt5.QtGui import QWheelEvent
 
 from utils import pass_f, isdig
@@ -41,6 +41,15 @@ class BackButton(QtWidgets.QPushButton):
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
         super().resizeEvent(a0)
         self.setText(self.text_field.text())
+
+
+class SettingsLineEdit(QtWidgets.QLineEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def focusOutEvent(self, a0: QtGui.QFocusEvent) -> None:
+        super().focusOutEvent(a0)
+        self.parent().value_changed(self)
 
 
 class SettingsWindow(QtWidgets.QWidget):
@@ -152,18 +161,16 @@ class SettingsWindow(QtWidgets.QWidget):
             value1 = value2 = None
             if self.standard_values:
                 value1, value2 = self.standard_values
-            self.value1 = QtWidgets.QLineEdit(self)
+            self.value1 = SettingsLineEdit(self)
             self.value1.resize(*self.FIELDS_SIZE)
             self.value1.setText(str(value1))
             self.value1.move(self.width() - self.FIELDS_SIZE[0] * 2 - self.OFFSET * 2,
                              self.height() // 2 - self.value1.height() // 2)
-            self.value1.textChanged.connect(self.value1_changed)
-            self.value2 = QtWidgets.QLineEdit(self)
+            self.value2 = SettingsLineEdit(self)
             self.value2.resize(*self.FIELDS_SIZE)
             self.value2.setText(str(value2))
             self.value2.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value2.height() // 2)
-            self.value2.textChanged.connect(self.value2_changed)
             self.show()
 
         def value1_changed(self):
@@ -173,11 +180,17 @@ class SettingsWindow(QtWidgets.QWidget):
             if self.int_only:
                 if self.min_max_values:
                     if not self.min_max_values[0][0] <= int(new_value1) <= self.min_max_values[0][1]:
-                        print(123)
                         new_value1 = str(self.standard_values[0])
             self.value1.setText(new_value1)
-            if self.call_back[0]:
+            if self.call_back[0] and new_value1:
+                print(123)
                 self.call_back[0](self.value1_get())
+
+        def value_changed(self, sender):
+            if self.value1 is sender:
+                self.value1_changed()
+            elif self.value2 is sender:
+                self.value2_changed()
 
         def value2_changed(self):
             new_value2 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
@@ -235,10 +248,12 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.value1.setText(
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
+                self.value1_changed()
             elif self.value2.underMouse():
                 self.value2.setText(
                     str(int(self.value2.text() if self.value2.text() else
                             self.standard_values[1]) + p))
+                self.value2_changed()
 
     class SettCheckboxLineEdit(QtWidgets.QWidget):
         VALUES_N = 2
@@ -540,13 +555,15 @@ class SettingsWindow(QtWidgets.QWidget):
             sett.update()
 
     def hide_all_sett(self):
-        for _, sett in self.objects.values():
-            if sett and not sett[0].isHidden():
+        for obj, (_, sett) in self.objects.items():
+            if sett:
                 [s.hide() for s in sett]
+            if type(type(obj)) == sip.wrappertype:
+                obj.clearFocus()
         self.hide_menu_button.show()
 
     def mouseReleaseEvent(self, a0: QtGui.QMouseEvent) -> None:
-        pass
+        self.setFocus()
 
     def raise_(self) -> None:
         super().raise_()

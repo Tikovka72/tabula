@@ -16,6 +16,8 @@ class Arrow:
             exit(1)
         self.manager = manager
         self.start_pos = start_pos
+        self.start_pos_by_obj = (0, 0)
+        self.end_pos_by_obj = (0, 0)
         self.end_pos = end_pos
         self.color = color
         self.obj1 = None
@@ -24,6 +26,7 @@ class Arrow:
         self.selected_color = "#aaaaaa"
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
+        self.manager.settings_window.hide_all_sett()
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
                                                   name="Положение стрелки")
         self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
@@ -42,36 +45,58 @@ class Arrow:
                                                   call_back=(self.call_back_x2,
                                                              self.call_back_y2),
                                                   call_update_all=self.call_set_xy2)
+        self.manager.settings_window.show_sett(self)
 
     def call_back_x1(self, x1):
         if not self.start_pos or not self.obj1:
             return
-        self.start_pos = x1 + self.obj1.x(), self.start_pos[1]
+        if -(self.obj1.size().width() // 2) >= x1:
+            x1 = -(self.obj1.size().width() // 2)
+        elif self.obj1.size().width() // 2 <= x1:
+            x1 = self.obj1.size().width() // 2
+
+        self.start_pos_by_obj = x1, self.start_pos_by_obj[1]
+        self.set_start_and_end()
 
     def call_back_y1(self, y1):
         if not self.start_pos or not self.obj1:
             return
-        self.start_pos = self.start_pos[0], y1 + self.obj1.y()
+        if -(self.obj1.size().height() // 2) >= y1:
+            y1 = -(self.obj1.size().height() // 2)
+        elif self.obj1.size().height() // 2 <= y1:
+            y1 = self.obj1.size().height() // 2
+        self.start_pos_by_obj = self.start_pos_by_obj[0], y1
+        self.set_start_and_end()
 
     def call_back_x2(self, x2):
         if not self.end_pos or not self.obj2:
             return
-        self.end_pos = x2 + self.obj2.x(), self.end_pos[1]
+        if -(self.obj2.size().width() // 2) >= x2:
+            x2 = -(self.obj2.size().width() // 2)
+        elif self.obj2.size().width() // 2 <= x2:
+            x2 = self.obj2.size().width() // 2
+        self.end_pos_by_obj = x2, self.end_pos_by_obj[1]
+        self.set_start_and_end()
 
     def call_back_y2(self, y2):
         if not self.end_pos or not self.obj2:
             return
-        self.end_pos = self.end_pos[0], y2 + self.obj2.y()
+        if -(self.obj2.size().height() // 2) >= y2:
+            y2 = -(self.obj2.size().height() // 2)
+        elif self.obj2.size().height() // 2 <= y2:
+            y2 = self.obj2.size().height() // 2
+        self.end_pos_by_obj = self.end_pos_by_obj[0], y2
+        self.set_start_and_end()
 
     def call_set_xy1(self):
         if not self.start_pos or not self.obj1:
             return 0, 0
-        return self.start_pos[0] - self.obj1.x(), self.start_pos[1] - self.obj1.y()
+        return self.start_pos_by_obj
 
     def call_set_xy2(self):
         if not self.end_pos or not self.obj2:
             return 0, 0
-        return self.end_pos[0] - self.obj2.x(), self.end_pos[1] - self.obj2.y()
+        return self.end_pos_by_obj
 
     def get_data_about_object1(self):
         if not self.obj1:
@@ -83,8 +108,7 @@ class Arrow:
         bottom_dot1 = x1 + width1 // 2, y1 + height1
         left_dot1 = x1, y1 + height1 // 2
         right_dot1 = x1 + width1, y1 + height1 // 2
-        return width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1, \
-
+        return width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1
 
     def get_data_about_object2(self):
         if not self.obj2:
@@ -127,10 +151,25 @@ class Arrow:
         self.start_pos, self.end_pos = center1, center2
         return center1, center2
 
-    def set_start_and_end_pos_by_obj(self):
+    def set_start_and_end(self):
         if not (self.obj1 and self.obj2):
             return
-        return ARROW_TYPES[self.arrow_type]["set_sae"](self)
+        self.start_pos = (self.obj1.x() + self.obj1.width() // 2 + self.start_pos_by_obj[0],
+                          self.obj1.y() + self.obj1.height() // 2 + self.start_pos_by_obj[1])
+        self.end_pos = (self.obj2.x() + self.obj2.width() // 2 + self.end_pos_by_obj[0],
+                        self.obj2.y() + self.obj2.height() // 2 + self.end_pos_by_obj[1])
+        return self.start_pos, self.end_pos
+
+    def get_start_and_end(self, end_pos):
+        if not self.obj1:
+            return (0, 0), (0, 0)
+        return (self.obj1.x() + self.obj1.width() // 2 + self.start_pos_by_obj[0],
+                self.obj1.y() + self.obj1.height() // 2 + self.start_pos_by_obj[1]), end_pos
+
+    def set_start_and_end_pos_by_obj(self):
+        if not self.obj1:
+            return
+        return self.set_start_and_end()
 
     def get_start_and_end_ntn(self, end_pos: tuple):
         width1, height1, x1, y1, up_dot1, bottom_dot1, left_dot1, right_dot1 = \
@@ -152,7 +191,7 @@ class Arrow:
 
     def get_start_pos_and_end_pos_by_end_pos(self, end_pos: tuple):
         if self.obj1:
-            return ARROW_TYPES[self.arrow_type]["get_saebep"](self, end_pos)
+            return self.get_start_and_end(end_pos)
         return (0, 0), (0, 0)
 
     def create_arrow(self, end_pos=None):
@@ -180,7 +219,6 @@ class Arrow:
         return self.color
 
     def draw(self, qp: QPainter, end_pos=None):
-        self.manager.settings_window.update_obj_settings(self)
         if self.end_pos:
             qp.drawLine(QLine(*self.start_pos, *self.end_pos))
             if self.need_arrow:
