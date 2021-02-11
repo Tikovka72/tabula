@@ -183,7 +183,6 @@ class SettingsWindow(QtWidgets.QWidget):
                         new_value1 = str(self.standard_values[0])
             self.value1.setText(new_value1)
             if self.call_back[0] and new_value1:
-                print(123)
                 self.call_back[0](self.value1_get())
 
         def value_changed(self, sender):

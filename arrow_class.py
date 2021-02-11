@@ -7,6 +7,11 @@ from numpy import arctan2
 from settings_widget import SettingsWindow
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 
+UP = 0
+RIGHT = 1
+DOWN = 2
+LEFT = 3
+
 
 class Arrow:
     def __init__(self, manager=None, start_pos=None, end_pos=None, color="#000000",
@@ -47,9 +52,9 @@ class Arrow:
                                                   call_update_all=self.call_set_xy2)
         self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckbox,
                                                   name="Стрелка",
-                                                  standard_values=(("вкл", True), ),
-                                                  default_values_to_return=(True, ),
-                                                  call_back=(self.call_back_arrow, ),
+                                                  standard_values=(("вкл", True),),
+                                                  default_values_to_return=(True,),
+                                                  call_back=(self.call_back_arrow,),
                                                   call_update_all=self.call_set_arrow)
         self.manager.settings_window.show_sett(self)
 
@@ -242,6 +247,38 @@ class Arrow:
             if self.need_arrow:
                 ar1, ar2 = self.create_arrow(end_pos=end_pos)
                 qp.drawLines(ar1, ar2)
+
+    @staticmethod
+    def get_nearest_side(w, h, x, y):
+        #   0
+        # 3   1
+        #   2
+        x, y = x + w // 2, y + h // 2
+        x1, x2 = x, w - x
+        y1, y2 = y, h - y
+
+        if y1 < y2:
+            if x1 < x2:
+                if x1 < y1:
+                    return LEFT
+                else:
+                    return UP
+            else:
+                if x2 < y1:
+                    return RIGHT
+                else:
+                    return UP
+        else:
+            if x1 < x2:
+                if x1 < y2:
+                    return LEFT
+                else:
+                    return DOWN
+            else:
+                if x2 < y2:
+                    return RIGHT
+                else:
+                    return DOWN
 
 
 ARROW_TYPES = {
