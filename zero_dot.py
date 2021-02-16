@@ -26,8 +26,11 @@ class ZeroPointDotWidget(QtWidgets.QWidget):
     def get_pos(self):
         return self.x(), self.y()
 
-    def return_to_zero(self):
-        self.move_animation(self.zero)
+    def return_to_zero(self, anim=True):
+        if anim:
+            self.move_animation(self.zero)
+        else:
+            self.move(*self.zero)
 
     def set_zero(self, x, y):
         self.zero = x, y

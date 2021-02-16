@@ -6,6 +6,7 @@ from grid import Grid
 from object_class import ObjectClass
 from mouse import Mouse
 from settings_widget import SettingsWindow
+from arrow_class import Arrow
 
 
 class Manager:
@@ -25,7 +26,7 @@ class Manager:
         self.grid = Grid(show=True, core_size=(self.core.width(), self.core.height()),
                          zero_pos=self.zero_point_dot)
         self.mouse = Mouse()
-        self.settings_window = SettingsWindow(self.core)
+        self.settings_window = SettingsWindow(self.core, self)
 
     def add_widget(self, pos=None, widget=None):
         if widget is None:
@@ -35,6 +36,7 @@ class Manager:
         self.widgets[widget] = {"in": [], "out": []}
         self.settings_window.hide_all_sett()
         self.settings_window.show_sett(widget)
+        return widget
 
     def add_arrow(self, arrow):
         self.arrows[arrow] = {"obj1": arrow.obj1, "obj2": arrow.obj2}
@@ -108,7 +110,11 @@ class Manager:
     def delete_widget(self, obj):
         arrows = self.get_all_arrows_from_object(obj)
         for arrow in arrows:
-            self.delete_arrow(arrow)
+            try:
+                self.delete_arrow(arrow)
+            except Exception as e:
+                print(e)
+
         self.widgets.pop(obj)
 
     def change_arrow_color(self, arrow):
@@ -357,3 +363,46 @@ class Manager:
 
     def clear_focus_arrows(self):
         [arr.clear_focus() for arr in self.arrows]
+
+    def save_file(self):
+        text_file = []
+        widget_ids = {}
+        for i, widget in enumerate(self.widgets):
+            text_file.append("U+FB4x13c".join(map(str, (i, widget.x(), widget.y(), widget.width(), widget.height(), widget.data()))))
+            widget_ids[widget] = i
+        text_arrows = []
+        for i, arrow in enumerate(self.arrows):
+            text_arrows.append("U+FB4x16c".join(map(str, (i, widget_ids[arrow.obj1], widget_ids[arrow.obj2], int(arrow.need_arrow)))))
+        with open("out.tbl", "w", encoding="UTF-8") as f:
+            f.write("U+FB4x18c".join(("U+FB4x15c".join(text_file), "U+FB4x17c".join(text_arrows))))
+
+    def open_file(self):
+        file = QtWidgets.QFileDialog().getOpenFileName(self.core, "open file", filter="*.tbl")
+        if not file[0]:
+            return
+        widgets = tuple(self.widgets.keys())
+        tuple(map(lambda widget: widget.del_self(), widgets))
+        with open(file[0], encoding="UTF-8") as f:
+            data = f.read()
+        self.zero_point_dot.return_to_zero(anim=False)
+        self.grid.set_offset_by_zero_point()
+        self.grid.regenerate_grid()
+        widgets, arrows = data.split("U+FB4x18c")
+        widgets = widgets.split("U+FB4x15c")
+        arrows = arrows.split("U+FB4x17c")
+        widgets_total = {}
+        for widget in widgets:
+            wid, x, y, w, h, d = widget.split("U+FB4x13c")
+            widget_class = self.add_widget((int(x), int(y)))
+            widget_class.resize(int(w), int(h))
+            widget_class.set_data(d)
+            widgets_total[int(wid)] = widget_class
+        for arrow in arrows:
+            aid, obj1, obj2, na = arrow.split("U+FB4x16c")
+            arr = Arrow(self, need_arrow=int(na))
+            self.add_arrow(arr)
+            self.set_obj1_arrow(arr, widgets_total[int(obj1)])
+            self.set_obj2_arrow(arr, widgets_total[int(obj2)])
+            arr.set_start_and_end_pos_by_obj()
+            self.clear_focus()
+            self.clear_focus_arrows()

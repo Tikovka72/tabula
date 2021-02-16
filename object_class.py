@@ -292,6 +292,7 @@ class ObjectClass(QWidget):
         self.manager.delete_widget(self)
         self.setEnabled(False)
         self.hide()
+        del self
 
     def copy_self(self):
         copy = ObjectClass(self.parent(), self.manager, self.zero_dot)
@@ -408,3 +409,9 @@ class ObjectClass(QWidget):
             self.show_angles()
         if event.button() == Qt.LeftButton:
             self.clicked.emit()
+
+    def data(self):
+        return self.edit_line.text()
+
+    def set_data(self, data):
+        self.edit_line.setText(data)

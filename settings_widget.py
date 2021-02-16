@@ -542,9 +542,10 @@ class SettingsWindow(QtWidgets.QWidget):
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
 
-    def __init__(self, parent):
+    def __init__(self, parent, manager):
         super().__init__(parent)
         self.objects = {parent: [2, []]}
+        self.manager = manager
         self.show_ = True
         self.__init_ui__()
 
@@ -560,7 +561,24 @@ class SettingsWindow(QtWidgets.QWidget):
         self.hide_menu_button.setText("→")
         self.hide_menu_button.show()
         self.hide_menu_button.clicked.connect(self.toggle_show)
+
+        self.open_button = QtWidgets.QPushButton(self)
+        self.open_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
+                                       "border-radius: 15%;}"
+                                       "QPushButton::hover {background-color: #eee}")
+        self.open_button.setText("Открыть")
+        self.open_button.clicked.connect(self.manager.open_file)
+
+        self.save_button = QtWidgets.QPushButton(self)
+        self.save_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
+                                       "border-radius: 15%;}"
+                                       "QPushButton::hover {background-color: #eee}")
+        self.save_button.setText("Сохранить")
+        self.save_button.clicked.connect(self.manager.save_file)
         self.set_geometry()
+
+    def save_file(self):
+        ...
 
     def set_geometry(self):
         if self.show_:
@@ -573,6 +591,13 @@ class SettingsWindow(QtWidgets.QWidget):
                              self.MENU_SIZE_X, self.parent().height())
             self.widget.setGeometry(0, 0, self.width(), self.height())
             self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
+        self.open_button.adjustSize()
+        self.open_button.setGeometry(10, self.height() - 30 - self.open_button.height(),
+                                     self.open_button.width() + 20, self.open_button.height() + 20)
+        self.save_button.adjustSize()
+        self.save_button.setGeometry(10 + self.open_button.width() + 10,
+                                     self.height() - 30 - self.save_button.height(),
+                                     self.save_button.width() + 20, self.save_button.height() + 20)
 
     def toggle_show(self):
         if self.x() == self.parent().width():
