@@ -577,9 +577,6 @@ class SettingsWindow(QtWidgets.QWidget):
         self.save_button.clicked.connect(self.manager.save_file)
         self.set_geometry()
 
-    def save_file(self):
-        ...
-
     def set_geometry(self):
         if self.show_:
             self.setGeometry(self.parent().width() - self.MENU_SIZE_X, 0,

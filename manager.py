@@ -434,7 +434,8 @@ class Manager:
                 self.clear_focus_arrows()
 
     def get_name_file(self):
-        name = QtWidgets.QFileDialog.getSaveFileName(self.core, 'Save File', filter="*.tbl")
+        name = QtWidgets.QFileDialog.getSaveFileName(self.core, 'Save File', filter="*.tbl",
+                                                     directory="new scheme.tbl")
         if name[0]:
             return name[0]
         return None
