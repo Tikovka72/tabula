@@ -2,7 +2,15 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 
 class ZeroPointDotWidget(QtWidgets.QWidget):
+    """
+    point in centre of screen. This needs for moving canvas and knowing where real center.
+    (point moves with canvas)
+    """
     def __init__(self, parent, manager=None):
+        """
+        :param parent: widget on which point is located
+        :param manager: main class containing all information
+        """
         super().__init__(parent=parent)
         self.parent = parent
         self.zero = self.parent.STANDARD_SIZE[0] // 2, self.parent.STANDARD_SIZE[1] // 2
@@ -16,14 +24,16 @@ class ZeroPointDotWidget(QtWidgets.QWidget):
         self.setStyleSheet("background-color: black")
 
     def move_event(self, x, y):
+        """
+        add-on for move for moving animation
+        """
         self.move(x, y)
 
-    def paintEvent(self, a0: QtGui.QPaintEvent) -> None:
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        qp.drawRect(0, 0, self.width(), self.height())
-
     def get_pos(self):
+        """
+        gives real center position
+        :return:
+        """
         return self.x(), self.y()
 
     def return_to_zero(self, anim=True):
