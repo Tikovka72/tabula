@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
 from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 
 from arrow_class import Arrow
-from zero_dot import ZeroPointDotWidget
+from zero_point import ZeroPointWidget
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 from settings_widget import SettingsWindow
 
@@ -145,7 +145,7 @@ class ObjectClass(QWidget):
     FONT_SIZE_FACTOR = 0.80
     STANDARD_SIZE = (150, 40)
 
-    def __init__(self, parent, manager, zero_dot: ZeroPointDotWidget, pos=None):
+    def __init__(self, parent, manager, zero_dot: ZeroPointWidget, pos=None):
         super().__init__(parent)
         self.manager = manager
         self.setAcceptDrops(True)

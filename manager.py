@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-from zero_dot import ZeroPointDotWidget
+from zero_point import ZeroPointWidget
 from grid import Grid
 from object_class import ObjectClass
 from mouse import Mouse
@@ -22,7 +22,7 @@ class Manager:
         self.magnet_lines = []
         self.drag_or_resize = 0
         self.active_arrow = None
-        self.zero_point_dot = ZeroPointDotWidget(parent=self.core, manager=self)
+        self.zero_point_dot = ZeroPointWidget(parent=self.core, manager=self)
         self.zero_point_dot.setGeometry(self.core.width() // 2, self.core.height() // 2, 1, 1)
         self.grid = Grid(show=True, core_size=(self.core.width(), self.core.height()),
                          zero_pos=self.zero_point_dot)

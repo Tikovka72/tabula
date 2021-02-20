@@ -1,11 +1,11 @@
 from PyQt5 import QtCore, QtGui
 
-from zero_dot import ZeroPointDotWidget
+from zero_point import ZeroPointWidget
 
 
 class Grid:
     def __init__(self, color="#C8C8C8", line=QtCore.Qt.DashLine, show=False, core_size=None,
-                 step=20, offset=(20, 20), zero_pos: ZeroPointDotWidget = None,
+                 step=20, offset=(20, 20), zero_pos: ZeroPointWidget = None,
                  special_lines_color="#969696"):
         self.color = color
         self.special_lines_color = special_lines_color
