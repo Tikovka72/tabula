@@ -285,20 +285,8 @@ class Manager:
     def get_mouse_pos(self):
         return self.mouse.get_pos()
 
-    def get_mouse_x(self):
-        return self.mouse.get_x()
-
-    def get_mouse_y(self):
-        return self.mouse.get_y()
-
     def change_mouse_pos(self, x, y):
         self.mouse.change_pos(x, y)
-
-    def change_mouse_x(self, x):
-        self.mouse.change_x(x)
-
-    def change_mouse_y(self, y):
-        self.mouse.change_y(y)
 
     def set_new_zero_point_pos(self, x, y):
         self.zero_point_dot.set_zero(x, y)

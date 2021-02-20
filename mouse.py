@@ -1,22 +1,19 @@
 class Mouse:
-    def __init__(self, x=0, y=0):
+    """
+    class for mouse. contains position of mouse
+    """
+    def __init__(self, x: int = 0, y: int = 0):
         self.mouse_x = x
         self.mouse_y = y
 
     def change_pos(self, x, y):
+        """
+        changes position of mouse to (x, y) coordinate
+        """
         self.mouse_x, self.mouse_y = x, y
 
-    def change_x(self, x):
-        self.mouse_x = x
-
-    def change_y(self, y):
-        self.mouse_y = y
-
-    def get_pos(self):
+    def get_pos(self) -> tuple:
+        """
+        returns mouse position in tuple format (x, y)
+        """
         return self.mouse_x, self.mouse_y
-
-    def get_x(self):
-        return self.mouse_x
-
-    def get_y(self):
-        return self.mouse_y
