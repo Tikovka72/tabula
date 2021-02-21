@@ -302,13 +302,13 @@ class Manager:
     ):
         if widgets is None:
             widgets = {}
-        x_left = self.grid.get_nearest_x_line_by_offset(obj.x())
-        x_center = self.grid.get_nearest_x_line_by_offset(obj.x() + obj.width() // 2)
-        x_right = self.grid.get_nearest_x_line_by_offset(obj.x() + obj.width())
-        y_left = self.grid.get_nearest_y_line_by_offset(obj.y())
-        y_center = self.grid.get_nearest_y_line_by_offset(
+        x_left = self.grid.get_nearest_y_line_by_offset(obj.x())
+        x_center = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width() // 2)
+        x_right = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width())
+        y_left = self.grid.get_nearest_x_line_by_offset(obj.y())
+        y_center = self.grid.get_nearest_x_line_by_offset(
             obj.y() + obj.height() // 2)
-        y_right = self.grid.get_nearest_y_line_by_offset(obj.y() + obj.height())
+        y_right = self.grid.get_nearest_x_line_by_offset(obj.y() + obj.height())
         self.grid.clear_special_lines()
         if x_left or x_center or x_right:
 

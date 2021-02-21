@@ -105,7 +105,7 @@ class Core(QtWidgets.QWidget):
                                                new_y + y)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
-        self.manager.grid.change_grid_size(a0.size().width(), a0.size().height())
+        self.manager.grid.change_core_size(a0.size().width(), a0.size().height())
         self.manager.settings_window.set_geometry()
         self.manager.settings_window.update_obj_settings(self)
 
