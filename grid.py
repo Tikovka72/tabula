@@ -184,6 +184,5 @@ class Grid:
     def clear_special_lines(self):
         """
         clears list of special lines
-        :return:
         """
-        self.special_lines_for_drag_obj = []
+        self.special_lines_for_drag_obj.clear()
