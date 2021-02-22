@@ -9,6 +9,9 @@ from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR
 
 
 class Core(QtWidgets.QWidget):
+    """
+    main class with UI
+    """
     STANDARD_SIZE = 640, 480
 
     def __init__(self):
@@ -57,45 +60,71 @@ class Core(QtWidgets.QWidget):
                                                   lock_line_edit=False)
         self.manager.settings_window.show_sett(self)
 
-    def call_back_zero_pos_width(self, x):
+    def call_back_zero_pos_width(self, x: int):
+        """
+        callback for settings window. This is necessary to move zero point horizontally
+        settings window -> core
+        """
         self.manager.zero_point_dot.move_event(x + self.width() // 2,
                                                self.manager.zero_point_dot.get_pos()[1])
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
 
-    def call_back_zero_pos_height(self, y):
+    def call_back_zero_pos_height(self, y: int):
+        """
+        callback for settings window. This is necessary to move zero point vertically
+        settings window -> core
+        """
         self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.get_pos()[0],
                                                y + self.height() // 2)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
 
-    def call_set_zero_pos(self):
+    def call_set_zero_pos(self) -> tuple:
+        """
+        gives right zero point position to settings window
+        core -> settings window
+        :return: position in tuple format (x, y)
+        """
         x_left, y_up = self.manager.zero_point_dot.get_pos()
         x = x_left - self.width() // 2
         y = y_up - self.height() // 2
         return x, y
 
-    def call_back_grid_show(self, show):
+    def call_back_grid_show(self, show: bool):
+        """
+        callback for settings window. This is necessary to change grid showing
+        settings window -> core
+        """
         if show and not self.manager.grid.show:
             self.manager.grid.toggle_show()
         elif not show and self.manager.grid.show:
             self.manager.grid.toggle_show()
 
-    def call_back_grid_size(self, step):
+    def call_back_grid_size(self, step: int):
+        """
+        callback for settings window. This is necessary to change grid size
+        settings window -> core
+        """
         self.manager.grid.change_step(step)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
 
-    def call_set_grid(self):
+    def call_set_grid(self) -> tuple:
+        """
+        gives grid's showing and step
+        core -> settings window
+        :return: tuple: (show, step)
+        """
         return self.manager.grid.show, self.manager.grid.get_step()
 
-    def resizeEvent(self, a0) -> None:
-        super().resizeEvent(a0)
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
         self.update()
         x, y = self.manager.zero_point_dot.get_pos()
         x -= self.manager.zero_point_dot.get_zero()[0]
         y -= self.manager.zero_point_dot.get_zero()[1]
-        new_x, new_y = a0.size().width() // 2, a0.size().height() // 2
+        new_x, new_y = event.size().width() // 2, event.size().height() // 2
         [widget.move_event(widget.x() + new_x - self.manager.zero_point_dot.get_zero()[0],
                            widget.y() + new_y - self.manager.zero_point_dot.get_zero()[1],
                            show_pos=False)
@@ -105,11 +134,14 @@ class Core(QtWidgets.QWidget):
                                                new_y + y)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
-        self.manager.grid.change_core_size(a0.size().width(), a0.size().height())
+        self.manager.grid.change_core_size(event.size().width(), event.size().height())
         self.manager.settings_window.set_geometry()
         self.manager.settings_window.update_obj_settings(self)
 
     def self_menu_show(self):
+        """
+        main context menu
+        """
         pos = self.manager.get_mouse_pos()
         context_menu = QtWidgets.QMenu()
         context_menu.addAction('Добавить объект',
@@ -122,6 +154,10 @@ class Core(QtWidgets.QWidget):
         context_menu.exec_(QtGui.QCursor.pos())
 
     def arrow_menu_show(self, arrow):
+        """
+        arrow's context menu
+        :param arrow: arrow_class.Arrow class
+        """
         context_menu = QtWidgets.QMenu()
         context_menu.addAction("Изменить цвет", lambda: self.manager.change_arrow_color(arrow))
         context_menu.addAction('Удалить стрелку', lambda: self.manager.delete_arrow(arrow),
@@ -214,7 +250,7 @@ class Core(QtWidgets.QWidget):
         self.manager.clear_focus()
         self.setFocus()
 
-    def dragEnterEvent(self, event):
+    def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
         if 0 <= x <= event.source().OFFSET + 5 and 0 <= y <= event.source().OFFSET + 5:
             self.manager.set_dor(DRAG)
