@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from PyQt5 import QtCore
 
 from zero_point import ZeroPointWidget
@@ -13,7 +13,10 @@ from warning_window import WarningWindow
 class Manager:
     OFFSET_MAGNET = 5
 
-    def __init__(self, core):
+    def __init__(self, core: QtWidgets.QWidget):
+        """
+        :param core: main UI window
+        """
         self.core = core
         # Arrow: {obj1: ObjectClass, obj2: ObjectClass}
         self.arrows = {}
@@ -30,7 +33,17 @@ class Manager:
         self.settings_window = SettingsWindow(self.core, self)
         self.opened_file = None
 
-    def add_widget(self, pos=None, widget=None):
+    def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
+        """
+        method for adding widget in dict with all widgets (self.widgets).
+        if widget was passed, this manager will add this widget to dict self.widgets
+        if widget wasn't passed, this manager will create new widget for dict and
+            set position "pos" for this new widget, if "pos" wasn't passed,
+            "pos" will set to  (0, 0)
+        :param pos: pos of widget
+        :param widget: object_class.ObjectClass
+        :return: this widget
+        """
         if widget is None:
             widget = ObjectClass(self.core, self, pos=pos if pos else (0, 0),
                                  zero_dot=self.zero_point_dot)
@@ -40,7 +53,12 @@ class Manager:
         self.settings_window.show_sett(widget)
         return widget
 
-    def add_arrow(self, arrow):
+    def add_arrow(self, arrow: Arrow):
+        """
+        adds arrow to dict self.arrows
+        :param arrow: arrow that you want to add to dict
+        :return:
+        """
         self.arrows[arrow] = {"obj1": arrow.obj1, "obj2": arrow.obj2}
         obj1, obj2 = self.widgets.get(arrow.obj1, None), self.widgets.get(arrow.obj2, None)
         if obj1:
@@ -49,33 +67,49 @@ class Manager:
             self.widgets[obj2]["in"].append(arrow)
 
     def get_all_widgets(self):
+        """
+        returns all of widgets that it contains self.widgets
+        :return: all widgets
+        """
         return self.widgets.keys()
 
     def get_all_arrows(self):
+        """
+        returns all of arrows that it contains self.arrows
+        :return: all arrows
+        """
         return self.arrows.keys()
 
     def toggle_active_arrow(self, arrow=None):
+        """
+        toggles active arrow (arrow for which settings window is enabled)
+        :param arrow: arrow, for which you want to enable settings
+               or clear this window if arrow is None
+        """
         self.active_arrow = arrow
 
-    def get_active_arrow(self):
+    def get_active_arrow(self) -> Arrow:
+        """
+        gets active arrow (arrow for which settings window is enabled)
+        :return:
+        """
         return self.active_arrow
 
-    def get_in_arrows_from_object(self, obj):
-        if self.widgets.get(obj, None):
-            return self.widgets.get(obj)["in"]
-        return []
-
-    def get_out_arrows_from_object(self, obj):
-        if self.widgets.get(obj, None):
-            return self.widgets.get(obj)["out"]
-        return []
-
-    def get_all_arrows_from_object(self, obj):
+    def get_all_arrows_from_object(self, obj: ObjectClass) -> list:
+        """
+        gets all arrows linked  with "obj" widget
+        :param obj: widget for which you need to get arrows
+        :return: list of these arrows, or empty list if widget isn't in self.widgets
+        """
         if self.widgets.get(obj, None):
             return self.widgets.get(obj)["in"] + self.widgets.get(obj)["out"]
         return []
 
     def get_arrows_with(self, obj1, obj2):
+        """
+        checks if objects are linked
+        :return: True if objects are linked else False
+        """
         obj1_arrows = self.get_all_arrows_from_object(obj1)
         obj2_arrows = self.get_all_arrows_from_object(obj2)
         len_lists_arrows = len(obj1_arrows + obj2_arrows)
@@ -84,19 +118,28 @@ class Manager:
             return False
         return True
 
-    def set_obj1_arrow(self, arrow, obj):
+    def set_obj1_arrow(self, arrow: Arrow, obj: ObjectClass):
+        """
+        sets arrow's first object
+        """
         if self.arrows.get(arrow, None):
             self.arrows.get(arrow)["obj1"] = obj
             arrow.obj1 = obj
             self.widgets.get(obj)["out"].append(arrow)
 
-    def set_obj2_arrow(self, arrow, obj):
+    def set_obj2_arrow(self, arrow: Arrow, obj: ObjectClass):
+        """
+        sets arrow's second object
+        """
         if self.arrows.get(arrow, None):
             self.arrows.get(arrow)["obj2"] = obj
             arrow.obj2 = obj
             self.widgets.get(obj)["in"].append(arrow)
 
-    def delete_arrow(self, arrow):
+    def delete_arrow(self, arrow: Arrow):
+        """
+        deletes arrow from self.arrows and all links with this arrow
+        """
         objects = self.arrows.get(arrow, {"obj1": None, "obj2": None})
         obj1, obj2 = objects["obj1"], objects["obj2"]
         if obj1:
@@ -109,24 +152,41 @@ class Manager:
                 obj2_arrows["in"].pop(obj2_arrows["in"].index(arrow))
         self.arrows.pop(arrow)
 
-    def delete_widget(self, obj):
+    def delete_widget(self, obj: ObjectClass):
+        """
+        deletes widget from self.widgets and all arrows that were linked with it
+        """
         arrows = self.get_all_arrows_from_object(obj)
         for arrow in arrows:
             try:
                 self.delete_arrow(arrow)
             except Exception as e:
                 print(e)
-
         self.widgets.pop(obj)
 
-    def change_arrow_color(self, arrow):
+    def change_arrow_color(self, arrow: Arrow):
+        """
+        IN PROCESS
+
+        calls dialog, that changes arrow's color
+
+        IN PROCESS
+        """
         color = QtWidgets.QColorDialog(self.core)
         color.setStyleSheet("border : 2px solid blue;")
         color = color.getColor()
         if color.isValid():
             arrow.color = color.name()
 
-    def set_coords_on_widgets(self, widgets, event, x, y):
+    def set_coords_on_widgets(self, widgets: list or tuple,
+                              event: QtGui.QDragMoveEvent, x: int, y: int):
+        """
+        sets label for widgets with distance to some widget
+        :param widgets: widgets that need label
+        :param event: event for position of mouse
+        :param x: x coordinate of main widget
+        :param y: y coordinate of main widget
+        """
         [widget.hide_size_or_pos_label() for widget in self.get_all_widgets()]
         for widget, (way_x, way_y) in widgets.items():
             if way_x or way_y:

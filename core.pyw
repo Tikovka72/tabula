@@ -144,8 +144,7 @@ class Core(QtWidgets.QWidget):
         """
         pos = self.manager.get_mouse_pos()
         context_menu = QtWidgets.QMenu()
-        context_menu.addAction('Добавить объект',
-                               lambda: self.manager.add_widget(pos))
+        context_menu.addAction('Добавить объект', lambda: self.manager.add_widget(pos))
         context_menu.setStyleSheet(
             f"font-size: 15px;"
             f"border-radius: 5%;"
