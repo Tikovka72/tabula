@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import math
+from typing import TYPE_CHECKING
 
 from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
@@ -6,6 +9,8 @@ from numpy import arctan2
 
 from settings_widget import SettingsWindow
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
+if TYPE_CHECKING:
+    from manager import Manager
 
 UP = 0
 RIGHT = 1
@@ -14,9 +19,23 @@ LEFT = 3
 
 
 class Arrow:
-    def __init__(self, manager=None, start_pos=None, end_pos=None, color="#000000",
-                 need_arrow=False,
-                 arrow_type=FROM_AND_TO_NEAREST_LINE):
+    """
+    class for arrows in tabula
+    """
+    def __init__(self, manager: Manager = None,
+                 start_pos: tuple or list or None = None,
+                 end_pos: tuple or list or None = None,
+                 color: str = "#000000",
+                 need_arrow: bool = False,
+                 arrow_type: int = FROM_AND_TO_NEAREST_LINE):
+        """
+        :param manager:
+        :param start_pos:
+        :param end_pos:
+        :param color:
+        :param need_arrow:
+        :param arrow_type:
+        """
         if not manager:
             exit(1)
         self.manager = manager
