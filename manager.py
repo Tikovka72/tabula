@@ -198,7 +198,15 @@ class Manager:
                                            if way_y else '') + '↕') if way_y else '')
                 )
             
-    def resize_magnet_checker(self, obj, pos):
+    def resize_magnet_checker(self, obj: ObjectClass, pos: QtCore.QPoint) \
+            -> (int, int, int, int, dict):
+        """
+        checks whether object has magnetic lines to other objects while resizing
+        :param obj: object for check
+        :param pos: future position of widget
+        :return: (x, y, width, height) of object, (x, y) was modified and
+                 dict with struct widget = (way by x line, way by y line)
+        """
         self.magnet_lines = []
         obj_x1 = obj.x()
         obj_y1 = obj.y()
@@ -245,7 +253,13 @@ class Manager:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
 
-    def drag_magnet_checker(self, obj):
+    def drag_magnet_checker(self, obj: ObjectClass) -> (int, int, int, int, bool, bool, dict):
+        """
+        checks whether object has magnetic lines to other objects while moving
+        :param obj: object for check
+        :return: (x, y, width, height) of object, (x, y) was modified and
+                 dict with struct widget = (way by x line, way by y line)
+        """
         self.magnet_lines = []
         obj_x1 = obj.x()
         obj_y1 = obj.y()
@@ -336,30 +350,72 @@ class Manager:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
 
-    def get_magnet_lines(self):
+    def get_magnet_lines(self) -> list:
+        """
+        :return: all magnet lines
+        """
         return self.magnet_lines
 
     def drop_magnet_lines(self):
-        self.magnet_lines = []
+        """
+        drops all magnet lines
+        """
+        self.magnet_lines.clear()
 
-    def get_mouse_pos(self):
+    def get_mouse_pos(self) -> tuple:
+        """
+        :return: mouse position
+        """
         return self.mouse.get_pos()
 
-    def change_mouse_pos(self, x, y):
+    def change_mouse_pos(self, x: int, y: int):
+        """
+        changes mouse (mouse.Mouse) position to (x, y)
+        """
         self.mouse.change_pos(x, y)
 
-    def set_new_zero_point_pos(self, x, y):
+    def set_new_zero_point_pos(self, x: int, y: int):
+        """
+        sets new zero point's position to (x, y)
+        """
         self.zero_point_dot.set_zero(x, y)
 
-    def get_dor(self):
+    def get_dor(self) -> int:
+        """
+        :return: object drag or resize at the moment by user
+        drag = 1
+        resize = 2
+        """
         return self.drag_or_resize
 
-    def set_dor(self, dor):
+    def set_dor(self, dor: int):
+        """
+        set drag or resize:
+        drag = 1
+        resize = 2
+        you can use DRAG and RESIZE constants from constants.py
+        """
         self.drag_or_resize = dor
 
+    # TODO doc for this
     def check_and_set_grid_magnet_lines_for_resizing(
-            self, obj, x, y, x_mod=False, y_mod=False, widgets=None
-    ):
+            self, obj: ObjectClass,
+            x: int,
+            y: int,
+            x_mod: bool = False,
+            y_mod: bool = False,
+            widgets: dict = None
+    ) -> (int, int, dict):
+        """
+        I don't know what it does
+        :param obj:
+        :param x:
+        :param y:
+        :param x_mod:
+        :param y_mod:
+        :param widgets:
+        :return:
+        """
         if widgets is None:
             widgets = {}
         x_left = self.grid.get_nearest_y_line_by_offset(obj.x())
@@ -409,12 +465,21 @@ class Manager:
         return x, y, widgets
 
     def clear_focus(self):
+        """
+        clears focus and hides angles from all widgets
+        """
         [(w.clearFocus(), w.hide_angles()) for w in self.widgets]
 
     def clear_focus_arrows(self):
+        """
+        clears focus from all arrows
+        """
         [arr.clear_focus() for arr in self.arrows]
 
     def save_file(self):
+        """
+        handler for saving project in file
+        """
         if not self.opened_file:
             self.opened_file = self.get_name_file()
             if not self.opened_file:
@@ -440,6 +505,9 @@ class Manager:
             f.write("U+FB4x18c".join(("U+FB4x15c".join(text_file), "U+FB4x17c".join(text_arrows))))
 
     def open_file(self):
+        """
+        handler for opening  *.tbl files
+        """
         if self.opened_file:
             dialog = WarningWindow(text="Вы хотите закрыть текущий файл?")
             if dialog.exec_():
@@ -481,7 +549,11 @@ class Manager:
                 self.clear_focus()
                 self.clear_focus_arrows()
 
-    def get_name_file(self):
+    def get_name_file(self) -> str or None:
+        """
+        handler for calling dialog, which asks for name for new file
+        :return: name of new file or None if user closes dialog
+        """
         name = QtWidgets.QFileDialog.getSaveFileName(self.core, 'Save File', filter="*.tbl",
                                                      directory="new scheme.tbl")
         if name[0]:
