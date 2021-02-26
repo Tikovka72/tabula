@@ -545,7 +545,7 @@ class Manager:
                 self.add_arrow(arr)
                 self.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.set_obj2_arrow(arr, widgets_total[int(obj2)])
-                arr.set_start_and_end_pos_by_obj()
+                arr.set_start_and_end()
                 self.clear_focus()
                 self.clear_focus_arrows()
 

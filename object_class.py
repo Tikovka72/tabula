@@ -361,7 +361,7 @@ class ObjectClass(QWidget):
                 return
             self.manager.set_obj2_arrow(arrow, self)
             self.manager.toggle_active_arrow()
-            arrow.set_start_and_end_pos_by_obj()
+            arrow.set_start_and_end()
 
     def add_arrow_f(self, need_arrow=False, arrow_type=FROM_AND_TO_NEAREST_LINE):
         arrow = Arrow(manager=self.manager, need_arrow=need_arrow, arrow_type=arrow_type)
@@ -371,7 +371,7 @@ class ObjectClass(QWidget):
 
     def update_arrows(self):
         for arrow in self.manager.get_all_arrows_from_object(self):
-            arrow.set_start_and_end_pos_by_obj()
+            arrow.set_start_and_end()
 
     def check_have_active_arrow(self):
         return self.manager.get_active_arrow()
