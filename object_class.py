@@ -8,136 +8,6 @@ from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
 from settings_widget import SettingsWindow
 
 
-class LineEdit(QLineEdit):
-    FONT_SIZE_FACTOR = 0.80
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.text_size_menu = 12  # px
-        self.border_radius = 5  # %
-        self.border_size = 1
-        self.text_size = None
-        self.auto = True
-        self.background_color = "white"
-        self.background_color_menu = "white"
-        self.background_color_menu_selected = "rgb(128, 166, 255)"
-        self.setMouseTracking(True)
-        self.__init_ui__()
-
-    def __init_ui__(self):
-        self.setStyleSheet(
-            "QLineEdit {"
-            f"border-radius: {self.border_radius}%;"
-            f"border: {self.border_size}px solid black;"
-            "}"
-        )
-        self.font_ = self.font()
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.self_menu_show)
-        self.menu = QMenu(self)
-        self.menu.addAction("Копировать текст", self.copy, shortcut="Ctrl+C")
-        self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
-        self.menu.addSeparator()
-        self.menu.addAction("Дублировать объект", self.parent().copy_self)
-        self.menu.addAction("На задний план", self.on_back)
-        self.menu.addSeparator()
-        self.menu.addAction("Добавить связь",
-                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
-        line_menu = self.menu.addMenu("Добавить связь...")
-        line_menu.addAction("от центра до центра",
-                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
-        self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
-        self.menu.addSeparator()
-        self.menu.addAction("Удалить", self.parent().del_self)
-        self.menu.setStyleSheet(
-            "QMenu {"
-            f"font-size: {self.text_size_menu}px;"
-            f"background-color: {self.background_color_menu};"
-            f"border-radius: {self.border_radius}%;"
-            f"border: 1px solid black;"
-            "}"
-            "QMenu::selected {"
-            f"background-color: {self.background_color_menu_selected};"
-            "};"
-        )
-        self.text_size = int(self.size().height() * self.FONT_SIZE_FACTOR)
-        self.update_text_size()
-
-    def on_back(self):
-        self.parent().on_back()
-
-    def change_text_size(self, size=None):
-        self.text_size = size
-
-    def update_text_size(self):
-        if self.auto:
-            size = int(self.size().height() * self.FONT_SIZE_FACTOR)
-        else:
-            size = self.text_size
-        self.font_.setPixelSize(size)
-        self.setFont(self.font_)
-
-    def change_auto(self, st=True):
-        self.auto = st
-
-    def get_auto(self):
-        return self.auto
-
-    def get_text_size(self):
-        return self.font_.pixelSize()
-
-    def set_border(self, size=None, radius=None):
-        default = self.get_border()
-        radius = radius if radius is not None else int(default[1])
-        size = size if size is not None and size >= 0 else int(default[0])
-        size = size if size >= 0 else default[0]
-        radius = radius if min(self.width(), self.height()) // 2 >= radius \
-            else min(self.width(), self.height()) // 2
-        self.setStyleSheet(
-            "QLineEdit {"
-            f"border-radius: {radius}%;"
-            f"{'border: ' + str(size) + 'px solid black;' if int(size) > 0 else ''}"
-            "}")
-        self.border_radius = radius
-        self.border_size = size
-
-    def get_border(self):
-        style = self.styleSheet()
-        style = "".join(style.split())
-        radius_index = style.rfind("border-radius:") + len("border-radius:")
-        radius = style[radius_index:style[radius_index:].find("%") + radius_index]
-        size_index = style.rfind("border:") + len("border:")
-        size = style[size_index:style[size_index:].find("px") + size_index]
-        return size if size.isdigit() else "0", radius if radius.isdigit() else "0"
-
-    def check_radius(self, radius):
-        return min(self.width(), self.height()) // 2 - 5 >= radius
-
-    def mouseReleaseEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
-            self.parent().manager.settings_window.hide_all_sett()
-            self.parent().manager.clear_focus()
-            self.parent().manager.clear_focus_arrows()
-            self.parent().show_angles()
-            self.parent().check_and_set_arrow()
-            self.parent().hide_size_or_pos_label()
-
-            self.parent().manager.settings_window.show_sett(self.parent())
-
-    def self_menu_show(self):
-        self.menu.exec_(QCursor.pos())
-
-    def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        self.change_parent_mouse_pos(event)
-
-    def change_parent_mouse_pos(self, event: QMouseEvent):
-        self.parent().change_parent_mouse_pos(event, need_offset=True)
-
-    def resize(self, *size) -> None:
-        super().resize(*size)
-        self.update_text_size()
-
-
 class ObjectClass(QWidget):
     clicked = pyqtSignal()
 
@@ -415,3 +285,170 @@ class ObjectClass(QWidget):
 
     def set_data(self, data):
         self.edit_line.setText(data)
+
+
+class LineEdit(QLineEdit):
+    FONT_SIZE_FACTOR = 0.80
+
+    def __init__(self, parent: ObjectClass):
+        """
+        :param parent: widget
+        """
+        super().__init__(parent)
+        self.text_size_menu = 12  # px
+        self.border_radius = 5  # %
+        self.border_size = 1
+        self.text_size = None
+        self.auto = True
+        self.background_color = "white"
+        self.background_color_menu = "white"
+        self.background_color_menu_selected = "rgb(128, 166, 255)"
+        self.setMouseTracking(True)
+        self.__init_ui__()
+
+    def __init_ui__(self):
+        self.setStyleSheet(
+            "QLineEdit {"
+            f"border-radius: {self.border_radius}%;"
+            f"border: {self.border_size}px solid black;"
+            "}"
+        )
+        self.font_ = self.font()
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.self_menu_show)
+        self.menu = QMenu(self)
+        self.menu.addAction("Копировать текст", self.copy, shortcut="Ctrl+C")
+        self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
+        self.menu.addSeparator()
+        self.menu.addAction("Дублировать объект", self.parent().copy_self)
+        self.menu.addAction("На задний план", self.on_back)
+        self.menu.addSeparator()
+        self.menu.addAction("Добавить связь",
+                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
+        line_menu = self.menu.addMenu("Добавить связь...")
+        line_menu.addAction("от центра до центра",
+                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
+        self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
+        self.menu.addSeparator()
+        self.menu.addAction("Удалить", self.parent().del_self)
+        self.menu.setStyleSheet(
+            "QMenu {"
+            f"font-size: {self.text_size_menu}px;"
+            f"background-color: {self.background_color_menu};"
+            f"border-radius: {self.border_radius}%;"
+            f"border: 1px solid black;"
+            "}"
+            "QMenu::selected {"
+            f"background-color: {self.background_color_menu_selected};"
+            "};"
+        )
+        self.text_size = int(self.size().height() * self.FONT_SIZE_FACTOR)
+        self.update_text_size()
+
+    def on_back(self):
+        """
+        sends signal to parent for move widget on back
+        """
+        self.parent().on_back()
+
+    def change_text_size(self, size: int = None):
+        """
+        changes size for text, but doesn't change it. for setting new size - self.update_text_size()
+        :param size: size of text. if None, size will be change with widget's size
+        """
+        self.text_size = size
+
+    def update_text_size(self):
+        """
+        updates font's size
+        """
+        if self.auto:
+            size = int(self.size().height() * self.FONT_SIZE_FACTOR)
+        else:
+            size = self.text_size
+        self.font_.setPixelSize(size)
+        self.setFont(self.font_)
+
+    def change_auto(self, st: bool = True):
+        """
+        if text size sets automatically or not
+        """
+        self.auto = st
+
+    def get_auto(self) -> bool:
+        """
+        :return: text size sets automatically
+        """
+        return self.auto
+
+    def get_text_size(self) -> int:
+        """
+        :return: text size at the moment
+        """
+        return self.font_.pixelSize()
+
+    def set_border(self, size: int = None, radius: int = None):
+        """
+        sets border parameters: width and radius of border
+        :param size: border's width. default if parameter is None
+        :param radius: border's radius. default if parameter is None
+        """
+        default = self.get_border()
+        radius = radius if radius is not None else int(default[1])
+        size = size if size is not None and size >= 0 else int(default[0])
+        size = size if size >= 0 else default[0]
+        radius = radius if min(self.width(), self.height()) // 2 >= radius \
+            else min(self.width(), self.height()) // 2
+        self.setStyleSheet(
+            "QLineEdit {"
+            f"border-radius: {radius}%;"
+            f"{'border: ' + str(size) + 'px solid black;' if int(size) > 0 else ''}"
+            "}")
+        self.border_radius = radius
+        self.border_size = size
+
+    def get_border(self) -> tuple:
+        """
+        :return: size and radius of borer in size: str, radius: str
+        """
+        style = self.styleSheet()
+        style = "".join(style.split())
+        radius_index = style.rfind("border-radius:") + len("border-radius:")
+        radius = style[radius_index:style[radius_index:].find("%") + radius_index]
+        size_index = style.rfind("border:") + len("border:")
+        size = style[size_index:style[size_index:].find("px") + size_index]
+        return size if size.isdigit() else "0", radius if radius.isdigit() else "0"
+
+    def check_radius(self, radius: int) -> int:
+        """
+        checks if radius value matches widget's size
+        :return: True if radius matches
+        """
+        return min(self.width(), self.height()) // 2 - 5 >= radius
+
+    def mouseReleaseEvent(self, event: QMouseEvent):
+        if event.button() == Qt.LeftButton:
+            self.parent().manager.settings_window.hide_all_sett()
+            self.parent().manager.clear_focus()
+            self.parent().manager.clear_focus_arrows()
+            self.parent().show_angles()
+            self.parent().check_and_set_arrow()
+            self.parent().hide_size_or_pos_label()
+
+            self.parent().manager.settings_window.show_sett(self.parent())
+
+    def self_menu_show(self):
+        """
+        method for showing context menu
+        """
+        self.menu.exec_(QCursor.pos())
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        self.change_parent_mouse_pos(event)
+
+    def change_parent_mouse_pos(self, event: QMouseEvent):
+        self.parent().change_parent_mouse_pos(event, need_offset=True)
+
+    def resize(self, *size) -> None:
+        super().resize(*size)
+        self.update_text_size()
