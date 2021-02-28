@@ -1,4 +1,8 @@
-﻿from PyQt5 import QtWidgets, QtGui, QtCore, sip
+﻿from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from manager import Manager
+from PyQt5 import QtWidgets, QtGui, QtCore, sip
 from PyQt5.QtGui import QWheelEvent
 
 from utils import pass_f, isdig
@@ -53,27 +57,49 @@ class SettingsLineEdit(QtWidgets.QLineEdit):
 
 
 class SettingsWindow(QtWidgets.QWidget):
+    """
+    right menu with settings
+    """
     MENU_SIZE_X = 300
     STANDARD_SIZE = 300, 400
     OFFSET = 10
     STANDARD_SIZE_FOR_WIDGETS = STANDARD_SIZE[0] - 2 * OFFSET, OFFSET * 2
 
-    class Line(QtWidgets.QWidget):
-        SIZE = (450, 20)
+    class ParentSett(QtWidgets.QWidget):
         OFFSET = 10
-        LINE_HEIGHT = 2
 
-        def __init__(self, parent,
+        def __init__(self, parent: SettingsWindow,
                      n: int,
-                     name: str,
-                     size: tuple,
-                     standard_values=None, int_only=None,
-                     default_values_to_return=None, call_back=None, call_update_all=None):
+                     size: tuple):
+            """
+            :param parent: settings window
+            :param n: number of this setting
+            :param size: size of this setting in settings window
+            """
             super().__init__(parent)
             self.parent = parent
             self.n = n
             self.size = size
-            _ = name, standard_values, int_only, default_values_to_return, call_back, call_update_all
+
+    class Line(ParentSett):
+        SIZE = (450, 20)
+        LINE_HEIGHT = 2
+
+        def __init__(self, parent: SettingsWindow,
+                     n: int,
+                     size: tuple,
+                     *other,
+                     **other_):
+            """
+            :param parent: settings window
+            :param n: number of this setting
+            :param name: name of this setting
+            :param size: size of this setting in settings window
+            :param other: ...
+            :param other_: ...
+            """
+            _ = other, other_
+            super().__init__(parent, n, size)
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -85,22 +111,19 @@ class SettingsWindow(QtWidgets.QWidget):
             self.line.resize(self.width() - 2 * self.OFFSET, self.LINE_HEIGHT)
             self.line.setStyleSheet("background-color: rgb(200, 200, 200)")
 
-    class Title(QtWidgets.QWidget):
+    class Title(ParentSett):
         SIZE = (450, 20)
-        OFFSET = 10
 
         def __init__(self, parent,
                      n: int,
                      name: str,
                      size: tuple,
-                     standard_values=None, int_only=None,
-                     default_values_to_return=None, call_back=None, call_update_all=None):
-            super().__init__(parent)
+                     *other,
+                     **other_):
+            _ = other, other_
+            super().__init__(parent, n, size)
             self.parent = parent
-            self.n = n
             self.name = name
-            self.size = size
-            _ = standard_values, int_only, default_values_to_return, call_back, call_update_all
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -118,10 +141,9 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.height() // 2 - self.text.height() // 2
             )
 
-    class SettTwoLineEdit(QtWidgets.QWidget):
+    class SettTwoLineEdit(ParentSett):
         VALUES_N = 2
         SIZE = (450, 20)
-        OFFSET = 10
         FIELDS_SIZE = 50, 20
         STANDARD_SIZE = 150, 40
 
@@ -135,12 +157,9 @@ class SettingsWindow(QtWidgets.QWidget):
                      min_max_values: tuple = tuple(),
                      call_back: tuple = tuple(),
                      call_update_all=None):
-            super().__init__(parent)
-            self.parent = parent
-            self.n = n
+            super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
-            self.size = size
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (pass_f, pass_f)
@@ -254,10 +273,9 @@ class SettingsWindow(QtWidgets.QWidget):
                             self.standard_values[1]) + p))
                 self.value2_changed()
 
-    class SettCheckboxLineEdit(QtWidgets.QWidget):
+    class SettCheckboxLineEdit(ParentSett):
         VALUES_N = 2
         SIZE = (450, 20)
-        OFFSET = 10
         FIELDS_SIZE = 50, 20
         STANDARD_SIZE = 150, 40
 
@@ -271,12 +289,9 @@ class SettingsWindow(QtWidgets.QWidget):
                      call_back: tuple = tuple(),
                      call_update_all=None,
                      lock_line_edit=True):
-            super().__init__(parent)
-            self.parent = parent
-            self.n = n
+            super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
-            self.size = size
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
@@ -380,10 +395,9 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.value1_set(value1)
                 self.value2_set(value2)
 
-    class SettCheckbox(QtWidgets.QWidget):
+    class SettCheckbox(ParentSett):
         VALUES_N = 1
         SIZE = (450, 20)
-        OFFSET = 10
         FIELDS_SIZE = 50, 20
         STANDARD_SIZE = 150, 40
 
@@ -392,16 +406,14 @@ class SettingsWindow(QtWidgets.QWidget):
                      name: str,
                      standard_values: tuple,
                      size: tuple,
-                     int_only: bool,
                      default_values_to_return: tuple = tuple(),
                      call_back: tuple = tuple(),
-                     call_update_all=None):
-            super().__init__(parent)
-            self.parent = parent
-            self.n = n
+                     call_update_all=None,
+                     *other, **other_):
+            _ = other, other_
+            super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
-            self.size = size
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
@@ -455,10 +467,9 @@ class SettingsWindow(QtWidgets.QWidget):
                 value1 = self.call_update_all()
                 self.value1_set(value1)
 
-    class SettOneLineEdit(QtWidgets.QWidget):
+    class SettOneLineEdit(ParentSett):
         VALUES_N = 1
         SIZE = (450, 20)
-        OFFSET = 10
         FIELDS_SIZE = 50, 20
         STANDARD_SIZE = 150, 40
 
@@ -471,12 +482,9 @@ class SettingsWindow(QtWidgets.QWidget):
                      default_values_to_return: tuple = tuple(),
                      call_back: tuple = tuple(),
                      call_update_all=None):
-            super().__init__(parent)
-            self.parent = parent
-            self.n = n
+            super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
-            self.size = size
             self.int_only = int_only
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
@@ -542,7 +550,7 @@ class SettingsWindow(QtWidgets.QWidget):
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
 
-    def __init__(self, parent, manager):
+    def __init__(self, parent: QtWidgets.QWidget, manager: Manager):
         super().__init__(parent)
         self.objects = {parent: [2, []]}
         self.manager = manager
