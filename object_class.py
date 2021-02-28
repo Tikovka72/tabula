@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from manager import Manager
+
 from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
 from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
@@ -15,7 +20,16 @@ class ObjectClass(QWidget):
     FONT_SIZE_FACTOR = 0.80
     STANDARD_SIZE = (150, 40)
 
-    def __init__(self, parent, manager, zero_dot: ZeroPointWidget, pos=None):
+    def __init__(self, parent: QWidget,
+                 manager: Manager,
+                 zero_dot: ZeroPointWidget,
+                 pos: tuple or list = None):
+        """
+        :param parent: core UI widget
+        :param manager: main class containing all information
+        :param zero_dot: widget that tracks canvas's center
+        :param pos: position of object
+        """
         super().__init__(parent)
         self.manager = manager
         self.setAcceptDrops(True)
@@ -110,61 +124,123 @@ class ObjectClass(QWidget):
         self.manager.settings_window.show_sett(self)
 
     def return_to_fact_pos(self):
+        """
+        returns self to the fact position by zero point
+        """
         self.move_animation((self.x() - self.zero_dot.get_pos()[0] + self.zero_dot.zero[0],
                              self.y() - self.zero_dot.get_pos()[1] + self.zero_dot.zero[1]))
 
-    def move_animation(self, end_pos):
+    def move_animation(self, end_pos: tuple or list):
+        """
+        sets move animation to end_pos
+        :param end_pos: point to go to
+        """
         self.anim.setStartValue(QRect(self.x(), self.y(), self.width(), self.height()))
         self.anim.setEndValue(QRect(*end_pos, self.width(), self.height()))
 
         self.anim.start()
 
-    def call_back_size_width(self, width):
+    def call_back_size_width(self, width: int):
+        """
+        callback for settings window. This is necessary to change width of object
+        settings window -> ObjectClass
+        """
         self.resize_event(width, self.height(), False)
 
     def call_back_size_height(self, height):
+        """
+        callback for settings window. This is necessary to change height of object
+        settings window -> ObjectClass
+        """
         self.resize_event(self.width(), height, False)
 
-    def call_set_size(self):
+    def call_set_size(self) -> tuple:
+        """
+        gives self size
+        ObjectClass -> settings window
+        """
         return self.width(), self.height()
 
-    def call_back_pos_x(self, x):
+    def call_back_pos_x(self, x: int):
+        """
+        callback for settings window. This is necessary to change x position of object
+        settings window -> ObjectClass
+        """
         self.move_event(self.zero_dot.get_pos()[0] + x - self.width() // 2, self.y(), False)
 
-    def call_back_pos_y(self, y):
+    def call_back_pos_y(self, y: int):
+        """
+        callback for settings window. This is necessary to change y position of object
+        settings window -> ObjectClass
+        """
         self.move_event(self.x(), self.zero_dot.get_pos()[1] + y - self.height() // 2, False)
 
-    def call_set_pos(self):
+    def call_set_pos(self) -> tuple:
+        """
+        gives self position
+        ObjectClass -> settings window
+        """
         return -self.zero_dot.get_pos()[0] + self.x() + self.width() // 2, \
                -self.zero_dot.get_pos()[1] + self.y() + self.height() // 2
 
-    def call_back_text_size(self, size):
+    def call_back_text_size(self, size: int):
+        """
+        callback for settings window. This is necessary to change text size
+        settings window -> ObjectClass
+        """
         self.edit_line.change_text_size(size)
         self.edit_line.update_text_size()
 
-    def call_back_text_auto(self, st):
+    def call_back_text_auto(self, st: bool):
+        """
+        callback for settings window. This is necessary
+        to change whether the font size is set automatically
+        settings window -> ObjectClass
+        """
         self.edit_line.change_auto(st)
         self.edit_line.update_text_size()
 
     def call_set_text_size(self):
+        """
+        callback for settings window. This is necessary to change text size
+        settings window -> ObjectClass
+        """
         return self.edit_line.get_auto(), self.edit_line.get_text_size()
 
-    def call_back_border_radius(self, radius):
+    def call_back_border_radius(self, radius: int):
+        """
+        callback for settings window. This is necessary to change border radius
+        settings window -> ObjectClass
+        """
         self.edit_line.set_border(radius=radius)
 
-    def call_back_border_size(self, size):
+    def call_back_border_size(self, size: int):
+        """
+        callback for settings window. This is necessary to change text size
+        settings window -> ObjectClass
+        """
         self.edit_line.set_border(size=size)
 
-    def call_set_border(self):
+    def call_set_border(self) -> tuple:
+        """
+        gives self border size and radius
+        ObjectClass -> settings window
+        """
         return self.edit_line.get_border()
 
     def del_self(self):
+        """
+        deletes self
+        """
         self.manager.delete_widget(self)
         self.setEnabled(False)
         self.hide()
         del self
 
     def copy_self(self):
+        """
+        makes self duplicate
+        """
         copy = ObjectClass(self.parent(), self.manager, self.zero_dot)
         copy.resize_event(self.width(), self.height())
         copy.edit_line.setText(self.edit_line.text())
@@ -175,16 +251,29 @@ class ObjectClass(QWidget):
         copy.show()
 
     def on_back(self):
+        """
+        moves self on back
+        """
         self.lower()
 
-    def change_parent_mouse_pos(self, event, need_offset=False):
+    def change_parent_mouse_pos(self, event: QMouseEvent, need_offset: bool = False):
+        """
+        changes mouse point for parent. needs for drag event
+        """
         self.manager.change_mouse_pos(self.x() + event.x() + (self.OFFSET if need_offset else 0),
                                       self.y() + event.y() + (self.OFFSET if need_offset else 0))
 
-    def resize_event(self, x, y, show_size=True):
-        if x < 1 or y < 1:
+    def resize_event(self, width: int, height: int, show_size: bool = True):
+        """
+        resizes self
+        :param width: width
+        :param height: height
+        :param show_size: shows size in small window
+               in widget's center in {width}x{height} format or not
+        """
+        if width < 1 or height < 1:
             return
-        self.resize(x, y)
+        self.resize(width, height)
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.size().height() - self.OFFSET * 2)
         self.resize_angle.setGeometry(self.size().width() - self.OFFSET,
@@ -192,11 +281,17 @@ class ObjectClass(QWidget):
                                       self.size().width(), self.size().height())
         if show_size:
             self.show_size_or_pos_label()
-            self.set_size_or_pos_label(f"{x}x{y}")
+            self.set_size_or_pos_label(f"{width}x{height}")
         self.update_arrows()
         self.manager.settings_window.update_obj_settings(self)
 
-    def move_event(self, x, y, show_pos=True):
+    def move_event(self, x: int, y: int, show_pos: bool = True):
+        """
+        moves self
+        :param x: new x position
+        :param y: new y position
+        :param show_pos: shows position on the centre of widget
+        """
         self.move(x, y)
         if show_pos:
             self.show_size_or_pos_label()
@@ -209,6 +304,9 @@ class ObjectClass(QWidget):
         self.update_arrows()
 
     def set_size_or_pos_label(self, text):
+        """
+        sets text on center of widget
+        """
         self.size_or_pos_label.setText(text)
         self.size_or_pos_label.adjustSize()
         self.size_or_pos_label.move(
@@ -217,12 +315,22 @@ class ObjectClass(QWidget):
         )
 
     def hide_size_or_pos_label(self):
+        """
+        hides text on center of widget
+        """
         self.size_or_pos_label.hide()
 
     def show_size_or_pos_label(self):
+        """
+        shows text on center of widget
+        """
         self.size_or_pos_label.show()
 
     def check_and_set_arrow(self):
+        """
+        with clicking on widget this widget checks active arrows and if there is active arrow,
+        widget sets self as second object
+        """
         arrow: Arrow or None = self.manager.get_active_arrow()
         if arrow:
             if arrow.obj1 == self:
@@ -233,32 +341,58 @@ class ObjectClass(QWidget):
             self.manager.toggle_active_arrow()
             arrow.set_start_and_end()
 
-    def add_arrow_f(self, need_arrow=False, arrow_type=FROM_AND_TO_NEAREST_LINE):
+    def add_arrow_f(self, need_arrow: bool = False, arrow_type: int = FROM_AND_TO_NEAREST_LINE):
+        """
+        adds arrow from this widget
+        :param need_arrow: needs arrow on end (---- or --->)
+        :param arrow_type: type of arrow
+        """
         arrow = Arrow(manager=self.manager, need_arrow=need_arrow, arrow_type=arrow_type)
         self.manager.toggle_active_arrow(arrow)
         self.manager.add_arrow(arrow)
         self.manager.set_obj1_arrow(arrow, self)
 
     def update_arrows(self):
+        """
+        updates position of all widget's arrows
+        """
         for arrow in self.manager.get_all_arrows_from_object(self):
             arrow.set_start_and_end()
 
-    def check_have_active_arrow(self):
+    def check_have_active_arrow(self) -> Arrow:
+        """
+        checks if app has active arrow. needs to transfer this to LineEdit
+        manager -> widget -> line edit
+        """
         return self.manager.get_active_arrow()
 
     def toggle_have_active_arrow(self):
+        """
+        toggles active arrow. needs to transfer this to LineEdit
+        manager -> widget -> line edit
+        """
         self.manager.toggle_active_arrow()
 
-    def have_arrow_with(self, obj):
+    def have_arrow_with(self, obj: ObjectClass) -> bool:
+        """
+        checks if this object has arrow with other object
+        :param obj: other object to check
+        """
         return self.manager.get_arrows_with(self, obj)
 
     def show_angles(self):
+        """
+        shows angles for moving and resizing
+        """
         if self.resize_angle:
             self.resize_angle.show()
         if self.drag_angle:
             self.drag_angle.show()
 
     def hide_angles(self):
+        """
+        hides angles for moving and resizing
+        """
         if self.resize_angle:
             self.resize_angle.hide()
         if self.drag_angle:
@@ -280,10 +414,17 @@ class ObjectClass(QWidget):
         if event.button() == Qt.LeftButton:
             self.clicked.emit()
 
-    def data(self):
+    def data(self) -> str:
+        """
+        :return: data from LineEdit
+        """
         return self.edit_line.text()
 
-    def set_data(self, data):
+    def set_data(self, data: str):
+        """
+        sets your text in LineEdit
+        :param data: your text
+        """
         self.edit_line.setText(data)
 
 
@@ -418,13 +559,6 @@ class LineEdit(QLineEdit):
         size_index = style.rfind("border:") + len("border:")
         size = style[size_index:style[size_index:].find("px") + size_index]
         return size if size.isdigit() else "0", radius if radius.isdigit() else "0"
-
-    def check_radius(self, radius: int) -> int:
-        """
-        checks if radius value matches widget's size
-        :return: True if radius matches
-        """
-        return min(self.width(), self.height()) // 2 - 5 >= radius
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:

@@ -21,10 +21,10 @@ class ClassClass(ObjectClass):
         self.info.hide()
         self.resize_event(*self.STANDARD_SIZE)
 
-    def resize_event(self, x, y):
+    def resize_event(self, x, height):
         x = max(x, self.STANDARD_SIZE[0])
-        y = max(y, self.STANDARD_SIZE[1])
-        self.resize(x, y)
+        height = max(height, self.STANDARD_SIZE[1])
+        self.resize(x, height)
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.edit_line.height())
 

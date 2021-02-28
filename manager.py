@@ -541,7 +541,7 @@ class Manager:
         if arrows[0]:
             for arrow in arrows:
                 aid, obj1, obj2, na = arrow.split("U+FB4x16c")
-                arr = Arrow(self, need_arrow=int(na))
+                arr = Arrow(self, need_arrow=bool(int(na)))
                 self.add_arrow(arr)
                 self.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.set_obj2_arrow(arr, widgets_total[int(obj2)])

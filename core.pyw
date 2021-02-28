@@ -13,6 +13,7 @@ class Core(QtWidgets.QWidget):
     main class with UI
     """
     STANDARD_SIZE = 640, 480
+    OFFSET_MAGNET = 5
 
     def __init__(self):
         super().__init__()
@@ -278,7 +279,6 @@ class Core(QtWidgets.QWidget):
         if self.manager.get_dor() == DRAG:
             event.source().move(event.pos().x() - obj.OFFSET // 2, event.pos().y() - obj.OFFSET // 2)
             x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
-
             if shift_pressed:
                 if not x_mod:
                     x = x - (x - self.manager.zero_point_dot.get_pos()[0]) \
@@ -300,9 +300,9 @@ class Core(QtWidgets.QWidget):
             x, y = obj_x2 - obj_x1, obj_y2 - obj_y1
             if shift_pressed:
                 if not x_mod:
-                    x = max(x - x % (self.OFFSET_MAGNET * 2), 0)
+                    x = max(x - x % (self.manager.OFFSET_MAGNET * 2), 0)
                 if not y_mod:
-                    y = max(y - y % (self.OFFSET_MAGNET * 2), 0)
+                    y = max(y - y % (self.manager.OFFSET_MAGNET * 2), 0)
             self.manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().resize_event(x, y)
 

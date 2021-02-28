@@ -1,7 +1,10 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from manager import Manager
 
 import math
-from typing import TYPE_CHECKING
+
 
 from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
@@ -9,8 +12,7 @@ from numpy import arctan2
 
 from settings_widget import SettingsWindow
 from constants import FROM_AND_TO_NEAREST_LINE
-if TYPE_CHECKING:
-    from manager import Manager
+
 
 UP = 0
 RIGHT = 1
