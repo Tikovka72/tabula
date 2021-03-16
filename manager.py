@@ -150,7 +150,7 @@ class Manager:
             obj2_arrows = self.widgets.get(obj2)
             if arrow in obj2_arrows["in"]:
                 obj2_arrows["in"].pop(obj2_arrows["in"].index(arrow))
-        self.arrows.pop(arrow)
+        self.arrows.pop(arrow) if self.arrows.get(arrow, False) else None
 
     def delete_widget(self, obj: ObjectClass):
         """
@@ -559,3 +559,7 @@ class Manager:
         if name[0]:
             return name[0]
         return None
+
+    def delete_obj(self, obj):
+        del obj
+        self.core.update()

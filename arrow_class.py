@@ -247,12 +247,14 @@ class Arrow:
             if self.need_arrow:
                 ar1, ar2 = self.create_arrow(end_pos=self.end_pos)
                 qp.drawLines(ar1, ar2)
+            return False
         elif end_pos:
             start, end = self.get_start_and_end(end_pos)
             qp.drawLine(QLine(*start, *end))
             if self.need_arrow:
                 ar1, ar2 = self.create_arrow(end_pos=end_pos)
                 qp.drawLines(ar1, ar2)
+            return True
 
     @staticmethod
     def get_nearest_side(w, h, x, y):

@@ -19,6 +19,8 @@ class Core(QtWidgets.QWidget):
 
     def __init__(self):
         super().__init__()
+        self.qp = QPainter()
+        self.qp.begin(self)
         self.manager = Manager(self)
         self.arrow_menu = False
         self.mouse_nearest_lines = []
@@ -72,6 +74,7 @@ class Core(QtWidgets.QWidget):
                                                self.manager.zero_point_dot.get_pos()[1])
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
+        self.update()
 
     def call_back_zero_pos_height(self, y: int):
         """
@@ -82,6 +85,7 @@ class Core(QtWidgets.QWidget):
                                                y + self.height() // 2)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
+        self.update()
 
     def call_set_zero_pos(self) -> tuple:
         """
@@ -103,6 +107,7 @@ class Core(QtWidgets.QWidget):
             self.manager.grid.toggle_show()
         elif not show and self.manager.grid.show:
             self.manager.grid.toggle_show()
+        self.update()
 
     def call_back_grid_size(self, step: int):
         """
@@ -112,6 +117,7 @@ class Core(QtWidgets.QWidget):
         self.manager.grid.change_step(step)
         self.manager.grid.set_offset_by_zero_point()
         self.manager.grid.regenerate_grid()
+        self.update()
 
     def call_set_grid(self) -> tuple:
         """
@@ -136,10 +142,11 @@ class Core(QtWidgets.QWidget):
         self.manager.zero_point_dot.move_event(new_x + x,
                                                new_y + y)
         self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.regenerate_grid()
+        self.manager.grid.generate_grid()
         self.manager.grid.change_core_size(event.size().width(), event.size().height())
         self.manager.settings_window.set_geometry()
         self.manager.settings_window.update_obj_settings(self)
+        self.update()
 
     def self_menu_show(self):
         """
@@ -180,18 +187,15 @@ class Core(QtWidgets.QWidget):
                 show_pos=False
             )
                 for widget in self.manager.get_all_widgets()]
-
-            if self.manager.grid.show:
-                grid_offset = self.manager.grid.get_offset()
-                self.manager.grid.change_offset(
-                    (grid_offset[0] + (event.pos().x() - x)) % self.manager.grid.get_step(),
-                    (grid_offset[1] + (event.pos().y() - y)) % self.manager.grid.get_step())
-                self.manager.grid.regenerate_grid()
             self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.x() +
                                                    (event.pos().x() - x),
                                                    self.manager.zero_point_dot.y() +
                                                    (event.pos().y() - y))
+            if self.manager.grid.show:
+                self.manager.grid.set_offset_by_zero_point()
+                self.manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
+            self.update()
         self.manager.change_mouse_pos(event.x(), event.y())
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
@@ -216,6 +220,7 @@ class Core(QtWidgets.QWidget):
             self.manager.grid.set_offset_by_zero_point()
             self.manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
+        self.update()
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
         [a.clear_focus() for a in self.manager.get_all_arrows()]
@@ -231,6 +236,7 @@ class Core(QtWidgets.QWidget):
                     x3, y3 = event.pos().x(), event.pos().y()
                     if -3 < check_on_arrow(x1, y1, x2, y2, x3, y3) < 3:
                         self.arrow_menu_show(arrow)
+                        self.update()
                         return
 
             if self.hasFocus():
@@ -243,6 +249,7 @@ class Core(QtWidgets.QWidget):
                     x3, y3 = event.pos().x(), event.pos().y()
                     if -3 < check_on_arrow(x1, y1, x2, y2, x3, y3) < 3:
                         arrow.set_focus()
+                        self.update()
                         return
             self.manager.settings_window.hide_all_sett()
             self.manager.settings_window.show_sett(self)
@@ -252,6 +259,7 @@ class Core(QtWidgets.QWidget):
             widget.hide_angles()
         self.manager.clear_focus()
         self.setFocus()
+        self.update()
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
@@ -274,6 +282,7 @@ class Core(QtWidgets.QWidget):
             self.manager.settings_window.show_sett(event.source())
 
         event.accept()
+        self.update()
 
     def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
         obj = event.source()
@@ -308,6 +317,7 @@ class Core(QtWidgets.QWidget):
                     y = max(y - y % (self.manager.OFFSET_MAGNET * 2), 0)
             self.manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().resize_event(x, y)
+        self.update()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         self.manager.drop_magnet_lines()
@@ -315,24 +325,25 @@ class Core(QtWidgets.QWidget):
         event.accept()
         self.manager.set_dor(NONE)
         [widget.hide_size_or_pos_label() for widget in self.manager.get_all_widgets()]
+        self.update()
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
-        qp = QPainter()
-        qp.begin(self)
-        qp.setRenderHint(QPainter.Antialiasing)
-        self.manager.grid.draw(qp)
+        self.qp.begin(self)
+        self.qp.setRenderHint(QPainter.Antialiasing)
+        self.manager.grid.draw(self.qp)
         for arrow in self.manager.get_all_arrows():
-            qp.setPen(QPen(QColor(arrow.get_color()), 2))
+            self.qp.setPen(QPen(QColor(arrow.get_color()), 2))
             end = self.manager.get_mouse_pos()
-            arrow.draw(qp, end_pos=end)
+            if arrow.draw(self.qp, end_pos=end):
+                self.update()
         pen = QPen(QColor(MAGNET_LINES_COLOR), 1)
         pen.setStyle(QtCore.Qt.DashLine)
-        qp.setPen(pen)
+        self.qp.setPen(pen)
         mls = self.manager.get_magnet_lines()
         if mls:
-            qp.drawLines(*mls)
-        qp.end()
-        self.update()
+            self.qp.drawLines(*mls)
+        self.qp.end()
+
         time.sleep(0.005)
 
 
