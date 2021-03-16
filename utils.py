@@ -29,14 +29,20 @@ def check_on_arrow(x1: int, y1: int, x2: int, y2: int, point_x: int, point_y: in
     :return: distance between point and line
     (I don't know how it counts distance, I took formulas from math forum)
     """
-    dx1 = x2 - x1
-    dy1 = y2 - y1
-    dx = point_x - x1
-    dy = point_y - y1
-    s = dx1 * dy - dx * dy1
-    ab = (dx1 * dx1 + dy1 * dy1) ** 0.5
-    h = s / ab
-    return h
+    px = x2 - x1
+    py = y2 - y1
+    norm = px * px + py * py
+    u = ((point_x - x1) * px + (point_y - y1) * py) / float(norm)
+    if u > 1:
+        u = 1
+    elif u < 0:
+        u = 0
+    x = x1 + u * px
+    y = y1 + u * py
+    dx = x - point_x
+    dy = y - point_y
+    dist = (dx * dx + dy * dy) ** .5
+    return dist
 
 
 def pass_f(*args, **kwargs) -> None:

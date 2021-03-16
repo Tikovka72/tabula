@@ -1,4 +1,6 @@
 import sys
+import time
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPainter, QColor, QPen
 
@@ -216,6 +218,7 @@ class Core(QtWidgets.QWidget):
             self.manager.settings_window.update_obj_settings(self)
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
+        [a.clear_focus() for a in self.manager.get_all_arrows()]
         if event.button() == QtCore.Qt.RightButton:
             if self.manager.get_active_arrow():
                 self.manager.delete_arrow(self.manager.get_active_arrow())
@@ -330,6 +333,7 @@ class Core(QtWidgets.QWidget):
             qp.drawLines(*mls)
         qp.end()
         self.update()
+        time.sleep(0.005)
 
 
 def except_hook(cls, exception, traceback):
