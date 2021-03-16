@@ -20,12 +20,11 @@ class Core(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.qp = QPainter()
-        self.qp.begin(self)
         self.manager = Manager(self)
-        self.arrow_menu = False
-        self.mouse_nearest_lines = []
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
+        self.drag_dot = 0, 0
+        self.dragged_obj = None
         self.__init_ui__()
 
     def __init_ui__(self):
@@ -238,7 +237,6 @@ class Core(QtWidgets.QWidget):
                         self.arrow_menu_show(arrow)
                         self.update()
                         return
-
             if self.hasFocus():
                 self.self_menu_show()
         elif event.button() == QtCore.Qt.LeftButton:
@@ -255,21 +253,13 @@ class Core(QtWidgets.QWidget):
             self.manager.settings_window.show_sett(self)
 
             self.manager.clear_focus_arrows()
-        for widget in self.manager.get_all_widgets():
-            widget.hide_angles()
         self.manager.clear_focus()
         self.setFocus()
         self.update()
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
-        if 0 <= x <= event.source().OFFSET + 5 and 0 <= y <= event.source().OFFSET + 5:
-            self.manager.set_dor(DRAG)
-            event.source().show_size_or_pos_label()
-            event.source().show_angles()
-            self.manager.settings_window.hide_all_sett()
-            self.manager.settings_window.show_sett(event.source())
-        elif event.source().size().width() - event.source().OFFSET - 5 \
+        if not self.dragged_obj and event.source().size().width() - event.source().OFFSET - 5 \
                 <= x <= \
                 event.source().size().width() + 5 and \
                 event.source().size().height() - event.source().OFFSET - 5 \
@@ -280,7 +270,16 @@ class Core(QtWidgets.QWidget):
             event.source().show_angles()
             self.manager.settings_window.hide_all_sett()
             self.manager.settings_window.show_sett(event.source())
-
+        else:
+            if self.dragged_obj is None:
+                self.dragged_obj = event.source()
+                self.manager.set_dor(DRAG)
+                event.source().show_size_or_pos_label()
+                event.source().show_angles()
+                self.drag_dot = event.pos().x() - event.source().x(), \
+                                event.pos().y() - event.source().y()
+                self.manager.settings_window.hide_all_sett()
+                self.manager.settings_window.show_sett(event.source())
         event.accept()
         self.update()
 
@@ -289,7 +288,7 @@ class Core(QtWidgets.QWidget):
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
         shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.manager.get_dor() == DRAG:
-            event.source().move(event.pos().x() - obj.OFFSET // 2, event.pos().y() - obj.OFFSET // 2)
+            event.source().move(event.pos().x() - self.drag_dot[0], event.pos().y() - self.drag_dot[1])
             x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
             if shift_pressed:
                 if not x_mod:
@@ -320,6 +319,7 @@ class Core(QtWidgets.QWidget):
         self.update()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
+        self.dragged_obj = None
         self.manager.drop_magnet_lines()
         self.manager.grid.clear_special_lines()
         event.accept()

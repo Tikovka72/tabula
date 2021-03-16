@@ -578,7 +578,15 @@ class LineEdit(QLineEdit):
         self.menu.exec_(QCursor.pos())
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        self.change_parent_mouse_pos(event)
+        super().mouseMoveEvent(event)
+        if event.buttons() == Qt.RightButton:
+            mime = QMimeData()
+            drag = QDrag(self.parent())
+            drag.setMimeData(mime)
+            drag.setHotSpot(event.pos())
+            drag.exec_(Qt.MoveAction)
+        else:
+            self.change_parent_mouse_pos(event)
 
     def change_parent_mouse_pos(self, event: QMouseEvent):
         self.parent().change_parent_mouse_pos(event, need_offset=True)
