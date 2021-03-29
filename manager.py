@@ -1,6 +1,9 @@
 from PyQt5 import QtWidgets, QtGui
 from PyQt5 import QtCore
 
+import sys
+
+from core import Core
 from zero_point import ZeroPointWidget
 from grid import Grid
 from object_class import ObjectClass
@@ -8,16 +11,13 @@ from mouse import Mouse
 from settings_widget import SettingsWindow
 from arrow_class import Arrow
 from warning_window import WarningWindow
+from utils import except_hook
 
 
 class Manager:
     OFFSET_MAGNET = 5
 
-    def __init__(self, core: QtWidgets.QWidget):
-        """
-        :param core: main UI window
-        """
-        self.core = core
+    def __init__(self):
         # Arrow: {obj1: ObjectClass, obj2: ObjectClass}
         self.arrows = {}
         # ObjectClass: {in: Arrow, out: Arrow}
@@ -25,6 +25,8 @@ class Manager:
         self.magnet_lines = []
         self.drag_or_resize = 0
         self.active_arrow = None
+        self.app = QtWidgets.QApplication(sys.argv)
+        self.core = Core(self)
         self.zero_point_dot = ZeroPointWidget(parent=self.core, manager=self)
         self.zero_point_dot.setGeometry(self.core.width() // 2, self.core.height() // 2, 1, 1)
         self.grid = Grid(show=True, core_size=(self.core.width(), self.core.height()),
@@ -32,6 +34,8 @@ class Manager:
         self.mouse = Mouse()
         self.settings_window = SettingsWindow(self.core, self)
         self.opened_file = None
+        self.core.__init_ui__()
+        self.core.show()
 
     def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
         """
@@ -563,3 +567,12 @@ class Manager:
     def delete_obj(self, obj):
         del obj
         self.core.update()
+
+    def update_core(self):
+        self.core.update()
+
+
+if __name__ == "__main__":
+    sys.excepthook = except_hook
+    app = Manager()
+    sys.exit(app.app.exec())

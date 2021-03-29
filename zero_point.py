@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 
 
 class ZeroPointWidget(QtWidgets.QWidget):
@@ -93,3 +93,4 @@ class ZeroPointAndGridAnimation(QtCore.QPropertyAnimation):
             self.manager.grid.set_offset_by_zero_point()
             self.manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self.manager.core)
+            self.manager.update_core()

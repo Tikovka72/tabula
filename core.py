@@ -1,10 +1,8 @@
-import sys
 import time
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPainter, QColor, QPen
 
-from manager import Manager
 from settings_widget import SettingsWindow
 from utils import check_on_arrow
 from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR
@@ -17,15 +15,15 @@ class Core(QtWidgets.QWidget):
     STANDARD_SIZE = 640, 480
     OFFSET_MAGNET = 5
 
-    def __init__(self):
+    def __init__(self, manager):
         super().__init__()
         self.qp = QPainter()
-        self.manager = Manager(self)
+        self.manager = manager
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.drag_dot = 0, 0
         self.dragged_obj = None
-        self.__init_ui__()
+        # self.__init_ui__()
 
     def __init_ui__(self):
         self.setWindowTitle("tabula")
@@ -276,8 +274,8 @@ class Core(QtWidgets.QWidget):
                 self.manager.set_dor(DRAG)
                 event.source().show_size_or_pos_label()
                 event.source().show_angles()
-                self.drag_dot = event.pos().x() - event.source().x(), \
-                                event.pos().y() - event.source().y()
+                self.drag_dot = (event.pos().x() - event.source().x(),
+                                 event.pos().y() - event.source().y())
                 self.manager.settings_window.hide_all_sett()
                 self.manager.settings_window.show_sett(event.source())
         event.accept()
@@ -288,7 +286,9 @@ class Core(QtWidgets.QWidget):
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
         shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.manager.get_dor() == DRAG:
-            event.source().move(event.pos().x() - self.drag_dot[0], event.pos().y() - self.drag_dot[1])
+            event.source().move(
+                event.pos().x() - self.drag_dot[0], event.pos().y() - self.drag_dot[1]
+            )
             x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
             if shift_pressed:
                 if not x_mod:
@@ -345,15 +345,3 @@ class Core(QtWidgets.QWidget):
         self.qp.end()
 
         time.sleep(0.005)
-
-
-def except_hook(cls, exception, traceback):
-    sys.__excepthook__(cls, exception, traceback)
-
-
-if __name__ == "__main__":
-    sys.excepthook = except_hook
-    app = QtWidgets.QApplication(sys.argv)
-    tabula_app = Core()
-    tabula_app.show()
-    sys.exit(app.exec())

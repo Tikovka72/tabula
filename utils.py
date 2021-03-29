@@ -1,4 +1,5 @@
 from collections.abc import Callable
+import sys
 
 
 def isdig(s: str) -> bool:
@@ -72,3 +73,7 @@ def test(func: Callable) -> Callable:
         func(*args, **kwargs)
         print(f"end {func}")
     return func_start_and_stop
+
+
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
