@@ -1,9 +1,10 @@
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
 import sys
 
 from core import Core
+from widget_manager import WidgetManager
 from zero_point import ZeroPointWidget
 from grid import Grid
 from object_class import ObjectClass
@@ -18,10 +19,9 @@ class Manager:
     OFFSET_MAGNET = 5
 
     def __init__(self):
+        self.widget_manager = WidgetManager(self)
         # Arrow: {obj1: ObjectClass, obj2: ObjectClass}
         self.arrows = {}
-        # ObjectClass: {in: Arrow, out: Arrow}
-        self.widgets = {}
         self.magnet_lines = []
         self.drag_or_resize = 0
         self.active_arrow = None
@@ -37,26 +37,6 @@ class Manager:
         self.core.__init_ui__()
         self.core.show()
 
-    def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
-        """
-        method for adding widget in dict with all widgets (self.widgets).
-        if widget was passed, this manager will add this widget to dict self.widgets
-        if widget wasn't passed, this manager will create new widget for dict and
-            set position "pos" for this new widget, if "pos" wasn't passed,
-            "pos" will set to  (0, 0)
-        :param pos: pos of widget
-        :param widget: object_class.ObjectClass
-        :return: this widget
-        """
-        if widget is None:
-            widget = ObjectClass(self.core, self, pos=pos if pos else (0, 0),
-                                 zero_dot=self.zero_point_dot)
-        widget.show()
-        self.widgets[widget] = {"in": [], "out": []}
-        self.settings_window.hide_all_sett()
-        self.settings_window.show_sett(widget)
-        return widget
-
     def add_arrow(self, arrow: Arrow):
         """
         adds arrow to dict self.arrows
@@ -64,18 +44,12 @@ class Manager:
         :return:
         """
         self.arrows[arrow] = {"obj1": arrow.obj1, "obj2": arrow.obj2}
-        obj1, obj2 = self.widgets.get(arrow.obj1, None), self.widgets.get(arrow.obj2, None)
+        obj1, obj2 = (self.widget_manager.widgets.get(arrow.obj1, None),
+                      self.widget_manager.widgets.get(arrow.obj2, None))
         if obj1:
-            self.widgets[obj1]["out"].append(arrow)
+            self.widget_manager.widgets[obj1]["out"].append(arrow)
         if obj2:
-            self.widgets[obj2]["in"].append(arrow)
-
-    def get_all_widgets(self):
-        """
-        returns all of widgets that it contains self.widgets
-        :return: all widgets
-        """
-        return self.widgets.keys()
+            self.widget_manager.widgets[obj2]["in"].append(arrow)
 
     def get_all_arrows(self):
         """
@@ -105,8 +79,9 @@ class Manager:
         :param obj: widget for which you need to get arrows
         :return: list of these arrows, or empty list if widget isn't in self.widgets
         """
-        if self.widgets.get(obj, None):
-            return self.widgets.get(obj)["in"] + self.widgets.get(obj)["out"]
+        if self.widget_manager.widgets.get(obj, None):
+            return self.widget_manager.widgets.get(obj)["in"] + \
+                   self.widget_manager.widgets.get(obj)["out"]
         return []
 
     def get_arrows_with(self, obj1, obj2):
@@ -129,7 +104,7 @@ class Manager:
         if self.arrows.get(arrow, None):
             self.arrows.get(arrow)["obj1"] = obj
             arrow.obj1 = obj
-            self.widgets.get(obj)["out"].append(arrow)
+            self.widget_manager.widgets.get(obj)["out"].append(arrow)
 
     def set_obj2_arrow(self, arrow: Arrow, obj: ObjectClass):
         """
@@ -138,7 +113,7 @@ class Manager:
         if self.arrows.get(arrow, None):
             self.arrows.get(arrow)["obj2"] = obj
             arrow.obj2 = obj
-            self.widgets.get(obj)["in"].append(arrow)
+            self.widget_manager.widgets.get(obj)["in"].append(arrow)
 
     def delete_arrow(self, arrow: Arrow):
         """
@@ -147,26 +122,14 @@ class Manager:
         objects = self.arrows.get(arrow, {"obj1": None, "obj2": None})
         obj1, obj2 = objects["obj1"], objects["obj2"]
         if obj1:
-            obj1_arrows = self.widgets.get(obj1)
+            obj1_arrows = self.widget_manager.widgets.get(obj1)
             if arrow in obj1_arrows["out"]:
                 obj1_arrows["out"].pop(obj1_arrows["out"].index(arrow))
         if obj2:
-            obj2_arrows = self.widgets.get(obj2)
+            obj2_arrows = self.widget_manager.widgets.get(obj2)
             if arrow in obj2_arrows["in"]:
                 obj2_arrows["in"].pop(obj2_arrows["in"].index(arrow))
         self.arrows.pop(arrow) if self.arrows.get(arrow, False) else None
-
-    def delete_widget(self, obj: ObjectClass):
-        """
-        deletes widget from self.widgets and all arrows that were linked with it
-        """
-        arrows = self.get_all_arrows_from_object(obj)
-        for arrow in arrows:
-            try:
-                self.delete_arrow(arrow)
-            except Exception as e:
-                print(e)
-        self.widgets.pop(obj)
 
     def change_arrow_color(self, arrow: Arrow):
         """
@@ -182,26 +145,6 @@ class Manager:
         if color.isValid():
             arrow.color = color.name()
 
-    def set_coords_on_widgets(self, widgets: list or tuple,
-                              event: QtGui.QDragMoveEvent, x: int, y: int):
-        """
-        sets label for widgets with distance to some widget
-        :param widgets: widgets that need label
-        :param event: event for position of mouse
-        :param x: x coordinate of main widget
-        :param y: y coordinate of main widget
-        """
-        [widget.hide_size_or_pos_label() for widget in self.get_all_widgets()]
-        for widget, (way_x, way_y) in widgets.items():
-            if way_x or way_y:
-                widget.show_size_or_pos_label()
-                widget.set_size_or_pos_label(
-                    "{} {}".format(str(str(abs((x + event.source().width() // 2) - way_x)
-                                           if way_x else '') + '↔') if way_x else '',
-                                   str(str(abs((y + event.source().height() // 2) - way_y)
-                                           if way_y else '') + '↕') if way_y else '')
-                )
-            
     def resize_magnet_checker(self, obj: ObjectClass, pos: QtCore.QPoint) \
             -> (int, int, int, int, dict):
         """
@@ -218,7 +161,7 @@ class Manager:
         obj_y2 = pos.y()
         x_mod = y_mod = False
         widgets = {}
-        for widget in self.get_all_widgets():
+        for widget in self.widget_manager.get_all_widgets():
             way_x = way_y = None
             if widget == obj:
                 continue
@@ -272,7 +215,7 @@ class Manager:
         x_mod = y_mod = False
         # widget: x, y
         widgets = {}
-        for widget in self.get_all_widgets():
+        for widget in self.widget_manager.get_all_widgets():
             way_x = way_y = None
             if widget == obj:
                 continue
@@ -472,7 +415,7 @@ class Manager:
         """
         clears focus and hides angles from all widgets
         """
-        [(w.clearFocus(), w.hide_angles()) for w in self.widgets]
+        [(w.clearFocus(), w.hide_angles()) for w in self.widget_manager.widgets]
 
     def clear_focus_arrows(self):
         """
@@ -490,7 +433,7 @@ class Manager:
                 return
         text_file = []
         widget_ids = {}
-        for i, widget in enumerate(self.widgets):
+        for i, widget in enumerate(self.widget_manager.widgets):
             text_file.append(
                 "U+FB4x13c".join(map(
                     str,
@@ -519,7 +462,7 @@ class Manager:
         file = QtWidgets.QFileDialog().getOpenFileName(self.core, "open file", filter="*.tbl")
         if not file[0]:
             return
-        widgets = tuple(self.widgets.keys())
+        widgets = tuple(self.widget_manager.widgets.keys())
         tuple(map(lambda wi: wi.del_self(), widgets))
         with open(file[0], encoding="UTF-8") as f:
             self.opened_file = file[0]
@@ -538,7 +481,7 @@ class Manager:
         if widgets[0]:
             for widget in widgets:
                 wid, x, y, w, h, d = widget.split("U+FB4x13c")
-                widget_class = self.add_widget((int(x), int(y)))
+                widget_class = self.widget_manager.add_widget((int(x), int(y)))
                 widget_class.resize(int(w), int(h))
                 widget_class.set_data(d)
                 widgets_total[int(wid)] = widget_class

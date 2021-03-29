@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from manager import Manager
+    from widget_manager import WidgetManager
 
 from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
@@ -21,7 +22,7 @@ class ObjectClass(QWidget):
     STANDARD_SIZE = (150, 40)
 
     def __init__(self, parent: QWidget,
-                 manager: Manager,
+                 manager: WidgetManager,
                  zero_dot: ZeroPointWidget,
                  pos: tuple or list = None):
         """
@@ -31,7 +32,7 @@ class ObjectClass(QWidget):
         :param pos: position of object
         """
         super().__init__(parent)
-        self.manager = manager
+        self.object_manager = manager
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.zero_dot = zero_dot
@@ -41,7 +42,7 @@ class ObjectClass(QWidget):
         if pos:
             self.move(*pos)
         self.__init_ui__()
-        self.manager.settings_window.raise_()
+        self.object_manager.manager.settings_window.raise_()
 
     def __init_ui__(self):
         self.resize(*self.STANDARD_SIZE)
@@ -78,50 +79,61 @@ class ObjectClass(QWidget):
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
         self.resize_angle.setStyleSheet("background-color: black")
-        self.manager.settings_window.add_settings(self, SettingsWindow.Title,
-                                                  name="Размер и расположение объекта")
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Размер",
-                                                  standard_values=(
-                                                      self.size().width(), self.size().height()),
-                                                  int_only=True,
-                                                  default_values_to_return=(self.size().width(),
-                                                                            self.size().height()),
-                                                  call_back=(self.call_back_size_width,
-                                                             self.call_back_size_height),
-                                                  call_update_all=self.call_set_size)
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Положение",
-                                                  standard_values=(self.x(), self.y()),
-                                                  int_only=True,
-                                                  default_values_to_return=(self.x(), self.y()),
-                                                  call_back=(
-                                                      self.call_back_pos_x, self.call_back_pos_y),
-                                                  call_update_all=self.call_set_pos)
-        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.manager.settings_window.add_settings(self, SettingsWindow.Title, name="Текст")
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckboxLineEdit,
-                                                  name="Размер шрифта",
-                                                  standard_values=(("Авто", True),
-                                                                   self.edit_line.get_text_size()),
-                                                  int_only=True,
-                                                  default_values_to_return=(
-                                                      True, self.edit_line.get_text_size()),
-                                                  call_back=(self.call_back_text_auto,
-                                                             self.call_back_text_size),
-                                                  call_update_all=self.call_set_text_size)
-        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.manager.settings_window.add_settings(self, SettingsWindow.Title, name="Рамка")
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Размер и радиус рамки",
-                                                  standard_values=self.edit_line.get_border(),
-                                                  int_only=True,
-                                                  default_values_to_return=(0, 1),
-                                                  call_back=(self.call_back_border_size,
-                                                             self.call_back_border_radius),
-                                                  call_update_all=self.call_set_border)
-        self.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.manager.settings_window.show_sett(self)
+        self.object_manager.manager.settings_window.add_settings(
+            self, SettingsWindow.Title, name="Размер и расположение объекта"
+        )
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettTwoLineEdit,
+            name="Размер",
+            standard_values=(self.size().width(), self.size().height()),
+            int_only=True,
+            default_values_to_return=(self.size().width(), self.size().height()),
+            call_back=(self.call_back_size_width, self.call_back_size_height),
+            call_update_all=self.call_set_size
+        )
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettTwoLineEdit,
+            name="Положение",
+            standard_values=(self.x(), self.y()),
+            int_only=True,
+            default_values_to_return=(self.x(), self.y()),
+            call_back=(self.call_back_pos_x, self.call_back_pos_y),
+            call_update_all=self.call_set_pos
+        )
+        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.Title,
+            name="Текст"
+        )
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettCheckboxLineEdit,
+            name="Размер шрифта",
+            standard_values=(("Авто", True), self.edit_line.get_text_size()),
+            int_only=True,
+            default_values_to_return=(True, self.edit_line.get_text_size()),
+            call_back=(self.call_back_text_auto, self.call_back_text_size),
+            call_update_all=self.call_set_text_size)
+        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.Title,
+            name="Рамка"
+        )
+        self.object_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettTwoLineEdit,
+            name="Размер и радиус рамки",
+            standard_values=self.edit_line.get_border(),
+            int_only=True,
+            default_values_to_return=(0, 1),
+            call_back=(self.call_back_border_size, self.call_back_border_radius),
+            call_update_all=self.call_set_border)
+        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.object_manager.manager.settings_window.show_sett(self)
 
     def return_to_fact_pos(self):
         """
@@ -232,22 +244,22 @@ class ObjectClass(QWidget):
         """
         deletes self
         """
-        self.manager.delete_widget(self)
+        self.object_manager.delete_widget(self)
         self.setEnabled(False)
         self.hide()
-        self.manager.delete_obj(self)
+        self.object_manager.manager.delete_obj(self)
 
     def copy_self(self):
         """
         makes self duplicate
         """
-        copy = ObjectClass(self.parent(), self.manager, self.zero_dot)
+        copy = ObjectClass(self.parent(), self.object_manager, self.zero_dot)
         copy.resize_event(self.width(), self.height())
         copy.edit_line.setText(self.edit_line.text())
         copy.move_event(self.geometry().x() + self.geometry().width() // 2 - 10,
                         self.geometry().y() + self.geometry().height() + 10, show_pos=False)
         copy.hide_size_or_pos_label()
-        self.manager.add_widget(widget=copy)
+        self.object_manager.add_widget(widget=copy)
         copy.show()
 
     def on_back(self):
@@ -260,8 +272,9 @@ class ObjectClass(QWidget):
         """
         changes mouse point for parent. needs for drag event
         """
-        self.manager.change_mouse_pos(self.x() + event.x() + (self.OFFSET if need_offset else 0),
-                                      self.y() + event.y() + (self.OFFSET if need_offset else 0))
+        self.object_manager.manager.change_mouse_pos(
+            self.x() + event.x() + (self.OFFSET if need_offset else 0),
+            self.y() + event.y() + (self.OFFSET if need_offset else 0))
 
     def resize_event(self, width: int, height: int, show_size: bool = True):
         """
@@ -283,7 +296,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{width}x{height}")
         self.update_arrows()
-        self.manager.settings_window.update_obj_settings(self)
+        self.object_manager.manager.settings_window.update_obj_settings(self)
 
     def move_event(self, x: int, y: int, show_pos: bool = True):
         """
@@ -297,7 +310,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0] + self.width() // 2} "
                                        f"{y - self.zero_dot.get_pos()[1] + self.height() // 2}")
-        self.manager.settings_window.update_obj_settings(self)
+        self.object_manager.manager.settings_window.update_obj_settings(self)
 
     def moveEvent(self, a0) -> None:
         self.move(a0.pos().x(), a0.pos().y())
@@ -331,14 +344,14 @@ class ObjectClass(QWidget):
         with clicking on widget this widget checks active arrows and if there is active arrow,
         widget sets self as second object
         """
-        arrow: Arrow or None = self.manager.get_active_arrow()
+        arrow: Arrow or None = self.object_manager.manager.get_active_arrow()
         if arrow:
             if arrow.obj1 == self:
                 return
-            if self.manager.get_arrows_with(self, arrow.obj1):
+            if self.object_manager.manager.get_arrows_with(self, arrow.obj1):
                 return
-            self.manager.set_obj2_arrow(arrow, self)
-            self.manager.toggle_active_arrow()
+            self.object_manager.manager.set_obj2_arrow(arrow, self)
+            self.object_manager.manager.toggle_active_arrow()
             arrow.set_start_and_end()
 
     def add_arrow_f(self, need_arrow: bool = False, arrow_type: int = FROM_AND_TO_NEAREST_LINE):
@@ -347,16 +360,19 @@ class ObjectClass(QWidget):
         :param need_arrow: needs arrow on end (---- or --->)
         :param arrow_type: type of arrow
         """
-        arrow = Arrow(manager=self.manager, need_arrow=need_arrow, arrow_type=arrow_type)
-        self.manager.toggle_active_arrow(arrow)
-        self.manager.add_arrow(arrow)
-        self.manager.set_obj1_arrow(arrow, self)
+        arrow = Arrow(
+            manager=self.object_manager.manager,
+            need_arrow=need_arrow, arrow_type=arrow_type
+        )
+        self.object_manager.manager.toggle_active_arrow(arrow)
+        self.object_manager.manager.add_arrow(arrow)
+        self.object_manager.manager.set_obj1_arrow(arrow, self)
 
     def update_arrows(self):
         """
         updates position of all widget's arrows
         """
-        for arrow in self.manager.get_all_arrows_from_object(self):
+        for arrow in self.object_manager.manager.get_all_arrows_from_object(self):
             arrow.set_start_and_end()
 
     def check_have_active_arrow(self) -> Arrow:
@@ -364,21 +380,21 @@ class ObjectClass(QWidget):
         checks if app has active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        return self.manager.get_active_arrow()
+        return self.object_manager.manager.get_active_arrow()
 
     def toggle_have_active_arrow(self):
         """
         toggles active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        self.manager.toggle_active_arrow()
+        self.object_manager.manager.toggle_active_arrow()
 
     def have_arrow_with(self, obj: ObjectClass) -> bool:
         """
         checks if this object has arrow with other object
         :param obj: other object to check
         """
-        return self.manager.get_arrows_with(self, obj)
+        return self.object_manager.manager.get_arrows_with(self, obj)
 
     def show_angles(self):
         """
@@ -562,14 +578,14 @@ class LineEdit(QLineEdit):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
-            self.parent().manager.settings_window.hide_all_sett()
-            self.parent().manager.clear_focus()
-            self.parent().manager.clear_focus_arrows()
+            self.parent().object_manager.manager.settings_window.hide_all_sett()
+            self.parent().object_manager.manager.clear_focus()
+            self.parent().object_manager.manager.clear_focus_arrows()
             self.parent().show_angles()
             self.parent().check_and_set_arrow()
             self.parent().hide_size_or_pos_label()
 
-            self.parent().manager.settings_window.show_sett(self.parent())
+            self.parent().object_manager.manager.settings_window.show_sett(self.parent())
 
     def self_menu_show(self):
         """

@@ -1,3 +1,9 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from manager import Manager
+
 import time
 
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -15,7 +21,7 @@ class Core(QtWidgets.QWidget):
     STANDARD_SIZE = 640, 480
     OFFSET_MAGNET = 5
 
-    def __init__(self, manager):
+    def __init__(self, manager: Manager):
         super().__init__()
         self.qp = QPainter()
         self.manager = manager
@@ -134,7 +140,7 @@ class Core(QtWidgets.QWidget):
         [widget.move_event(widget.x() + new_x - self.manager.zero_point_dot.get_zero()[0],
                            widget.y() + new_y - self.manager.zero_point_dot.get_zero()[1],
                            show_pos=False)
-         for widget in self.manager.get_all_widgets()]
+         for widget in self.manager.widget_manager.get_all_widgets()]
         self.manager.set_new_zero_point_pos(new_x, new_y)
         self.manager.zero_point_dot.move_event(new_x + x,
                                                new_y + y)
@@ -151,7 +157,8 @@ class Core(QtWidgets.QWidget):
         """
         pos = self.manager.get_mouse_pos()
         context_menu = QtWidgets.QMenu()
-        context_menu.addAction('Добавить объект', lambda: self.manager.add_widget(pos))
+        context_menu.addAction('Добавить объект',
+                               lambda: self.manager.widget_manager.add_widget(pos))
         context_menu.setStyleSheet(
             f"font-size: 15px;"
             f"border-radius: 5%;"
@@ -183,7 +190,7 @@ class Core(QtWidgets.QWidget):
                 (event.pos().y() - y),
                 show_pos=False
             )
-                for widget in self.manager.get_all_widgets()]
+                for widget in self.manager.widget_manager.get_all_widgets()]
             self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.x() +
                                                    (event.pos().x() - x),
                                                    self.manager.zero_point_dot.y() +
@@ -199,7 +206,7 @@ class Core(QtWidgets.QWidget):
         if not self.hasFocus():
             return
         if event.key() in (QtCore.Qt.Key_R, 1050):
-            [widget.return_to_fact_pos() for widget in self.manager.get_all_widgets()]
+            [widget.return_to_fact_pos() for widget in self.manager.widget_manager.get_all_widgets()]
             self.manager.zero_point_dot.return_to_zero()
             self.manager.grid.set_offset_by_zero_point()
             self.manager.grid.regenerate_grid()
@@ -302,7 +309,7 @@ class Core(QtWidgets.QWidget):
                 x, y, widgets = self.manager.check_and_set_grid_magnet_lines_for_resizing(
                     obj, x, y, x_mod, y_mod, widgets
                 )
-            self.manager.set_coords_on_widgets(widgets, event, x, y)
+            self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().move_event(x, y)
             event.source().update_arrows()
         elif self.manager.get_dor() == RESIZE:
@@ -314,7 +321,7 @@ class Core(QtWidgets.QWidget):
                     x = max(x - x % (self.manager.OFFSET_MAGNET * 2), 0)
                 if not y_mod:
                     y = max(y - y % (self.manager.OFFSET_MAGNET * 2), 0)
-            self.manager.set_coords_on_widgets(widgets, event, x, y)
+            self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().resize_event(x, y)
         self.update()
 
@@ -324,7 +331,7 @@ class Core(QtWidgets.QWidget):
         self.manager.grid.clear_special_lines()
         event.accept()
         self.manager.set_dor(NONE)
-        [widget.hide_size_or_pos_label() for widget in self.manager.get_all_widgets()]
+        [widget.hide_size_or_pos_label() for widget in self.manager.widget_manager.get_all_widgets()]
         self.update()
 
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
