@@ -10,7 +10,7 @@ from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 
 from arrow_class import Arrow
 from zero_point import ZeroPointWidget
-from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE
+from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE
 from settings_widget import SettingsWindow
 
 
@@ -344,14 +344,14 @@ class ObjectClass(QWidget):
         with clicking on widget this widget checks active arrows and if there is active arrow,
         widget sets self as second object
         """
-        arrow: Arrow or None = self.object_manager.manager.get_active_arrow()
+        arrow: Arrow or None = self.object_manager.manager.arrow_manager.get_active_arrow()
         if arrow:
             if arrow.obj1 == self:
                 return
-            if self.object_manager.manager.get_arrows_with(self, arrow.obj1):
+            if self.object_manager.manager.arrow_manager.get_arrows_with(self, arrow.obj1):
                 return
-            self.object_manager.manager.set_obj2_arrow(arrow, self)
-            self.object_manager.manager.toggle_active_arrow()
+            self.object_manager.manager.arrow_manager.set_obj2_arrow(arrow, self)
+            self.object_manager.manager.arrow_manager.toggle_active_arrow()
             arrow.set_start_and_end()
 
     def add_arrow_f(self, need_arrow: bool = False, arrow_type: int = FROM_AND_TO_NEAREST_LINE):
@@ -364,15 +364,15 @@ class ObjectClass(QWidget):
             manager=self.object_manager.manager,
             need_arrow=need_arrow, arrow_type=arrow_type
         )
-        self.object_manager.manager.toggle_active_arrow(arrow)
-        self.object_manager.manager.add_arrow(arrow)
-        self.object_manager.manager.set_obj1_arrow(arrow, self)
+        self.object_manager.manager.arrow_manager.toggle_active_arrow(arrow)
+        self.object_manager.manager.arrow_manager.add_arrow(arrow)
+        self.object_manager.manager.arrow_manager.set_obj1_arrow(arrow, self)
 
     def update_arrows(self):
         """
         updates position of all widget's arrows
         """
-        for arrow in self.object_manager.manager.get_all_arrows_from_object(self):
+        for arrow in self.object_manager.manager.arrow_manager.get_all_arrows_from_object(self):
             arrow.set_start_and_end()
 
     def check_have_active_arrow(self) -> Arrow:
@@ -380,21 +380,21 @@ class ObjectClass(QWidget):
         checks if app has active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        return self.object_manager.manager.get_active_arrow()
+        return self.object_manager.manager.arrow_manager.get_active_arrow()
 
     def toggle_have_active_arrow(self):
         """
         toggles active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        self.object_manager.manager.toggle_active_arrow()
+        self.object_manager.manager.arrow_manager.toggle_active_arrow()
 
     def have_arrow_with(self, obj: ObjectClass) -> bool:
         """
         checks if this object has arrow with other object
         :param obj: other object to check
         """
-        return self.object_manager.manager.get_arrows_with(self, obj)
+        return self.object_manager.manager.arrow_manager.get_arrows_with(self, obj)
 
     def show_angles(self):
         """
@@ -416,11 +416,12 @@ class ObjectClass(QWidget):
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            mime = QMimeData()
-            drag = QDrag(self)
-            drag.setMimeData(mime)
-            drag.setHotSpot(event.pos())
-            drag.exec_(Qt.MoveAction)
+            if self.object_manager.manager.drag_or_resize is NONE:
+                mime = QMimeData()
+                drag = QDrag(self)
+                drag.setMimeData(mime)
+                drag.setHotSpot(event.pos())
+                drag.exec_(Qt.MoveAction)
         else:
             self.change_parent_mouse_pos(event)
 

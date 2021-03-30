@@ -172,8 +172,10 @@ class Core(QtWidgets.QWidget):
         :param arrow: arrow_class.Arrow class
         """
         context_menu = QtWidgets.QMenu()
-        context_menu.addAction("Изменить цвет", lambda: self.manager.change_arrow_color(arrow))
-        context_menu.addAction('Удалить стрелку', lambda: self.manager.delete_arrow(arrow),
+        context_menu.addAction("Изменить цвет",
+                               lambda: self.manager.arrow_manager.change_arrow_color(arrow))
+        context_menu.addAction('Удалить стрелку',
+                               lambda: self.manager.arrow_manager.delete_arrow(arrow),
                                shortcut=QtCore.Qt.Key_D)
         context_menu.setStyleSheet(
             f"font-size: 15px;"
@@ -227,13 +229,14 @@ class Core(QtWidgets.QWidget):
         self.update()
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
-        [a.clear_focus() for a in self.manager.get_all_arrows()]
+        [a.clear_focus() for a in self.manager.arrow_manager.get_all_arrows()]
         if event.button() == QtCore.Qt.RightButton:
-            if self.manager.get_active_arrow():
-                self.manager.delete_arrow(self.manager.get_active_arrow())
-                self.manager.toggle_active_arrow()
+            if self.manager.arrow_manager.get_active_arrow():
+                self.manager.arrow_manager.delete_arrow(
+                    self.manager.arrow_manager.get_active_arrow())
+                self.manager.arrow_manager.toggle_active_arrow()
                 return
-            for arrow in self.manager.get_all_arrows():
+            for arrow in self.manager.arrow_manager.get_all_arrows():
                 if arrow.start_pos and arrow.end_pos:
                     x1, y1 = arrow.start_pos
                     x2, y2 = arrow.end_pos
@@ -245,7 +248,7 @@ class Core(QtWidgets.QWidget):
             if self.hasFocus():
                 self.self_menu_show()
         elif event.button() == QtCore.Qt.LeftButton:
-            for arrow in self.manager.get_all_arrows():
+            for arrow in self.manager.arrow_manager.get_all_arrows():
                 if arrow.start_pos and arrow.end_pos:
                     x1, y1 = arrow.start_pos
                     x2, y2 = arrow.end_pos
@@ -338,7 +341,7 @@ class Core(QtWidgets.QWidget):
         self.qp.begin(self)
         self.qp.setRenderHint(QPainter.Antialiasing)
         self.manager.grid.draw(self.qp)
-        for arrow in self.manager.get_all_arrows():
+        for arrow in self.manager.arrow_manager.get_all_arrows():
             self.qp.setPen(QPen(QColor(arrow.get_color()), 2))
             end = self.manager.get_mouse_pos()
             if arrow.draw(self.qp, end_pos=end):
