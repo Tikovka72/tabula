@@ -2,7 +2,7 @@ from collections.abc import Callable
 import sys
 
 
-def isdig(s: str) -> bool:
+def is_dig(s: str) -> bool:
     """
     checks if s is an integer.
     This needs for checking negative integers

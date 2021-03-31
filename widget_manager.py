@@ -46,10 +46,10 @@ class WidgetManager:
         """
         deletes widget from self.widgets and all arrows that were linked with it
         """
-        arrows = self.manager.get_all_arrows_from_object(obj)
+        arrows = self.manager.arrow_manager.get_all_arrows_from_object(obj)
         for arrow in arrows:
             try:
-                self.manager.delete_arrow(arrow)
+                self.manager.arrow_manager.delete_arrow(arrow)
             except Exception as e:
                 print(e)
         self.widgets.pop(obj)

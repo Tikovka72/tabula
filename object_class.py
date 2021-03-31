@@ -361,7 +361,7 @@ class ObjectClass(QWidget):
         :param arrow_type: type of arrow
         """
         arrow = Arrow(
-            manager=self.object_manager.manager,
+            manager=self.object_manager.manager.arrow_manager,
             need_arrow=need_arrow, arrow_type=arrow_type
         )
         self.object_manager.manager.arrow_manager.toggle_active_arrow(arrow)

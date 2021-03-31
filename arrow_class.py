@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from manager import Manager
+    from arrow_manager import ArrowManager
 
 import math
-
 
 from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
@@ -12,7 +12,6 @@ from numpy import arctan2
 
 from settings_widget import SettingsWindow
 from constants import FROM_AND_TO_NEAREST_LINE
-
 
 UP = 0
 RIGHT = 1
@@ -24,7 +23,8 @@ class Arrow:
     """
     class for arrows in tabula
     """
-    def __init__(self, manager: Manager = None,
+
+    def __init__(self, manager: ArrowManager = None,
                  start_pos: tuple or list or None = None,
                  end_pos: tuple or list or None = None,
                  color: str = "#000000",
@@ -43,7 +43,7 @@ class Arrow:
         """
         if not manager:
             exit(1)
-        self.manager = manager
+        self.arrow_manager = manager
         self.start_pos = tuple(start_pos) if start_pos else None
         self.start_pos_by_obj = (0, 0)
         self.end_pos_by_obj = (0, 0)
@@ -55,32 +55,38 @@ class Arrow:
         self.selected_color = "#aaaaaa"
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
-        self.manager.settings_window.hide_all_sett()
-        self.manager.settings_window.add_settings(self, SettingsWindow.Title,
-                                                  name="Положение стрелки")
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Позиция на первом объекте",
-                                                  standard_values=(0, 0),
-                                                  int_only=True,
-                                                  default_values_to_return=(0, 0),
-                                                  call_back=(self.call_back_x1,
-                                                             self.call_back_y1),
-                                                  call_update_all=self.call_set_xy1)
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Позиция на втором объекте",
-                                                  standard_values=(0, 0),
-                                                  int_only=True,
-                                                  default_values_to_return=(0, 0),
-                                                  call_back=(self.call_back_x2,
-                                                             self.call_back_y2),
-                                                  call_update_all=self.call_set_xy2)
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckbox,
-                                                  name="Стрелка",
-                                                  standard_values=(("вкл", True),),
-                                                  default_values_to_return=(True,),
-                                                  call_back=(self.call_back_arrow,),
-                                                  call_update_all=self.call_set_arrow)
-        self.manager.settings_window.show_sett(self)
+        self.arrow_manager.manager.settings_window.hide_all_sett()
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.Title,
+            name="Положение стрелки")
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettTwoLineEdit,
+            name="Позиция на первом объекте",
+            standard_values=(0, 0),
+            int_only=True,
+            default_values_to_return=(0, 0),
+            call_back=(self.call_back_x1, self.call_back_y1),
+            call_update_all=self.call_set_xy1)
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettTwoLineEdit,
+            name="Позиция на втором объекте",
+            standard_values=(0, 0),
+            int_only=True,
+            default_values_to_return=(0, 0),
+            call_back=(self.call_back_x2, self.call_back_y2),
+            call_update_all=self.call_set_xy2)
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettCheckbox,
+            name="Стрелка",
+            standard_values=(("вкл", True),),
+            default_values_to_return=(True,),
+            call_back=(self.call_back_arrow,),
+            call_update_all=self.call_set_arrow)
+        self.arrow_manager.manager.settings_window.show_sett(self)
 
     # TODO почему я написал call_back вместо callback
     def call_back_arrow(self, need: bool):
@@ -220,8 +226,8 @@ class Arrow:
         sets focus for this arrow
         """
         self.selected = True
-        self.manager.settings_window.hide_all_sett()
-        self.manager.settings_window.show_sett(self)
+        self.arrow_manager.manager.settings_window.hide_all_sett()
+        self.arrow_manager.manager.settings_window.show_sett(self)
 
     def clear_focus(self):
         """

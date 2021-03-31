@@ -5,7 +5,7 @@ if TYPE_CHECKING:
 from PyQt5 import QtWidgets, QtGui, QtCore, sip
 from PyQt5.QtGui import QWheelEvent
 
-from utils import pass_f, isdig
+from utils import pass_f, is_dig
 
 
 class Label(QtWidgets.QLabel):
@@ -225,7 +225,7 @@ class SettingsWindow(QtWidgets.QWidget):
         def value1_get(self):
             value = self.value1.text()
             if self.int_only:
-                if isdig(value):
+                if is_dig(value):
                     return int(value)
                 return self.default_values_to_return[0]
             if value:
@@ -235,7 +235,7 @@ class SettingsWindow(QtWidgets.QWidget):
         def value2_get(self):
             value = self.value2.text()
             if self.int_only:
-                if isdig(value):
+                if is_dig(value):
                     return int(value)
                 return self.default_values_to_return[1]
             if value:
@@ -575,14 +575,14 @@ class SettingsWindow(QtWidgets.QWidget):
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
         self.open_button.setText("Открыть")
-        self.open_button.clicked.connect(self.manager.open_file)
+        self.open_button.clicked.connect(self.manager.file_manager.open_file)
 
         self.save_button = QtWidgets.QPushButton(self)
         self.save_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
         self.save_button.setText("Сохранить")
-        self.save_button.clicked.connect(self.manager.save_file)
+        self.save_button.clicked.connect(self.manager.file_manager.save_file)
         self.set_geometry()
 
     def set_geometry(self):
