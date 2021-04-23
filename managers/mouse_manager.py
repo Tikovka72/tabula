@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from manager import Manager
+    from main import Manager
 
 from objects.mouse import Mouse
 

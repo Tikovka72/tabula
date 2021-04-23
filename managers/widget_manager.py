@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from PyQt5 import QtGui, QtCore
 
 if TYPE_CHECKING:
-    from manager import Manager
+    from main import Manager
 
 from objects.object_class import ObjectClass
 from constants import OFFSET_MAGNET

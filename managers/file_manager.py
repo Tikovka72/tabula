@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from PyQt5 import QtWidgets
 
 if TYPE_CHECKING:
-    from manager import Manager
+    from main import Manager
 
 from objects.warning_window import WarningWindow
 from objects.arrow_class import Arrow

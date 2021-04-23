@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from manager import Manager
+    from main import Manager
     from objects.object_class import ObjectClass
 
 from objects.grid import Grid
