@@ -27,8 +27,6 @@ class Core(QtWidgets.QWidget):
         self.manager = manager
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
-        self.drag_dot = 0, 0
-        self.dragged_obj = None
         # self.__init_ui__()
 
     def __init_ui__(self):
@@ -274,7 +272,8 @@ class Core(QtWidgets.QWidget):
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         x, y = event.pos().x() - event.source().pos().x(), event.pos().y() - event.source().pos().y()
-        if not self.dragged_obj and event.source().size().width() - event.source().OFFSET - 5 \
+        if not self.manager.widget_manager.dragged_obj and \
+                event.source().size().width() - event.source().OFFSET - 5 \
                 <= x <= \
                 event.source().size().width() + 5 and \
                 event.source().size().height() - event.source().OFFSET - 5 \
@@ -286,13 +285,13 @@ class Core(QtWidgets.QWidget):
             self.manager.settings_window.hide_all_sett()
             self.manager.settings_window.show_sett(event.source())
         else:
-            if self.dragged_obj is None:
-                self.dragged_obj = event.source()
+            if self.manager.widget_manager.dragged_obj is None:
+                self.manager.widget_manager.dragged_obj = event.source()
                 self.manager.widget_manager.set_dor(DRAG)
                 event.source().show_size_or_pos_label()
                 event.source().show_angles()
-                self.drag_dot = (event.pos().x() - event.source().x(),
-                                 event.pos().y() - event.source().y())
+                self.manager.widget_manager.drag_dot = (event.pos().x() - event.source().x(),
+                                                        event.pos().y() - event.source().y())
                 self.manager.settings_window.hide_all_sett()
                 self.manager.settings_window.show_sett(event.source())
         event.accept()
@@ -304,7 +303,8 @@ class Core(QtWidgets.QWidget):
         shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.manager.widget_manager.get_dor() == DRAG:
             event.source().move(
-                event.pos().x() - self.drag_dot[0], event.pos().y() - self.drag_dot[1]
+                event.pos().x() - self.manager.widget_manager.drag_dot[0],
+                event.pos().y() - self.manager.widget_manager.drag_dot[1]
             )
             x, y, _, _, x_mod, y_mod, widgets = self.manager.widget_manager.drag_magnet_checker(obj)
             if shift_pressed:
@@ -337,7 +337,7 @@ class Core(QtWidgets.QWidget):
         self.update()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        self.dragged_obj = None
+        self.manager.widget_manager.dragged_obj = None
         self.manager.grid_manager.drop_magnet_lines()
         self.manager.grid_manager.grid.clear_special_lines()
         event.accept()

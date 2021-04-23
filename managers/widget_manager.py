@@ -16,6 +16,8 @@ class WidgetManager:
         # ObjectClass: {in: Arrow, out: Arrow}
         self.widgets = {}
         self.drag_or_resize = 0
+        self.drag_dot = 0, 0
+        self.dragged_obj = None
 
     def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
         """
