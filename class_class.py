@@ -38,6 +38,3 @@ class ClassClass(ObjectClass):
                               self.height() - self.OFFSET * 3 - self.edit_line.height())
 
         self.update_arrows()
-
-
-

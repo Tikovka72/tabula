@@ -272,7 +272,7 @@ class ObjectClass(QWidget):
         """
         changes mouse point for parent. needs for drag event
         """
-        self.object_manager.manager.change_mouse_pos(
+        self.object_manager.manager.mouse_manager.change_mouse_pos(
             self.x() + event.x() + (self.OFFSET if need_offset else 0),
             self.y() + event.y() + (self.OFFSET if need_offset else 0))
 

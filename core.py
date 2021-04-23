@@ -160,7 +160,7 @@ class Core(QtWidgets.QWidget):
         """
         main context menu
         """
-        pos = self.manager.get_mouse_pos()
+        pos = self.manager.mouse_manager.get_mouse_pos()
         context_menu = QtWidgets.QMenu()
         context_menu.addAction('Добавить объект',
                                lambda: self.manager.widget_manager.add_widget(pos))
@@ -191,7 +191,7 @@ class Core(QtWidgets.QWidget):
 
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.buttons() == QtCore.Qt.LeftButton and self.hasFocus():
-            x, y = self.manager.get_mouse_pos()
+            x, y = self.manager.mouse_manager.get_mouse_pos()
             [widget.move_event(
                 widget.x() + (event.pos().x() - x), widget.y() +
                 (event.pos().y() - y),
@@ -208,7 +208,7 @@ class Core(QtWidgets.QWidget):
                 self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
             self.update()
-        self.manager.change_mouse_pos(event.x(), event.y())
+        self.manager.mouse_manager.change_mouse_pos(event.x(), event.y())
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         if not self.hasFocus():
@@ -351,7 +351,7 @@ class Core(QtWidgets.QWidget):
         self.manager.grid_manager.grid.draw(self.qp)
         for arrow in self.manager.arrow_manager.get_all_arrows():
             self.qp.setPen(QPen(QColor(arrow.get_color()), 2))
-            end = self.manager.get_mouse_pos()
+            end = self.manager.mouse_manager.get_mouse_pos()
             if arrow.draw(self.qp, end_pos=end):
                 self.update()
         pen = QPen(QColor(MAGNET_LINES_COLOR), 1)
