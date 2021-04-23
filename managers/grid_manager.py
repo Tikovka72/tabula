@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from manager import Manager
-    from object_class import ObjectClass
+    from objects.object_class import ObjectClass
 
-from grid import Grid
-from zero_point import ZeroPointWidget
+from objects.grid import Grid
+from objects.zero_point import ZeroPointWidget
 
 
 class GridManager:

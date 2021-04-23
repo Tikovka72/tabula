@@ -6,8 +6,8 @@ from PyQt5 import QtWidgets
 if TYPE_CHECKING:
     from manager import Manager
 
-from warning_window import WarningWindow
-from arrow_class import Arrow
+from objects.warning_window import WarningWindow
+from objects.arrow_class import Arrow
 
 
 class FileManager:

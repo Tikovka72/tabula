@@ -5,9 +5,9 @@ from PyQt5 import QtWidgets
 
 if TYPE_CHECKING:
     from manager import Manager
-    from object_class import ObjectClass
+    from objects.object_class import ObjectClass
 
-from arrow_class import Arrow
+from objects.arrow_class import Arrow
 
 
 class ArrowManager:

@@ -9,7 +9,7 @@ import time
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPainter, QColor, QPen
 
-from settings_widget import SettingsWindow
+from objects.settings_widget import SettingsWindow
 from utils import check_on_arrow
 from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR, OFFSET_MAGNET
 

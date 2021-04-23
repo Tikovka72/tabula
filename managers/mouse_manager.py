@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from manager import Manager
 
-from mouse import Mouse
+from objects.mouse import Mouse
 
 
 class MouseManager:

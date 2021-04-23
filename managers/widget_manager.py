@@ -6,7 +6,7 @@ from PyQt5 import QtGui, QtCore
 if TYPE_CHECKING:
     from manager import Manager
 
-from object_class import ObjectClass
+from objects.object_class import ObjectClass
 from constants import OFFSET_MAGNET
 
 

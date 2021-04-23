@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui
 
-from zero_point import ZeroPointWidget
+from objects.zero_point import ZeroPointWidget
 
 
 class Grid:

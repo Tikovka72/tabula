@@ -10,7 +10,7 @@ from managers.arrow_manager import ArrowManager
 from managers.file_manager import FileManager
 from managers.grid_manager import GridManager
 
-from settings_widget import SettingsWindow
+from objects.settings_widget import SettingsWindow
 from utils import except_hook
 
 
