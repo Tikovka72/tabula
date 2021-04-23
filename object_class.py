@@ -247,7 +247,7 @@ class ObjectClass(QWidget):
         self.object_manager.delete_widget(self)
         self.setEnabled(False)
         self.hide()
-        self.object_manager.manager.delete_obj(self)
+        self.object_manager.delete_obj(self)
 
     def copy_self(self):
         """

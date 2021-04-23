@@ -79,3 +79,8 @@ class WidgetManager:
         clears focus and hides angles from all widgets
         """
         [(w.clearFocus(), w.hide_angles()) for w in self.widgets]
+
+    def delete_obj(self, obj):
+        _ = obj  # for use parameter (PEP8)
+        del obj
+        self.manager.core.update()

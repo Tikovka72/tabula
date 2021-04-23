@@ -312,9 +312,11 @@ class Core(QtWidgets.QWidget):
                         % (self.manager.OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
             if self.manager.grid_manager.grid.show:
-                x, y, widgets = self.manager.check_and_set_grid_magnet_lines_for_resizing(
-                    obj, x, y, x_mod, y_mod, widgets
-                )
+                x, y, widgets = \
+                    self.manager.grid_manager.check_and_set_grid_magnet_lines_for_resizing\
+                    (
+                        obj, x, y, x_mod, y_mod, widgets
+                    )
             self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().move_event(x, y)
             event.source().update_arrows()
