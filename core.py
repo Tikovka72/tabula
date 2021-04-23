@@ -58,10 +58,12 @@ class Core(QtWidgets.QWidget):
         self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckboxLineEdit,
                                                   name="Размер сетки",
                                                   standard_values=(("вкл", True),
-                                                                   self.manager.grid.get_step()),
+                                                                   self.manager.
+                                                                   grid_manager.grid.get_step()),
                                                   int_only=True,
                                                   default_values_to_return=(
-                                                      True, self.manager.grid.get_step()),
+                                                      True, self.manager.
+                                                      grid_manager.grid.get_step()),
                                                   call_back=(self.call_back_grid_show,
                                                              self.call_back_grid_size),
                                                   call_update_all=self.call_set_grid,
@@ -75,8 +77,8 @@ class Core(QtWidgets.QWidget):
         """
         self.manager.zero_point_dot.move_event(x + self.width() // 2,
                                                self.manager.zero_point_dot.get_pos()[1])
-        self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.regenerate_grid()
+        self.manager.grid_manager.grid.set_offset_by_zero_point()
+        self.manager.grid_manager.grid.regenerate_grid()
         self.update()
 
     def call_back_zero_pos_height(self, y: int):
@@ -86,8 +88,8 @@ class Core(QtWidgets.QWidget):
         """
         self.manager.zero_point_dot.move_event(self.manager.zero_point_dot.get_pos()[0],
                                                y + self.height() // 2)
-        self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.regenerate_grid()
+        self.manager.grid_manager.grid.set_offset_by_zero_point()
+        self.manager.grid_manager.grid.regenerate_grid()
         self.update()
 
     def call_set_zero_pos(self) -> tuple:
@@ -106,10 +108,10 @@ class Core(QtWidgets.QWidget):
         callback for settings window. This is necessary to change grid showing
         settings window -> core
         """
-        if show and not self.manager.grid.show:
-            self.manager.grid.toggle_show()
-        elif not show and self.manager.grid.show:
-            self.manager.grid.toggle_show()
+        if show and not self.manager.grid_manager.grid.show:
+            self.manager.grid_manager.grid.toggle_show()
+        elif not show and self.manager.grid_manager.grid.show:
+            self.manager.grid_manager.grid.toggle_show()
         self.update()
 
     def call_back_grid_size(self, step: int):
@@ -117,9 +119,9 @@ class Core(QtWidgets.QWidget):
         callback for settings window. This is necessary to change grid size
         settings window -> core
         """
-        self.manager.grid.change_step(step)
-        self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.regenerate_grid()
+        self.manager.grid_manager.grid.change_step(step)
+        self.manager.grid_manager.grid.set_offset_by_zero_point()
+        self.manager.grid_manager.grid.regenerate_grid()
         self.update()
 
     def call_set_grid(self) -> tuple:
@@ -128,7 +130,7 @@ class Core(QtWidgets.QWidget):
         core -> settings window
         :return: tuple: (show, step)
         """
-        return self.manager.grid.show, self.manager.grid.get_step()
+        return self.manager.grid_manager.grid.show, self.manager.grid_manager.grid.get_step()
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         super().resizeEvent(event)
@@ -144,9 +146,9 @@ class Core(QtWidgets.QWidget):
         self.manager.set_new_zero_point_pos(new_x, new_y)
         self.manager.zero_point_dot.move_event(new_x + x,
                                                new_y + y)
-        self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.generate_grid()
-        self.manager.grid.change_core_size(event.size().width(), event.size().height())
+        self.manager.grid_manager.grid.set_offset_by_zero_point()
+        self.manager.grid_manager.grid.generate_grid()
+        self.manager.grid_manager.grid.change_core_size(event.size().width(), event.size().height())
         self.manager.settings_window.set_geometry()
         self.manager.settings_window.update_obj_settings(self)
         self.update()
@@ -197,9 +199,9 @@ class Core(QtWidgets.QWidget):
                                                    (event.pos().x() - x),
                                                    self.manager.zero_point_dot.y() +
                                                    (event.pos().y() - y))
-            if self.manager.grid.show:
-                self.manager.grid.set_offset_by_zero_point()
-                self.manager.grid.regenerate_grid()
+            if self.manager.grid_manager.grid.show:
+                self.manager.grid_manager.grid.set_offset_by_zero_point()
+                self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
             self.update()
         self.manager.change_mouse_pos(event.x(), event.y())
@@ -210,21 +212,22 @@ class Core(QtWidgets.QWidget):
         if event.key() in (QtCore.Qt.Key_R, 1050):
             [widget.return_to_fact_pos() for widget in self.manager.widget_manager.get_all_widgets()]
             self.manager.zero_point_dot.return_to_zero()
-            self.manager.grid.set_offset_by_zero_point()
-            self.manager.grid.regenerate_grid()
+            self.manager.grid_manager.grid.set_offset_by_zero_point()
+            self.manager.grid_manager.grid.regenerate_grid()
 
         if event.key() in (QtCore.Qt.Key_G, 1055):
-            self.manager.grid.toggle_show()
+            self.manager.grid_manager.grid.toggle_show()
         if event.key() == QtCore.Qt.Key_Plus:
-            self.manager.grid.change_step(self.manager.grid.get_step() * 2)
-            self.manager.grid.set_offset_by_zero_point()
-            self.manager.grid.regenerate_grid()
+            self.manager.grid_manager.grid.change_step(self.manager.grid_manager.grid.get_step() * 2)
+            self.manager.grid_manager.grid.set_offset_by_zero_point()
+            self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
 
         elif event.key() == QtCore.Qt.Key_Minus:
-            self.manager.grid.change_step(self.manager.grid.get_step() // 2)
-            self.manager.grid.set_offset_by_zero_point()
-            self.manager.grid.regenerate_grid()
+            self.manager.grid_manager.grid.change_step(
+                self.manager.grid_manager.grid.get_step() // 2)
+            self.manager.grid_manager.grid.set_offset_by_zero_point()
+            self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self)
         self.update()
 
@@ -260,8 +263,8 @@ class Core(QtWidgets.QWidget):
             self.manager.settings_window.hide_all_sett()
             self.manager.settings_window.show_sett(self)
 
-            self.manager.clear_focus_arrows()
-        self.manager.clear_focus()
+            self.manager.arrow_manager.clear_focus_arrows()
+        self.manager.widget_manager.clear_focus()
         self.setFocus()
         self.update()
 
@@ -308,7 +311,7 @@ class Core(QtWidgets.QWidget):
                     y = y - (y - self.manager.zero_point_dot.get_pos()[1]) \
                         % (self.manager.OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
-            if self.manager.grid.show:
+            if self.manager.grid_manager.grid.show:
                 x, y, widgets = self.manager.check_and_set_grid_magnet_lines_for_resizing(
                     obj, x, y, x_mod, y_mod, widgets
                 )
@@ -331,7 +334,7 @@ class Core(QtWidgets.QWidget):
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         self.dragged_obj = None
         self.manager.drop_magnet_lines()
-        self.manager.grid.clear_special_lines()
+        self.manager.grid_manager.grid.clear_special_lines()
         event.accept()
         self.manager.set_dor(NONE)
         [widget.hide_size_or_pos_label() for widget in self.manager.widget_manager.get_all_widgets()]
@@ -340,7 +343,7 @@ class Core(QtWidgets.QWidget):
     def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         self.qp.begin(self)
         self.qp.setRenderHint(QPainter.Antialiasing)
-        self.manager.grid.draw(self.qp)
+        self.manager.grid_manager.grid.draw(self.qp)
         for arrow in self.manager.arrow_manager.get_all_arrows():
             self.qp.setPen(QPen(QColor(arrow.get_color()), 2))
             end = self.manager.get_mouse_pos()

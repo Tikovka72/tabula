@@ -5,12 +5,12 @@ import sys
 
 from core import Core
 
-from widget_manager import WidgetManager
-from arrow_manager import ArrowManager
-from file_manager import FileManager
+from managers.widget_manager import WidgetManager
+from managers.arrow_manager import ArrowManager
+from managers.file_manager import FileManager
+from managers.grid_manager import GridManager
 
 from zero_point import ZeroPointWidget
-from grid import Grid
 from object_class import ObjectClass
 from mouse import Mouse
 from settings_widget import SettingsWindow
@@ -21,22 +21,22 @@ class Manager:
     OFFSET_MAGNET = 5
 
     def __init__(self):
-        self.widget_manager = WidgetManager(self)
-        self.arrow_manager = ArrowManager(self)
-        self.file_manager = FileManager(self)
-
-        self.magnet_lines = []
-        self.drag_or_resize = 0
-        self.active_arrow = None
-
         self.app = QtWidgets.QApplication(sys.argv)
         self.core = Core(self)
 
         self.mouse = Mouse()
         self.zero_point_dot = ZeroPointWidget(parent=self.core, manager=self)
         self.zero_point_dot.setGeometry(self.core.width() // 2, self.core.height() // 2, 1, 1)
-        self.grid = Grid(show=True, core_size=(self.core.width(), self.core.height()),
-                         zero_pos=self.zero_point_dot)
+
+        self.widget_manager = WidgetManager(self)
+        self.arrow_manager = ArrowManager(self)
+        self.file_manager = FileManager(self)
+        self.grid_manager = GridManager(self)
+
+        self.magnet_lines = []
+        self.drag_or_resize = 0
+        self.active_arrow = None
+
         self.settings_window = SettingsWindow(self.core, self)
         self.core.__init_ui__()
         self.core.show()
@@ -261,14 +261,14 @@ class Manager:
         """
         if widgets is None:
             widgets = {}
-        x_left = self.grid.get_nearest_y_line_by_offset(obj.x())
-        x_center = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width() // 2)
-        x_right = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width())
-        y_left = self.grid.get_nearest_x_line_by_offset(obj.y())
-        y_center = self.grid.get_nearest_x_line_by_offset(
+        x_left = self.grid_manager.grid.get_nearest_y_line_by_offset(obj.x())
+        x_center = self.grid_manager.grid.get_nearest_y_line_by_offset(obj.x() + obj.width() // 2)
+        x_right = self.grid_manager.grid.get_nearest_y_line_by_offset(obj.x() + obj.width())
+        y_left = self.grid_manager.grid.get_nearest_x_line_by_offset(obj.y())
+        y_center = self.grid_manager.grid.get_nearest_x_line_by_offset(
             obj.y() + obj.height() // 2)
-        y_right = self.grid.get_nearest_x_line_by_offset(obj.y() + obj.height())
-        self.grid.clear_special_lines()
+        y_right = self.grid_manager.grid.get_nearest_x_line_by_offset(obj.y() + obj.height())
+        self.grid_manager.grid.clear_special_lines()
         if x_left or x_center or x_right:
 
             x_t = (x_left.x1() if x_left else False) or \
@@ -282,11 +282,11 @@ class Manager:
                         widgets[widget] = (None, v[1])
 
             if x_left and x == x_left.x1():
-                self.grid.add_line_to_special_lines(x_left)
+                self.grid_manager.grid.add_line_to_special_lines(x_left)
             if x_center and x + obj.width() // 2 == x_center.x1():
-                self.grid.add_line_to_special_lines(x_center)
+                self.grid_manager.grid.add_line_to_special_lines(x_center)
             if x_right and x + obj.width() == x_right.x1():
-                self.grid.add_line_to_special_lines(x_right)
+                self.grid_manager.grid.add_line_to_special_lines(x_right)
         if y_left or y_center or y_right:
             y_t = (y_left.y1() if y_left else False) or (
                 y_center.y1() - obj.height() // 2 if y_center else False) or \
@@ -299,27 +299,16 @@ class Manager:
                         widgets[widget] = (v[0], 0)
 
             if y_left and y == y_left.y1():
-                self.grid.add_line_to_special_lines(y_left)
+                self.grid_manager.grid.add_line_to_special_lines(y_left)
             if y_center and y + obj.height() // 2 == y_center.y1():
-                self.grid.add_line_to_special_lines(y_center)
+                self.grid_manager.grid.add_line_to_special_lines(y_center)
             if y_right and y + obj.height() == y_right.y1():
-                self.grid.add_line_to_special_lines(y_right)
+                self.grid_manager.grid.add_line_to_special_lines(y_right)
 
         return x, y, widgets
 
-    def clear_focus(self):
-        """
-        clears focus and hides angles from all widgets
-        """
-        [(w.clearFocus(), w.hide_angles()) for w in self.widget_manager.widgets]
-
-    def clear_focus_arrows(self):
-        """
-        clears focus from all arrows
-        """
-        [arr.clear_focus() for arr in self.arrow_manager.arrows]
-
     def delete_obj(self, obj):
+        _ = obj  # for use parameter (PEP8)
         del obj
         self.core.update()
 

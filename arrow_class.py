@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from arrow_manager import ArrowManager
+    from managers.arrow_manager import ArrowManager
 
 import math
 

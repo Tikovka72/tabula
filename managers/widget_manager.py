@@ -73,3 +73,9 @@ class WidgetManager:
                                    str(str(abs((y + event.source().height() // 2) - way_y)
                                            if way_y else '') + '↕') if way_y else '')
                 )
+
+    def clear_focus(self):
+        """
+        clears focus and hides angles from all widgets
+        """
+        [(w.clearFocus(), w.hide_angles()) for w in self.widgets]

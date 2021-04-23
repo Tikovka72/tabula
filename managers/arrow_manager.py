@@ -125,3 +125,9 @@ class ArrowManager:
         color = color.getColor()
         if color.isValid():
             arrow.color = color.name()
+
+    def clear_focus_arrows(self):
+        """
+        clears focus from all arrows
+        """
+        [arr.clear_focus() for arr in self.arrows]

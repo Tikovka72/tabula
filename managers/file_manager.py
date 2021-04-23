@@ -63,8 +63,8 @@ class FileManager:
             self.opened_file = file[0]
             data = f.read()
         self.manager.zero_point_dot.return_to_zero(anim=False)
-        self.manager.grid.set_offset_by_zero_point()
-        self.manager.grid.regenerate_grid()
+        self.manager.grid_manager.grid.set_offset_by_zero_point()
+        self.manager.grid_manager.grid.regenerate_grid()
         widgets_and_arrows = data.split("U+FB4x18c")
         if len(widgets_and_arrows) == 2:
             widgets, arrows = data.split("U+FB4x18c")
@@ -88,8 +88,8 @@ class FileManager:
                 self.arrow_manager.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.arrow_manager.set_obj2_arrow(arr, widgets_total[int(obj2)])
                 arr.set_start_and_end()
-                self.manager.clear_focus()
-                self.manager.clear_focus_arrows()
+                self.manager.widget_manager.clear_focus()
+                self.manager.arrow_manager.clear_focus_arrows()
 
     def get_name_file(self) -> str or None:
         """

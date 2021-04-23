@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from widget_manager import WidgetManager
+    from managers.widget_manager import WidgetManager
 
 from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
@@ -580,8 +580,8 @@ class LineEdit(QLineEdit):
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
             self.parent().object_manager.manager.settings_window.hide_all_sett()
-            self.parent().object_manager.manager.clear_focus()
-            self.parent().object_manager.manager.clear_focus_arrows()
+            self.parent().object_manager.clear_focus()
+            self.parent().object_manager.manager.arrow_manager.clear_focus_arrows()
             self.parent().show_angles()
             self.parent().check_and_set_arrow()
             self.parent().hide_size_or_pos_label()
