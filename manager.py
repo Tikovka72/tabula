@@ -9,7 +9,6 @@ from managers.arrow_manager import ArrowManager
 from managers.file_manager import FileManager
 from managers.grid_manager import GridManager
 
-from zero_point import ZeroPointWidget
 from mouse import Mouse
 from settings_widget import SettingsWindow
 from utils import except_hook
@@ -21,8 +20,6 @@ class Manager:
         self.core = Core(self)
 
         self.mouse = Mouse()
-        self.zero_point_dot = ZeroPointWidget(parent=self.core, manager=self)
-        self.zero_point_dot.setGeometry(self.core.width() // 2, self.core.height() // 2, 1, 1)
 
         self.widget_manager = WidgetManager(self)
         self.arrow_manager = ArrowManager(self)
@@ -46,12 +43,6 @@ class Manager:
         changes mouse (mouse.Mouse) position to (x, y)
         """
         self.mouse.change_pos(x, y)
-
-    def set_new_zero_point_pos(self, x: int, y: int):
-        """
-        sets new zero point's position to (x, y)
-        """
-        self.zero_point_dot.set_zero(x, y)
 
     def update_core(self):
         self.core.update()

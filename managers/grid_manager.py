@@ -6,14 +6,18 @@ if TYPE_CHECKING:
     from object_class import ObjectClass
 
 from grid import Grid
+from zero_point import ZeroPointWidget
 
 
 class GridManager:
     def __init__(self, manager: Manager):
         self.manager = manager
+        self.zero_point_dot = ZeroPointWidget(parent=self.manager.core, manager=self.manager)
+        self.zero_point_dot.setGeometry(
+            self.manager.core.width() // 2, self.manager.core.height() // 2, 1, 1)
         self.grid = Grid(
             show=True, core_size=(self.manager.core.width(), self.manager.core.height()),
-            zero_pos=self.manager.zero_point_dot)
+            zero_pos=self.zero_point_dot)
         self.magnet_lines = []
 
     # TODO doc for this
@@ -94,3 +98,9 @@ class GridManager:
         drops all magnet lines
         """
         self.magnet_lines.clear()
+
+    def set_new_zero_point_pos(self, x: int, y: int):
+        """
+        sets new zero point's position to (x, y)
+        """
+        self.zero_point_dot.set_zero(x, y)

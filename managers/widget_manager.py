@@ -30,7 +30,7 @@ class WidgetManager:
         """
         if widget is None:
             widget = ObjectClass(self.manager.core, self, pos=pos if pos else (0, 0),
-                                 zero_dot=self.manager.zero_point_dot)
+                                 zero_dot=self.manager.grid_manager.zero_point_dot)
         widget.show()
         self.widgets[widget] = {"in": [], "out": []}
         self.manager.settings_window.hide_all_sett()

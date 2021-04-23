@@ -62,7 +62,7 @@ class FileManager:
         with open(file[0], encoding="UTF-8") as f:
             self.opened_file = file[0]
             data = f.read()
-        self.manager.zero_point_dot.return_to_zero(anim=False)
+        self.manager.grid_manager.zero_point_dot.return_to_zero(anim=False)
         self.manager.grid_manager.grid.set_offset_by_zero_point()
         self.manager.grid_manager.grid.regenerate_grid()
         widgets_and_arrows = data.split("U+FB4x18c")
