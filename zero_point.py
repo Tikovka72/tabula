@@ -89,8 +89,8 @@ class ZeroPointAndGridAnimation(QtCore.QPropertyAnimation):
         :param value: end value in QRect format
         """
         self.targetObject().setGeometry(value)
-        if self.manager.grid.show:
-            self.manager.grid.set_offset_by_zero_point()
-            self.manager.grid.regenerate_grid()
+        if self.manager.grid_manager.grid.show:
+            self.manager.grid_manager.grid.set_offset_by_zero_point()
+            self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self.manager.core)
             self.manager.update_core()

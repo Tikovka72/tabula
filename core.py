@@ -11,7 +11,7 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 
 from settings_widget import SettingsWindow
 from utils import check_on_arrow
-from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR
+from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR, OFFSET_MAGNET
 
 
 class Core(QtWidgets.QWidget):
@@ -276,7 +276,7 @@ class Core(QtWidgets.QWidget):
                 event.source().size().height() - event.source().OFFSET - 5 \
                 <= y <= \
                 event.source().size().height() + 5:
-            self.manager.set_dor(RESIZE)
+            self.manager.widget_manager.set_dor(RESIZE)
             event.source().show_size_or_pos_label()
             event.source().show_angles()
             self.manager.settings_window.hide_all_sett()
@@ -284,7 +284,7 @@ class Core(QtWidgets.QWidget):
         else:
             if self.dragged_obj is None:
                 self.dragged_obj = event.source()
-                self.manager.set_dor(DRAG)
+                self.manager.widget_manager.set_dor(DRAG)
                 event.source().show_size_or_pos_label()
                 event.source().show_angles()
                 self.drag_dot = (event.pos().x() - event.source().x(),
@@ -298,47 +298,46 @@ class Core(QtWidgets.QWidget):
         obj = event.source()
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
         shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
-        if self.manager.get_dor() == DRAG:
+        if self.manager.widget_manager.get_dor() == DRAG:
             event.source().move(
                 event.pos().x() - self.drag_dot[0], event.pos().y() - self.drag_dot[1]
             )
-            x, y, _, _, x_mod, y_mod, widgets = self.manager.drag_magnet_checker(obj)
+            x, y, _, _, x_mod, y_mod, widgets = self.manager.widget_manager.drag_magnet_checker(obj)
             if shift_pressed:
                 if not x_mod:
                     x = x - (x - self.manager.zero_point_dot.get_pos()[0]) \
-                        % (self.manager.OFFSET_MAGNET * 2)
+                        % (OFFSET_MAGNET * 2)
                 if not y_mod:
                     y = y - (y - self.manager.zero_point_dot.get_pos()[1]) \
-                        % (self.manager.OFFSET_MAGNET * 2)
+                        % (OFFSET_MAGNET * 2)
             x, y = max(x, 0), max(y, 0)
             if self.manager.grid_manager.grid.show:
                 x, y, widgets = \
-                    self.manager.grid_manager.check_and_set_grid_magnet_lines_for_resizing\
-                    (
-                        obj, x, y, x_mod, y_mod, widgets
+                    self.manager.grid_manager.check_and_set_grid_magnet_lines_for_resizing(
+                         obj, x, y, x_mod, y_mod, widgets
                     )
             self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().move_event(x, y)
             event.source().update_arrows()
-        elif self.manager.get_dor() == RESIZE:
+        elif self.manager.widget_manager.get_dor() == RESIZE:
             obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets = \
-                self.manager.resize_magnet_checker(obj, event.pos())
+                self.manager.widget_manager.resize_magnet_checker(obj, event.pos())
             x, y = obj_x2 - obj_x1, obj_y2 - obj_y1
             if shift_pressed:
                 if not x_mod:
-                    x = max(x - x % (self.manager.OFFSET_MAGNET * 2), 0)
+                    x = max(x - x % (OFFSET_MAGNET * 2), 0)
                 if not y_mod:
-                    y = max(y - y % (self.manager.OFFSET_MAGNET * 2), 0)
+                    y = max(y - y % (OFFSET_MAGNET * 2), 0)
             self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
             event.source().resize_event(x, y)
         self.update()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         self.dragged_obj = None
-        self.manager.drop_magnet_lines()
+        self.manager.grid_manager.drop_magnet_lines()
         self.manager.grid_manager.grid.clear_special_lines()
         event.accept()
-        self.manager.set_dor(NONE)
+        self.manager.widget_manager.set_dor(NONE)
         [widget.hide_size_or_pos_label() for widget in self.manager.widget_manager.get_all_widgets()]
         self.update()
 
@@ -354,7 +353,7 @@ class Core(QtWidgets.QWidget):
         pen = QPen(QColor(MAGNET_LINES_COLOR), 1)
         pen.setStyle(QtCore.Qt.DashLine)
         self.qp.setPen(pen)
-        mls = self.manager.get_magnet_lines()
+        mls = self.manager.grid_manager.get_magnet_lines()
         if mls:
             self.qp.drawLines(*mls)
         self.qp.end()

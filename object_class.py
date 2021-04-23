@@ -416,7 +416,7 @@ class ObjectClass(QWidget):
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            if self.object_manager.manager.drag_or_resize is NONE:
+            if self.object_manager.drag_or_resize is NONE:
                 mime = QMimeData()
                 drag = QDrag(self)
                 drag.setMimeData(mime)

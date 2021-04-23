@@ -1,12 +1,13 @@
 ﻿from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 
 if TYPE_CHECKING:
     from manager import Manager
 
 from object_class import ObjectClass
+from constants import OFFSET_MAGNET
 
 
 class WidgetManager:
@@ -14,6 +15,7 @@ class WidgetManager:
         self.manager = manager
         # ObjectClass: {in: Arrow, out: Arrow}
         self.widgets = {}
+        self.drag_or_resize = 0
 
     def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
         """
@@ -84,3 +86,172 @@ class WidgetManager:
         _ = obj  # for use parameter (PEP8)
         del obj
         self.manager.core.update()
+
+    def get_dor(self) -> int:
+        """
+        :return: object drag or resize at the moment by user
+        drag = 1
+        resize = 2
+        """
+        return self.drag_or_resize
+
+    def set_dor(self, dor: int):
+        """
+        set drag or resize:
+        drag = 1
+        resize = 2
+        you can use DRAG and RESIZE constants from constants.py
+        """
+        self.drag_or_resize = dor
+
+    def resize_magnet_checker(self, obj: ObjectClass, pos: QtCore.QPoint) \
+            -> (int, int, int, int, dict):
+        """
+        checks whether object has magnetic lines to other objects while resizing
+        :param obj: object for check
+        :param pos: future position of widget
+        :return: (x, y, width, height) of object, (x, y) was modified and
+                 dict with struct widget = (way by x line, way by y line)
+        """
+        self.manager.magnet_lines = []
+        obj_x1 = obj.x()
+        obj_y1 = obj.y()
+        obj_x2 = pos.x()
+        obj_y2 = pos.y()
+        x_mod = y_mod = False
+        widgets = {}
+        for widget in self.get_all_widgets():
+            way_x = way_y = None
+            if widget == obj:
+                continue
+            x1, y1 = widget.geometry().x(), widget.geometry().y()
+            x2, y2 = x1 + widget.geometry().width(), y1 + widget.geometry().height()
+            if x1 - OFFSET_MAGNET <= obj_x2 <= x1 + OFFSET_MAGNET:
+                obj_x2 = x1
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - OFFSET_MAGNET <= obj_x2 <= x2 + OFFSET_MAGNET:
+                obj_x2 = x2
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
+                ))
+            if y1 - OFFSET_MAGNET <= obj_y2 <= y1 + OFFSET_MAGNET:
+                obj_y2 = y1
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y2 - OFFSET_MAGNET <= obj_y2 <= y2 + OFFSET_MAGNET:
+                obj_y2 = y2
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+
+            if way_y or way_x:
+                widgets[widget] = way_x, way_y
+        return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
+
+    def drag_magnet_checker(self, obj: ObjectClass) -> (int, int, int, int, bool, bool, dict):
+        """
+        checks whether object has magnetic lines to other objects while moving
+        :param obj: object for check
+        :return: (x, y, width, height) of object, (x, y) was modified and
+                 dict with struct widget = (way by x line, way by y line)
+        """
+        self.manager.magnet_lines = []
+        obj_x1 = obj.x()
+        obj_y1 = obj.y()
+        obj_x2 = obj_x1 + obj.geometry().width()
+        obj_y2 = obj_y1 + obj.geometry().height()
+        x_mod = y_mod = False
+        # widget: x, y
+        widgets = {}
+        for widget in self.get_all_widgets():
+            way_x = way_y = None
+            if widget == obj:
+                continue
+            x1, y1 = widget.geometry().x(), widget.geometry().y()
+            x2, y2 = x1 + widget.geometry().width(), y1 + widget.geometry().height()
+            if x1 - OFFSET_MAGNET <= obj_x1 <= x1 + OFFSET_MAGNET:
+                obj_x1 = x1
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x1 - OFFSET_MAGNET <= obj_x2 <= x1 + OFFSET_MAGNET:
+                obj_x1 = x1 - obj.geometry().width()
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - OFFSET_MAGNET <= obj_x1 <= x2 + OFFSET_MAGNET:
+                obj_x1 = x2
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, obj_x1, (obj_y1 + obj_y2) // 2
+                ))
+            if x2 - OFFSET_MAGNET <= obj_x2 <= x2 + OFFSET_MAGNET:
+                obj_x1 = x2 - obj.geometry().width()
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
+                ))
+            if (x1 + x2) // 2 - OFFSET_MAGNET <= (obj_x1 + obj_x2) // 2 \
+                    <= (x1 + x2) // 2 + OFFSET_MAGNET:
+                obj_x1 = (x1 + x2) // 2 - obj.geometry().width() // 2
+                way_y = (y2 + y1) // 2
+                x_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, (y1 + y2) // 2, (x1 + x2) // 2, (obj_y1 + obj_y2) // 2
+                ))
+            if y1 - OFFSET_MAGNET <= obj_y1 <= y1 + OFFSET_MAGNET:
+                obj_y1 = y1
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y1 - OFFSET_MAGNET <= obj_y2 <= y1 + OFFSET_MAGNET:
+                obj_y1 = y1 - obj.geometry().height()
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
+                ))
+            if y2 - OFFSET_MAGNET <= obj_y1 <= y2 + OFFSET_MAGNET:
+                obj_y1 = y2
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+            if y2 - OFFSET_MAGNET <= obj_y2 <= y2 + OFFSET_MAGNET:
+                obj_y1 = y2 - obj.geometry().height()
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
+                ))
+            if (y1 + y2) // 2 - OFFSET_MAGNET <= (obj_y1 + obj_y2) // 2 \
+                    <= (y1 + y2) // 2 + OFFSET_MAGNET:
+                obj_y1 = (y1 + y2) // 2 - obj.geometry().height() // 2
+                way_x = (x2 + x1) // 2
+                y_mod = True
+                self.manager.magnet_lines.append(QtCore.QLine(
+                    (x1 + x2) // 2, (y1 + y2) // 2, (obj_x1 + obj_x2) // 2, (y1 + y2) // 2
+                ))
+            if way_y or way_x:
+                widgets[widget] = way_x, way_y
+        return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
