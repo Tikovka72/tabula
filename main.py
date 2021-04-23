@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 
 import sys
 
-from core import Core
+from main_window import Core
 
 from managers.mouse_manager import MouseManager
 from managers.widget_manager import WidgetManager
