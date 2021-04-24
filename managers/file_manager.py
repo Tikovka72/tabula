@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from main import Manager
 
 from objects.warning_window import WarningWindow
-from objects.arrow_class import Arrow
+from objects.arrow import Arrow
 
 
 class FileManager:

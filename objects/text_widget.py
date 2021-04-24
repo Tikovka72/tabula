@@ -8,13 +8,13 @@ from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
 from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
 
-from objects.arrow_class import Arrow
+from objects.arrow import Arrow
 from objects.zero_point import ZeroPointWidget
 from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE
 from objects.settings_widget import SettingsWindow
 
 
-class ObjectClass(QWidget):
+class TextWidget(QWidget):
     clicked = pyqtSignal()
 
     OFFSET = 5
@@ -32,7 +32,7 @@ class ObjectClass(QWidget):
         :param pos: position of object
         """
         super().__init__(parent)
-        self.object_manager = manager
+        self.widget_manager = manager
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
         self.zero_dot = zero_dot
@@ -42,7 +42,7 @@ class ObjectClass(QWidget):
         if pos:
             self.move(*pos)
         self.__init_ui__()
-        self.object_manager.manager.settings_window.raise_()
+        self.widget_manager.manager.settings_window.raise_()
 
     def __init_ui__(self):
         self.resize(*self.STANDARD_SIZE)
@@ -79,10 +79,10 @@ class ObjectClass(QWidget):
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
         self.resize_angle.setStyleSheet("background-color: black")
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(
             self, SettingsWindow.Title, name="Размер и расположение объекта"
         )
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
             name="Размер",
@@ -92,7 +92,7 @@ class ObjectClass(QWidget):
             call_back=(self.call_back_size_width, self.call_back_size_height),
             call_update_all=self.call_set_size
         )
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
             name="Положение",
@@ -102,13 +102,13 @@ class ObjectClass(QWidget):
             call_back=(self.call_back_pos_x, self.call_back_pos_y),
             call_update_all=self.call_set_pos
         )
-        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
             name="Текст"
         )
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettCheckboxLineEdit,
             name="Размер шрифта",
@@ -117,13 +117,13 @@ class ObjectClass(QWidget):
             default_values_to_return=(True, self.edit_line.get_text_size()),
             call_back=(self.call_back_text_auto, self.call_back_text_size),
             call_update_all=self.call_set_text_size)
-        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
             name="Рамка"
         )
-        self.object_manager.manager.settings_window.add_settings(
+        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
             name="Размер и радиус рамки",
@@ -132,8 +132,8 @@ class ObjectClass(QWidget):
             default_values_to_return=(0, 1),
             call_back=(self.call_back_border_size, self.call_back_border_radius),
             call_update_all=self.call_set_border)
-        self.object_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.object_manager.manager.settings_window.show_sett(self)
+        self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+        self.widget_manager.manager.settings_window.show_sett(self)
 
     def return_to_fact_pos(self):
         """
@@ -244,22 +244,22 @@ class ObjectClass(QWidget):
         """
         deletes self
         """
-        self.object_manager.delete_widget(self)
+        self.widget_manager.delete_widget(self)
         self.setEnabled(False)
         self.hide()
-        self.object_manager.delete_obj(self)
+        self.widget_manager.delete_obj(self)
 
     def copy_self(self):
         """
         makes self duplicate
         """
-        copy = ObjectClass(self.parent(), self.object_manager, self.zero_dot)
+        copy = TextWidget(self.parent(), self.widget_manager, self.zero_dot)
         copy.resize_event(self.width(), self.height())
         copy.edit_line.setText(self.edit_line.text())
         copy.move_event(self.geometry().x() + self.geometry().width() // 2 - 10,
                         self.geometry().y() + self.geometry().height() + 10, show_pos=False)
         copy.hide_size_or_pos_label()
-        self.object_manager.add_widget(widget=copy)
+        self.widget_manager.add_widget(widget=copy)
         copy.show()
 
     def on_back(self):
@@ -272,7 +272,7 @@ class ObjectClass(QWidget):
         """
         changes mouse point for parent. needs for drag event
         """
-        self.object_manager.manager.mouse_manager.change_mouse_pos(
+        self.widget_manager.manager.mouse_manager.change_mouse_pos(
             self.x() + event.x() + (self.OFFSET if need_offset else 0),
             self.y() + event.y() + (self.OFFSET if need_offset else 0))
 
@@ -296,7 +296,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{width}x{height}")
         self.update_arrows()
-        self.object_manager.manager.settings_window.update_obj_settings(self)
+        self.widget_manager.manager.settings_window.update_obj_settings(self)
 
     def move_event(self, x: int, y: int, show_pos: bool = True):
         """
@@ -310,7 +310,7 @@ class ObjectClass(QWidget):
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0] + self.width() // 2} "
                                        f"{y - self.zero_dot.get_pos()[1] + self.height() // 2}")
-        self.object_manager.manager.settings_window.update_obj_settings(self)
+        self.widget_manager.manager.settings_window.update_obj_settings(self)
 
     def moveEvent(self, a0) -> None:
         self.move(a0.pos().x(), a0.pos().y())
@@ -344,14 +344,14 @@ class ObjectClass(QWidget):
         with clicking on widget this widget checks active arrows and if there is active arrow,
         widget sets self as second object
         """
-        arrow: Arrow or None = self.object_manager.manager.arrow_manager.get_active_arrow()
+        arrow: Arrow or None = self.widget_manager.manager.arrow_manager.get_active_arrow()
         if arrow:
             if arrow.obj1 == self:
                 return
-            if self.object_manager.manager.arrow_manager.get_arrows_with(self, arrow.obj1):
+            if self.widget_manager.manager.arrow_manager.get_arrows_with(self, arrow.obj1):
                 return
-            self.object_manager.manager.arrow_manager.set_obj2_arrow(arrow, self)
-            self.object_manager.manager.arrow_manager.toggle_active_arrow()
+            self.widget_manager.manager.arrow_manager.set_obj2_arrow(arrow, self)
+            self.widget_manager.manager.arrow_manager.toggle_active_arrow()
             arrow.set_start_and_end()
 
     def add_arrow_f(self, need_arrow: bool = False, arrow_type: int = FROM_AND_TO_NEAREST_LINE):
@@ -361,18 +361,18 @@ class ObjectClass(QWidget):
         :param arrow_type: type of arrow
         """
         arrow = Arrow(
-            manager=self.object_manager.manager.arrow_manager,
+            manager=self.widget_manager.manager.arrow_manager,
             need_arrow=need_arrow, arrow_type=arrow_type
         )
-        self.object_manager.manager.arrow_manager.toggle_active_arrow(arrow)
-        self.object_manager.manager.arrow_manager.add_arrow(arrow)
-        self.object_manager.manager.arrow_manager.set_obj1_arrow(arrow, self)
+        self.widget_manager.manager.arrow_manager.toggle_active_arrow(arrow)
+        self.widget_manager.manager.arrow_manager.add_arrow(arrow)
+        self.widget_manager.manager.arrow_manager.set_obj1_arrow(arrow, self)
 
     def update_arrows(self):
         """
         updates position of all widget's arrows
         """
-        for arrow in self.object_manager.manager.arrow_manager.get_all_arrows_from_object(self):
+        for arrow in self.widget_manager.manager.arrow_manager.get_all_arrows_from_object(self):
             arrow.set_start_and_end()
 
     def check_have_active_arrow(self) -> Arrow:
@@ -380,21 +380,21 @@ class ObjectClass(QWidget):
         checks if app has active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        return self.object_manager.manager.arrow_manager.get_active_arrow()
+        return self.widget_manager.manager.arrow_manager.get_active_arrow()
 
     def toggle_have_active_arrow(self):
         """
         toggles active arrow. needs to transfer this to LineEdit
         manager -> widget -> line edit
         """
-        self.object_manager.manager.arrow_manager.toggle_active_arrow()
+        self.widget_manager.manager.arrow_manager.toggle_active_arrow()
 
-    def have_arrow_with(self, obj: ObjectClass) -> bool:
+    def have_arrow_with(self, obj: TextWidget) -> bool:
         """
         checks if this object has arrow with other object
         :param obj: other object to check
         """
-        return self.object_manager.manager.arrow_manager.get_arrows_with(self, obj)
+        return self.widget_manager.manager.arrow_manager.get_arrows_with(self, obj)
 
     def show_angles(self):
         """
@@ -416,7 +416,7 @@ class ObjectClass(QWidget):
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            if self.object_manager.drag_or_resize is NONE:
+            if self.widget_manager.drag_or_resize is NONE:
                 mime = QMimeData()
                 drag = QDrag(self)
                 drag.setMimeData(mime)
@@ -448,7 +448,7 @@ class ObjectClass(QWidget):
 class LineEdit(QLineEdit):
     FONT_SIZE_FACTOR = 0.80
 
-    def __init__(self, parent: ObjectClass):
+    def __init__(self, parent: TextWidget):
         """
         :param parent: widget
         """
@@ -468,7 +468,7 @@ class LineEdit(QLineEdit):
         self.setStyleSheet(
             "QLineEdit {"
             f"border-radius: {self.border_radius}%;"
-            f"border: {self.border_size}px solid black;"
+            f"border: {self.border_size}px solid #808080;"
             "}"
         )
         self.font_ = self.font()
@@ -494,7 +494,7 @@ class LineEdit(QLineEdit):
             f"font-size: {self.text_size_menu}px;"
             f"background-color: {self.background_color_menu};"
             f"border-radius: {self.border_radius}%;"
-            f"border: 1px solid black;"
+            f"border: 1px solid #808080;"
             "}"
             "QMenu::selected {"
             f"background-color: {self.background_color_menu_selected};"
@@ -560,7 +560,7 @@ class LineEdit(QLineEdit):
         self.setStyleSheet(
             "QLineEdit {"
             f"border-radius: {radius}%;"
-            f"{'border: ' + str(size) + 'px solid black;' if int(size) > 0 else ''}"
+            f"{'border: ' + str(size) + 'px solid #808080;' if int(size) > 0 else ''}"
             "}")
         self.border_radius = radius
         self.border_size = size
@@ -579,14 +579,14 @@ class LineEdit(QLineEdit):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if event.button() == Qt.LeftButton:
-            self.parent().object_manager.manager.settings_window.hide_all_sett()
-            self.parent().object_manager.clear_focus()
-            self.parent().object_manager.manager.arrow_manager.clear_focus_arrows()
+            self.parent().widget_manager.manager.settings_window.hide_all_sett()
+            self.parent().widget_manager.clear_focus()
+            self.parent().widget_manager.manager.arrow_manager.clear_focus_arrows()
             self.parent().show_angles()
             self.parent().check_and_set_arrow()
             self.parent().hide_size_or_pos_label()
 
-            self.parent().object_manager.manager.settings_window.show_sett(self.parent())
+            self.parent().widget_manager.manager.settings_window.show_sett(self.parent())
 
     def self_menu_show(self):
         """

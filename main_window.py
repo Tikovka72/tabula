@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from main import Manager
 
-import time
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPainter, QColor, QPen
 
@@ -14,7 +12,7 @@ from utils import check_on_arrow
 from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR, OFFSET_MAGNET
 
 
-class Core(QtWidgets.QWidget):
+class GraphicCore(QtWidgets.QWidget):
     """
     main class with UI
     """
@@ -361,5 +359,3 @@ class Core(QtWidgets.QWidget):
         if mls:
             self.qp.drawLines(*mls)
         self.qp.end()
-
-        time.sleep(0.005)

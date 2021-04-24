@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 
 import sys
 
-from main_window import Core
+from main_window import GraphicCore
 
 from managers.mouse_manager import MouseManager
 from managers.widget_manager import WidgetManager
@@ -17,7 +17,7 @@ from utils import except_hook
 class Manager:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
-        self.core = Core(self)
+        self.core = GraphicCore(self)
 
         self.mouse_manager = MouseManager(self)
         self.widget_manager = WidgetManager(self)

@@ -5,9 +5,9 @@ from PyQt5 import QtWidgets
 
 if TYPE_CHECKING:
     from main import Manager
-    from objects.object_class import ObjectClass
+    from objects.text_widget import TextWidget
 
-from objects.arrow_class import Arrow
+from objects.arrow import Arrow
 
 
 class ArrowManager:
@@ -54,7 +54,7 @@ class ArrowManager:
         """
         return self.active_arrow
 
-    def get_all_arrows_from_object(self, obj: ObjectClass) -> list:
+    def get_all_arrows_from_object(self, obj: TextWidget) -> list:
         """
         gets all arrows linked  with "obj" widget
         :param obj: widget for which you need to get arrows
@@ -78,7 +78,7 @@ class ArrowManager:
             return False
         return True
 
-    def set_obj1_arrow(self, arrow: Arrow, obj: ObjectClass):
+    def set_obj1_arrow(self, arrow: Arrow, obj: TextWidget):
         """
         sets arrow's first object
         """
@@ -87,7 +87,7 @@ class ArrowManager:
             arrow.obj1 = obj
             self.widget_manager.widgets.get(obj)["out"].append(arrow)
 
-    def set_obj2_arrow(self, arrow: Arrow, obj: ObjectClass):
+    def set_obj2_arrow(self, arrow: Arrow, obj: TextWidget):
         """
         sets arrow's second object
         """

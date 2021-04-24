@@ -6,7 +6,7 @@ from PyQt5 import QtGui, QtCore
 if TYPE_CHECKING:
     from main import Manager
 
-from objects.object_class import ObjectClass
+from objects.text_widget import TextWidget
 from constants import OFFSET_MAGNET
 
 
@@ -19,7 +19,7 @@ class WidgetManager:
         self.drag_dot = 0, 0
         self.dragged_obj = None
 
-    def add_widget(self, pos: tuple or list = None, widget: ObjectClass = None) -> ObjectClass:
+    def add_widget(self, pos: tuple or list = None, widget: TextWidget = None) -> TextWidget:
         """
         method for adding widget in dict with all widgets (self.widgets).
         if widget was passed, this manager will add this widget to dict self.widgets
@@ -31,8 +31,8 @@ class WidgetManager:
         :return: this widget
         """
         if widget is None:
-            widget = ObjectClass(self.manager.core, self, pos=pos if pos else (0, 0),
-                                 zero_dot=self.manager.grid_manager.zero_point_dot)
+            widget = TextWidget(self.manager.core, self, pos=pos if pos else (0, 0),
+                                zero_dot=self.manager.grid_manager.zero_point_dot)
         widget.show()
         self.widgets[widget] = {"in": [], "out": []}
         self.manager.settings_window.hide_all_sett()
@@ -46,7 +46,7 @@ class WidgetManager:
         """
         return self.widgets.keys()
 
-    def delete_widget(self, obj: ObjectClass):
+    def delete_widget(self, obj: TextWidget):
         """
         deletes widget from self.widgets and all arrows that were linked with it
         """
@@ -106,7 +106,7 @@ class WidgetManager:
         """
         self.drag_or_resize = dor
 
-    def resize_magnet_checker(self, obj: ObjectClass, pos: QtCore.QPoint) \
+    def resize_magnet_checker(self, obj: TextWidget, pos: QtCore.QPoint) \
             -> (int, int, int, int, dict):
         """
         checks whether object has magnetic lines to other objects while resizing
@@ -161,7 +161,7 @@ class WidgetManager:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
 
-    def drag_magnet_checker(self, obj: ObjectClass) -> (int, int, int, int, bool, bool, dict):
+    def drag_magnet_checker(self, obj: TextWidget) -> (int, int, int, int, bool, bool, dict):
         """
         checks whether object has magnetic lines to other objects while moving
         :param obj: object for check

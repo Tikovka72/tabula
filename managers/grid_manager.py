@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from main import Manager
-    from objects.object_class import ObjectClass
+    from objects.text_widget import TextWidget
 
 from objects.grid import Grid
 from objects.zero_point import ZeroPointWidget
@@ -22,7 +22,7 @@ class GridManager:
 
     # TODO doc for this
     def check_and_set_grid_magnet_lines_for_resizing(
-            self, obj: ObjectClass,
+            self, obj: TextWidget,
             x: int,
             y: int,
             x_mod: bool = False,
