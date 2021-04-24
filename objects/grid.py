@@ -90,19 +90,7 @@ class Grid:
         """
         regenerates grid
         """
-        xn = len(self.grid["x"])
-        yn = len(self.grid["y"])
-        for i, x in enumerate(range(self.offset_left, self.core_size[0], self.step)):
-            if i >= yn:
-                self.grid["y"].append(QtCore.QLine(x, 0, x, self.core_size[1]))
-            line: QtCore.QLine = self.grid["y"][i]
-            line.setLine(x, 0, x, self.core_size[1])
-
-        for i, y in enumerate(range(self.offset_top, self.core_size[1], self.step)):
-            if i >= xn:
-                self.grid["x"].append(QtCore.QLine(0, y, self.core_size[0], y))
-            line: QtCore.QLine = self.grid["x"][i]
-            line.setLine(0, y, self.core_size[0], y)
+        self.grid = self.generate_grid()
 
     def toggle_show(self) -> bool:
         """
