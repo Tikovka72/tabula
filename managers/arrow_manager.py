@@ -1,11 +1,11 @@
 ﻿from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from PyQt5 import QtWidgets
-
 if TYPE_CHECKING:
     from main import Manager
     from objects.text_widget import TextWidget
+
+from PyQt5 import QtWidgets
 
 from objects.arrow import Arrow
 

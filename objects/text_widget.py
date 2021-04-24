@@ -4,14 +4,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from managers.widget_manager import WidgetManager
 
-from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
 from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
+from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
 
 from objects.arrow import Arrow
-from objects.zero_point import ZeroPointWidget
-from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE
 from objects.settings_widget import SettingsWindow
+from objects.zero_point import ZeroPointWidget
+
+from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE
 
 
 class TextWidget(QWidget):

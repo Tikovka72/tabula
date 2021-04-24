@@ -1,13 +1,13 @@
 ﻿from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from PyQt5 import QtWidgets
-
 if TYPE_CHECKING:
     from main import Manager
 
-from objects.warning_window import WarningWindow
+from PyQt5 import QtWidgets
+
 from objects.arrow import Arrow
+from objects.warning_window import WarningWindow
 
 
 class FileManager:

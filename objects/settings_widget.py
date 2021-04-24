@@ -1,7 +1,9 @@
 ﻿from __future__ import annotations
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from main import Manager
+
 from PyQt5 import QtWidgets, QtGui, QtCore, sip
 from PyQt5.QtGui import QWheelEvent
 

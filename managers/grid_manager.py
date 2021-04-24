@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from main import Manager
+
     from objects.text_widget import TextWidget
 
 from objects.grid import Grid

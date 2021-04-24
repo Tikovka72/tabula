@@ -1,12 +1,13 @@
 ﻿from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from PyQt5 import QtGui, QtCore
-
 if TYPE_CHECKING:
     from main import Manager
 
+from PyQt5 import QtGui, QtCore
+
 from objects.text_widget import TextWidget
+
 from constants import OFFSET_MAGNET
 
 

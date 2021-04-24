@@ -11,6 +11,7 @@ from managers.file_manager import FileManager
 from managers.grid_manager import GridManager
 
 from objects.settings_widget import SettingsWindow
+
 from utils import except_hook
 
 

@@ -4,13 +4,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from managers.arrow_manager import ArrowManager
 
-import math
-
 from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QPainter
+
+import math
 from numpy import arctan2
 
 from objects.settings_widget import SettingsWindow
+
 from constants import FROM_AND_TO_NEAREST_LINE
 
 UP = 0

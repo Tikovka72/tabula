@@ -8,7 +8,9 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QPainter, QColor, QPen
 
 from objects.settings_widget import SettingsWindow
+
 from utils import check_on_arrow
+
 from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR, OFFSET_MAGNET
 
 
@@ -25,7 +27,6 @@ class GraphicCore(QtWidgets.QWidget):
         self.manager = manager
         self.setAcceptDrops(True)
         self.setMouseTracking(True)
-        # self.__init_ui__()
 
     def __init_ui__(self):
         self.setWindowTitle("tabula")
