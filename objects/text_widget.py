@@ -451,7 +451,6 @@ class TextWidget(QWidget):
 
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
         modifier = QApplication.keyboardModifiers()
-        print(event.key(), modifier == Qt.ControlModifier)
         if modifier == Qt.ControlModifier:
             if event.key() in (Qt.Key_D, 1042):
                 self.copy_self()

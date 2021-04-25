@@ -212,7 +212,6 @@ class GraphicCore(QtWidgets.QWidget):
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         modifier = QtWidgets.QApplication.keyboardModifiers()
-        print(event.key(), "----")
         if modifier == Qt.ControlModifier:
             if event.key() in (Qt.Key_N, 1058):
                 w = self.manager.widget_manager.add_widget(

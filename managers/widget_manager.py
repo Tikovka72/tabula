@@ -53,10 +53,11 @@ class WidgetManager:
         """
         arrows = self.manager.arrow_manager.get_all_arrows_from_object(obj)
         for arrow in arrows:
+            # TODO check exception
             try:
                 self.manager.arrow_manager.delete_arrow(arrow)
-            except Exception as e:
-                print(e)
+            except Exception:
+                ...
         self.widgets.pop(obj)
 
     def set_coords_on_widgets(self, widgets: list or tuple,
