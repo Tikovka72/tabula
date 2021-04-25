@@ -11,7 +11,7 @@ from objects.settings_widget import SettingsWindow
 
 from utils import check_on_arrow
 
-from constants import NONE, DRAG, RESIZE, MAGNET_LINES_COLOR, OFFSET_MAGNET
+from constants import NONE, DRAG, RESIZE, MAGNET_LINE_COLOR, OFFSET_MAGNET
 
 
 class GraphicCore(QtWidgets.QWidget):
@@ -353,7 +353,7 @@ class GraphicCore(QtWidgets.QWidget):
             end = self.manager.mouse_manager.get_mouse_pos()
             if arrow.draw(self.qp, end_pos=end):
                 self.update()
-        pen = QPen(QColor(MAGNET_LINES_COLOR), 1)
+        pen = QPen(QColor(MAGNET_LINE_COLOR), 1)
         pen.setStyle(QtCore.Qt.DashLine)
         self.qp.setPen(pen)
         mls = self.manager.grid_manager.get_magnet_lines()

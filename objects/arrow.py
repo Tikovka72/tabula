@@ -12,7 +12,7 @@ from numpy import arctan2
 
 from objects.settings_widget import SettingsWindow
 
-from constants import FROM_AND_TO_NEAREST_LINE
+from constants import FROM_AND_TO_NEAREST_LINE, DEFAULT_ARROW_COLOR, DEFAULT_SELECTED_ARROW_COLOR
 
 UP = 0
 RIGHT = 1
@@ -28,7 +28,7 @@ class Arrow:
     def __init__(self, manager: ArrowManager = None,
                  start_pos: tuple or list or None = None,
                  end_pos: tuple or list or None = None,
-                 color: str = "#000000",
+                 color: str = DEFAULT_ARROW_COLOR,
                  need_arrow: bool = False,
                  arrow_type: int = FROM_AND_TO_NEAREST_LINE):
         """
@@ -53,7 +53,7 @@ class Arrow:
         self.obj1 = None
         self.obj2 = None
         self.selected = False
-        self.selected_color = "#aaaaaa"
+        self.selected_color = DEFAULT_SELECTED_ARROW_COLOR
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
         self.arrow_manager.manager.settings_window.hide_all_sett()

@@ -2,19 +2,21 @@ from PyQt5 import QtCore, QtGui
 
 from objects.zero_point import ZeroPointWidget
 
+from constants import GRID_COLOR, SPECIAL_LINE_COLOR, GRID_STEP
+
 
 class Grid:
     """
     object for creating grid by QPainter
     """
-    def __init__(self, color: str = "#C8C8C8",
+    def __init__(self, color: str = GRID_COLOR,
                  line: QtCore.Qt.PenStyle = QtCore.Qt.DashLine,
                  show: bool = False,
                  core_size: tuple = None,
-                 step: int = 20,
+                 step: int = GRID_STEP,
                  offset: tuple or list = (20, 20),
                  zero_pos: ZeroPointWidget = None,
-                 special_lines_color="#969696"):
+                 special_lines_color=SPECIAL_LINE_COLOR):
         """
         :param color: color of grid in hex format: #......
         :param line: code of line's type: QtCore.Qt.CodeLine
