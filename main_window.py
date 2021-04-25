@@ -5,13 +5,14 @@ if TYPE_CHECKING:
     from main import Manager
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 
 from objects.settings_widget import SettingsWindow
 
 from utils import check_on_arrow
 
-from constants import NONE, DRAG, RESIZE, MAGNET_LINE_COLOR, OFFSET_MAGNET
+from constants import NONE, DRAG, RESIZE, MAGNET_LINE_COLOR, OFFSET_MAGNET, CONTEXT_MENU_BORDER_COLOR
 
 
 class GraphicCore(QtWidgets.QWidget):
@@ -164,8 +165,9 @@ class GraphicCore(QtWidgets.QWidget):
         context_menu.setStyleSheet(
             f"font-size: 15px;"
             f"border-radius: 5%;"
-            f"border: 1px solid black;"
+            f"border: 1px solid {CONTEXT_MENU_BORDER_COLOR};"
         )
+        context_menu.setWindowFlags(context_menu.windowFlags() | Qt.NoDropShadowWindowHint)
         context_menu.exec_(QtGui.QCursor.pos())
 
     def arrow_menu_show(self, arrow):

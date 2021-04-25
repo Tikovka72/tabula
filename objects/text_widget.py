@@ -12,7 +12,8 @@ from objects.arrow import Arrow
 from objects.settings_widget import SettingsWindow
 from objects.zero_point import ZeroPointWidget
 
-from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE, WIDGET_BORDER_COLOR
+from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE, \
+    WIDGET_BORDER_COLOR, CONTEXT_MENU_BORDER_COLOR
 
 
 class TextWidget(QWidget):
@@ -495,12 +496,13 @@ class LineEdit(QLineEdit):
             f"font-size: {self.text_size_menu}px;"
             f"background-color: {self.background_color_menu};"
             f"border-radius: {self.border_radius}%;"
-            f"border: 1px solid {WIDGET_BORDER_COLOR};"
+            f"border: 1px solid {CONTEXT_MENU_BORDER_COLOR};"
             "}"
             "QMenu::selected {"
             f"background-color: {self.background_color_menu_selected};"
             "};"
         )
+        self.menu.setWindowFlags(self.menu.windowFlags() | Qt.NoDropShadowWindowHint)
         self.text_size = int(self.size().height() * self.FONT_SIZE_FACTOR)
         self.update_text_size()
 
