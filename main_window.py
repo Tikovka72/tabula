@@ -161,7 +161,8 @@ class GraphicCore(QtWidgets.QWidget):
         pos = self.manager.mouse_manager.get_mouse_pos()
         context_menu = QtWidgets.QMenu()
         context_menu.addAction('Добавить объект',
-                               lambda: self.manager.widget_manager.add_widget(pos))
+                               lambda: self.manager.widget_manager.add_widget(pos),
+                               shortcut="Ctrl+N")
         context_menu.setStyleSheet(
             f"font-size: 15px;"
             f"border-radius: 5%;"
@@ -210,6 +211,21 @@ class GraphicCore(QtWidgets.QWidget):
         self.manager.mouse_manager.change_mouse_pos(event.x(), event.y())
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
+        modifier = QtWidgets.QApplication.keyboardModifiers()
+        print(event.key(), "----")
+        if modifier == Qt.ControlModifier:
+            if event.key() in (Qt.Key_N, 1058):
+                w = self.manager.widget_manager.add_widget(
+                    self.manager.mouse_manager.get_mouse_pos())
+                self.update()
+                self.manager.widget_manager.clear_focus()
+                w.setFocus()
+                w.show_angles()
+                self.update()
+            widget_has_focus = self.manager.widget_manager.widget_has_focus_or_none()
+            if widget_has_focus:
+                widget_has_focus.keyReleaseEvent(event)
+                self.update()
         if not self.hasFocus():
             return
         if event.key() in (QtCore.Qt.Key_R, 1050):

@@ -258,3 +258,13 @@ class WidgetManager:
             if way_y or way_x:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
+
+    def widget_has_focus_or_none(self) -> TextWidget or None:
+        """
+        bring first widget that haas focus else None
+        :return: widget or none
+        """
+        for w in self.widgets:
+            if w.hasFocus():
+                return w
+        return None

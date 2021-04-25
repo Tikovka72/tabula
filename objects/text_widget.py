@@ -5,8 +5,8 @@ if TYPE_CHECKING:
     from managers.widget_manager import WidgetManager
 
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
-from PyQt5.QtGui import QDrag, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel
+from PyQt5.QtGui import QDrag, QCursor, QMouseEvent, QKeyEvent
+from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel, QApplication
 
 from objects.arrow import Arrow
 from objects.settings_widget import SettingsWindow
@@ -263,6 +263,9 @@ class TextWidget(QWidget):
         copy.hide_size_or_pos_label()
         self.widget_manager.add_widget(widget=copy)
         copy.show()
+        self.widget_manager.clear_focus()
+        copy.setFocus()
+        copy.show_angles()
 
     def on_back(self):
         """
@@ -446,6 +449,29 @@ class TextWidget(QWidget):
         """
         self.edit_line.setText(data)
 
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        modifier = QApplication.keyboardModifiers()
+        print(event.key(), modifier == Qt.ControlModifier)
+        if modifier == Qt.ControlModifier:
+            if event.key() in (Qt.Key_D, 1042):
+                self.copy_self()
+                self.widget_manager.manager.update_core()
+            elif event.key() in (Qt.Key_B, 1048):
+                self.on_back()
+                self.widget_manager.manager.update_core()
+            elif event.key() in (Qt.Key_N, 1058):
+                w = self.widget_manager.add_widget(
+                    self.widget_manager.manager.mouse_manager.get_mouse_pos())
+                self.update()
+                self.widget_manager.clear_focus()
+                w.setFocus()
+                w.show_angles()
+                self.widget_manager.manager.update_core()
+        elif modifier == Qt.ShiftModifier:
+            if event.key() == Qt.Key_Delete:
+                self.del_self()
+                self.widget_manager.manager.update_core()
+
 
 class LineEdit(QLineEdit):
     FONT_SIZE_FACTOR = 0.80
@@ -480,8 +506,8 @@ class LineEdit(QLineEdit):
         self.menu.addAction("Копировать текст", self.copy, shortcut="Ctrl+C")
         self.menu.addAction("Вставить", self.paste, shortcut="Ctrl+V")
         self.menu.addSeparator()
-        self.menu.addAction("Дублировать объект", self.parent().copy_self)
-        self.menu.addAction("На задний план", self.on_back)
+        self.menu.addAction("Дублировать объект", self.parent().copy_self, shortcut="Ctrl+D")
+        self.menu.addAction("На задний план", self.on_back, shortcut="Ctrl+B")
         self.menu.addSeparator()
         self.menu.addAction("Добавить связь",
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
@@ -490,7 +516,7 @@ class LineEdit(QLineEdit):
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
         self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
         self.menu.addSeparator()
-        self.menu.addAction("Удалить", self.parent().del_self)
+        self.menu.addAction("Удалить", self.parent().del_self, shortcut="Shift+Del")
         self.menu.setStyleSheet(
             "QMenu {"
             f"font-size: {self.text_size_menu}px;"
@@ -511,6 +537,9 @@ class LineEdit(QLineEdit):
         sends signal to parent for move widget on back
         """
         self.parent().on_back()
+
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        self.parent().keyReleaseEvent(event)
 
     def change_text_size(self, size: int = None):
         """
