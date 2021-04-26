@@ -76,6 +76,19 @@ class ImageManager:
         for widget in self.widget_manager.get_all_widgets():
             pen = aggdraw.Pen(WIDGET_BORDER_COLOR, int(widget.call_set_border()[0]))
             rad = widget.edit_line.border_radius
+
+            data_for_back = (
+                (0, rad, widget.edit_line.width(), widget.edit_line.height() - rad),
+                (rad, 0, widget.edit_line.width() - rad, widget.edit_line.height())
+            )
+            for x1, y1, x2, y2 in data_for_back:
+                draw.rectangle((
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2
+                ), aggdraw.Pen("#ffffff", 1), aggdraw.Brush("#ffffff"))
+
             data_for_arcs = (
                 ((0, 0, rad * 2, rad * 2), (90, 180)),
                 ((0, widget.edit_line.height() - rad * 2, rad * 2, widget.edit_line.height()),
@@ -85,13 +98,38 @@ class ImageManager:
                 ((-rad * 2 + widget.edit_line.width(), 0, widget.edit_line.width(), rad * 2),
                  (0, 90))
             )
+
             for (x1, y1, x2, y2), (start, end) in data_for_arcs:
+                draw.ellipse((
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2,
+                ), aggdraw.Pen("#ffffff", 1), aggdraw.Brush("#ffffff"))
                 draw.arc((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2,
                 ), start, end, pen)
+
+            data_for_lines = (
+                (0, rad, 0, widget.edit_line.height() - rad),
+                (rad, 0, widget.edit_line.width() - rad, 0),
+                (rad, widget.edit_line.height(),
+                 widget.edit_line.width() - rad, widget.edit_line.height()),
+                (widget.edit_line.width(), rad, widget.edit_line.width(),
+                 widget.edit_line.height() - rad)
+            )
+
+            for x1, y1, x2, y2 in data_for_lines:
+                draw.line((
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
+                    widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
+                    widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2
+                ), pen)
+
         draw.flush()
         im.save(file_to_save)
 
