@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from main import Manager
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QLine
 
 import aggdraw
 from PIL import Image, ImageDraw, ImageFont, JpegImagePlugin
@@ -50,17 +51,32 @@ class ImageManager:
         im = Image.new("RGB", (xl, yl))
         draw = aggdraw.Draw(im)
         draw.rectangle((0, 0, xl, yl), aggdraw.Pen("#ffffff"), aggdraw.Brush("#ffffff"))
+        zero_pos_coefficient_x = self.manager.grid_manager.zero_point_dot.get_pos()[0] - abs(xs) - 20
+        zero_pos_coefficient_y = self.manager.grid_manager.zero_point_dot.get_pos()[1] - abs(ys) - 20
         for arrow in self.arrow_manager.get_all_arrows():
             pen = aggdraw.Pen(arrow.color, 2)
-            draw.line((arrow.start_pos[0] -
-                       self.manager.grid_manager.zero_point_dot.get_pos()[0] + abs(xs) + 20,
-                       arrow.start_pos[1] -
-                       self.manager.grid_manager.zero_point_dot.get_pos()[1] + abs(ys) + 20,
-                       arrow.end_pos[0] -
-                       self.manager.grid_manager.zero_point_dot.get_pos()[0] + abs(xs) + 20,
-                       arrow.end_pos[1] -
-                       self.manager.grid_manager.zero_point_dot.get_pos()[1] + abs(ys) + 20
+            draw.line((arrow.start_pos[0] - zero_pos_coefficient_x,
+                       arrow.start_pos[1] - zero_pos_coefficient_y,
+                       arrow.end_pos[0] - zero_pos_coefficient_x,
+                       arrow.end_pos[1] - zero_pos_coefficient_y
                        ), pen)
+            if arrow.need_arrow:
+                arrow_line_1, arrow_line_2 = arrow.create_arrow()
+                arrow_line_1: QLine = arrow_line_1
+                arrow_line_2: QLine = arrow_line_2
+                draw.line((
+                    arrow_line_1.p1().x() - zero_pos_coefficient_x,
+                    arrow_line_1.p1().y() - zero_pos_coefficient_y,
+                    arrow_line_1.p2().x() - zero_pos_coefficient_x,
+                    arrow_line_1.p2().y() - zero_pos_coefficient_y,
+                ), pen)
+                draw.line((
+                    arrow_line_2.p1().x() - zero_pos_coefficient_x,
+                    arrow_line_2.p1().y() - zero_pos_coefficient_y,
+                    arrow_line_2.p2().x() - zero_pos_coefficient_x,
+                    arrow_line_2.p2().y() - zero_pos_coefficient_y,
+                ), pen)
+
         draw.flush()
         im.save(file_to_save)
 
