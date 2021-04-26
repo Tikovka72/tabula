@@ -4,11 +4,12 @@ import sys
 
 from main_window import GraphicCore
 
-from managers.mouse_manager import MouseManager
-from managers.widget_manager import WidgetManager
 from managers.arrow_manager import ArrowManager
 from managers.file_manager import FileManager
 from managers.grid_manager import GridManager
+from managers.image_manager import ImageManager
+from managers.mouse_manager import MouseManager
+from managers.widget_manager import WidgetManager
 
 from objects.settings_widget import SettingsWindow
 
@@ -25,8 +26,7 @@ class Manager:
         self.arrow_manager = ArrowManager(self)
         self.file_manager = FileManager(self)
         self.grid_manager = GridManager(self)
-
-        self.active_arrow = None
+        self.image_manager = ImageManager(self)
 
         self.settings_window = SettingsWindow(self.core, self)
         self.core.__init_ui__()

@@ -584,7 +584,12 @@ class SettingsWindow(QtWidgets.QWidget):
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
         self.save_button.setText("Сохранить")
-        self.save_button.clicked.connect(self.manager.file_manager.save_file)
+        self.image_button = QtWidgets.QPushButton(self)
+        self.image_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
+                                        "border-radius: 15%;}"
+                                        "QPushButton::hover {background-color: #eee}")
+        self.image_button.setText("В картинку")
+        self.image_button.clicked.connect(self.manager.image_manager.create_image)
         self.set_geometry()
 
     def set_geometry(self):
@@ -605,6 +610,12 @@ class SettingsWindow(QtWidgets.QWidget):
         self.save_button.setGeometry(10 + self.open_button.width() + 10,
                                      self.height() - 30 - self.save_button.height(),
                                      self.save_button.width() + 20, self.save_button.height() + 20)
+        self.image_button.adjustSize()
+        self.image_button.setGeometry(10 + self.open_button.width() + 10 +
+                                      self.save_button.width() + 10,
+                                      self.height() - 30 - self.image_button.height(),
+                                      self.image_button.width() + 20,
+                                      self.image_button.height() + 20)
 
     def toggle_show(self):
         if self.x() == self.parent().width():
