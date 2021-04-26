@@ -39,7 +39,9 @@ class FileManager:
         for i, arrow in enumerate(self.arrow_manager.arrows):
             text_arrows.append(
                 "U+FB4x16c".join(map(
-                    str, (i, widget_ids[arrow.obj1], widget_ids[arrow.obj2], int(arrow.need_arrow)))
+                    str, (i, widget_ids[arrow.obj1], widget_ids[arrow.obj2], int(arrow.need_arrow),
+                          f"{arrow.start_pos_by_obj[0]}x{arrow.start_pos_by_obj[1]}",
+                          f"{arrow.end_pos_by_obj[0]}x{arrow.end_pos_by_obj[1]}"))
                 )
             )
         with open(self.opened_file, "w", encoding="UTF-8") as f:
@@ -82,14 +84,17 @@ class FileManager:
                 widgets_total[int(wid)] = widget_class
         if arrows[0]:
             for arrow in arrows:
-                aid, obj1, obj2, na = arrow.split("U+FB4x16c")
+                aid, obj1, obj2, na, start_pos_bo, end_pos_bo = arrow.split("U+FB4x16c")
                 arr = Arrow(self.arrow_manager, need_arrow=bool(int(na)))
                 self.arrow_manager.add_arrow(arr)
                 self.arrow_manager.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.arrow_manager.set_obj2_arrow(arr, widgets_total[int(obj2)])
+                arr.start_pos_by_obj, arr.end_pos_by_obj = tuple(map(int, start_pos_bo.split("x"))), \
+                                                           tuple(map(int, end_pos_bo.split("x")))
                 arr.set_start_and_end()
                 self.manager.widget_manager.clear_focus()
                 self.manager.arrow_manager.clear_focus_arrows()
+                self.manager.core.setFocus()
 
     def get_name_file(self) -> str or None:
         """

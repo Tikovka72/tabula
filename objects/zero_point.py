@@ -40,8 +40,8 @@ class ZeroPointWidget(QtWidgets.QWidget):
             self.move_animation(self.zero)
         else:
             self.move(*self.zero)
-            self.manager.grid.set_offset_by_zero_point()
-            self.manager.grid.regenerate_grid()
+            self.manager.grid_manager.grid.set_offset_by_zero_point()
+            self.manager.grid_manager.grid.regenerate_grid()
             self.manager.settings_window.update_obj_settings(self.manager.core)
 
     def set_zero(self, x: int, y: int):
