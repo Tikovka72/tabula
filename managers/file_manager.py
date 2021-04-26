@@ -46,6 +46,7 @@ class FileManager:
             )
         with open(self.opened_file, "w", encoding="UTF-8") as f:
             f.write("U+FB4x18c".join(("U+FB4x15c".join(text_file), "U+FB4x17c".join(text_arrows))))
+        self.manager.core.setWindowTitle(f"tabula - {self.opened_file.split('/')[-1]}")
 
     def open_file(self):
         """
@@ -89,12 +90,14 @@ class FileManager:
                 self.arrow_manager.add_arrow(arr)
                 self.arrow_manager.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.arrow_manager.set_obj2_arrow(arr, widgets_total[int(obj2)])
-                arr.start_pos_by_obj, arr.end_pos_by_obj = tuple(map(int, start_pos_bo.split("x"))), \
-                                                           tuple(map(int, end_pos_bo.split("x")))
+                arr.start_pos_by_obj, arr.end_pos_by_obj = \
+                    tuple(map(int, start_pos_bo.split("x"))), \
+                    tuple(map(int, end_pos_bo.split("x")))
                 arr.set_start_and_end()
                 self.manager.widget_manager.clear_focus()
                 self.manager.arrow_manager.clear_focus_arrows()
                 self.manager.core.setFocus()
+        self.manager.core.setWindowTitle(f"tabula - {self.opened_file.split('/')[-1]}")
 
     def get_name_file(self) -> str or None:
         """
