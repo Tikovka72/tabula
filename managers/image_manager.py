@@ -47,9 +47,11 @@ class ImageManager:
         yl += abs(ys) + 40
         im = Image.new("RGB", (xl, yl))
         draw = aggdraw.Draw(im)
+        draw_pillow = ImageDraw.Draw(im)
         draw.rectangle((0, 0, xl, yl), aggdraw.Pen("#ffffff"), aggdraw.Brush("#ffffff"))
         zero_pos_coefficient_x = self.manager.grid_manager.zero_point_dot.get_pos()[0] - abs(xs) - 20
         zero_pos_coefficient_y = self.manager.grid_manager.zero_point_dot.get_pos()[1] - abs(ys) - 20
+        data_for_text = []
         for arrow in self.arrow_manager.get_all_arrows():
             pen = aggdraw.Pen(arrow.color, 2)
             draw.line((arrow.start_pos[0] - zero_pos_coefficient_x,
@@ -73,7 +75,12 @@ class ImageManager:
                     arrow_line_2.p2().x() - zero_pos_coefficient_x,
                     arrow_line_2.p2().y() - zero_pos_coefficient_y,
                 ), pen)
+        draw.flush()
+        im.save(file_to_save)
         for widget in self.widget_manager.get_all_widgets():
+            im = Image.open(file_to_save)
+            draw = aggdraw.Draw(im)
+            draw_pillow = ImageDraw.Draw(im)
             pen = aggdraw.Pen(WIDGET_BORDER_COLOR, int(widget.call_set_border()[0]))
             rad = widget.edit_line.border_radius
 
@@ -129,9 +136,17 @@ class ImageManager:
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2
                 ), pen)
+            draw.flush()
+            font = ImageFont.truetype(f"fonts/arial.ttf", widget.edit_line.text_size,
+                                      layout_engine=ImageFont.LAYOUT_BASIC)
+            text_size = draw_pillow.textsize(widget.data(), font=font)
+            draw_pillow.text((widget.x() + widget.OFFSET - zero_pos_coefficient_x +
+                              widget.edit_line.width() // 2 - text_size[0] // 2,
+                              widget.y() + widget.OFFSET - zero_pos_coefficient_y +
+                              widget.edit_line.height() // 2 - text_size[1] // 2),
+                             widget.data(), font=font, fill="#000000")
 
-        draw.flush()
-        im.save(file_to_save)
+            im.save(file_to_save)
 
     def get_name_file(self) -> str or None:
         """

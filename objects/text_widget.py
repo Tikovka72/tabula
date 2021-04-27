@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from managers.widget_manager import WidgetManager
 
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
-from PyQt5.QtGui import QDrag, QCursor, QMouseEvent, QKeyEvent
+from PyQt5.QtGui import QDrag, QCursor, QMouseEvent, QKeyEvent, QFont
 from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel, QApplication
 
 from objects.arrow import Arrow
@@ -498,6 +498,7 @@ class LineEdit(QLineEdit):
             f"border: {self.border_size}px solid {WIDGET_BORDER_COLOR};"
             "}"
         )
+        self.setFont(QFont("fonts/arial.ttf"))
         self.font_ = self.font()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.self_menu_show)
