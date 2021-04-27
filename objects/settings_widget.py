@@ -561,7 +561,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
     def __init_ui__(self):
         self.widget = QtWidgets.QWidget(self)
-        self.widget.setStyleSheet("background-color: white")
+        self.widget.setStyleSheet("background-color: #f2f3f4")
         self.anim = QtCore.QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(300)
         self.hide_menu_button = BackButton(self.parent())

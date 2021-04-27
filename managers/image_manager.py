@@ -8,13 +8,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QLine
 
 import aggdraw
-from PIL import Image, ImageDraw, ImageFont, JpegImagePlugin
+from PIL import Image, ImageDraw, ImageFont
 
-from objects.arrow import Arrow
 from objects.text_widget import TextWidget
-from objects.warning_window import WarningWindow
 
-from constants import WIDGET_BORDER_COLOR
+from constants import WIDGET_BORDER_COLOR, WHITE, BLACK
 
 
 class ImageManager:
@@ -45,7 +43,7 @@ class ImageManager:
     @staticmethod
     def draw_back(im, x, y):
         draw = aggdraw.Draw(im)
-        draw.rectangle((0, 0, x, y), aggdraw.Pen("#ffffff"), aggdraw.Brush("#ffffff"))
+        draw.rectangle((0, 0, x, y), aggdraw.Pen(WHITE), aggdraw.Brush(WHITE))
         draw.flush()
 
     def draw_arrows(self, im, zero_pos_coefficient_x, zero_pos_coefficient_y, file_to_save):
@@ -94,7 +92,7 @@ class ImageManager:
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2
-                ), aggdraw.Pen("#ffffff", 1), aggdraw.Brush("#ffffff"))
+                ), aggdraw.Pen(WHITE, 1), aggdraw.Brush(WHITE))
 
             data_for_arcs = (
                 ((0, 0, rad * 2, rad * 2), (90, 180)),
@@ -112,7 +110,7 @@ class ImageManager:
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2,
-                ), aggdraw.Pen("#ffffff", 1), aggdraw.Brush("#ffffff"))
+                ), aggdraw.Pen(WHITE, 1), aggdraw.Brush(WHITE))
                 draw.arc((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
@@ -144,7 +142,7 @@ class ImageManager:
                               widget.edit_line.width() // 2 - text_size[0] // 2,
                               widget.y() + widget.OFFSET - zero_pos_coefficient_y +
                               widget.edit_line.height() // 2 - text_size[1] // 2),
-                             widget.data(), font=font, fill="#000000")
+                             widget.data(), font=font, fill=BLACK)
 
             im.save(file)
 
@@ -152,6 +150,7 @@ class ImageManager:
         file_to_save = self.get_name_file()
         if not file_to_save:
             return
+        self.manager.core.setEnabled(False)
         with open(file_to_save, "w") as f:
             f.close()
         xs, ys, xl, yl = self.find_size_of_image()
@@ -164,6 +163,7 @@ class ImageManager:
         self.draw_back(im, xl, yl)
         self.draw_arrows(im, zero_pos_coefficient_x, zero_pos_coefficient_y, file_to_save)
         self.draw_widgets(file_to_save, zero_pos_coefficient_x, zero_pos_coefficient_y)
+        self.manager.core.setEnabled(True)
 
     def get_name_file(self) -> str or None:
         """
