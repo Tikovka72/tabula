@@ -23,12 +23,7 @@ class ImageManager:
         self.widget_manager = manager.widget_manager
         self.arrow_manager = manager.arrow_manager
 
-    def create_image(self):
-        file_to_save = self.get_name_file()
-        if not file_to_save:
-            return
-        with open(file_to_save, "w") as f:
-            f.close()
+    def find_size_of_image(self):
         xs, ys = float("inf"), float("inf")
         xl, yl = -float("inf"), -float("inf")
         for widget in self.widget_manager.get_all_widgets():
@@ -45,13 +40,16 @@ class ImageManager:
             yl = y_bottom if y_bottom > yl else yl
         xl += abs(xs) + 40
         yl += abs(ys) + 40
-        im = Image.new("RGB", (xl, yl))
+        return xs, ys, xl, yl
+
+    @staticmethod
+    def draw_back(im, x, y):
         draw = aggdraw.Draw(im)
-        draw_pillow = ImageDraw.Draw(im)
-        draw.rectangle((0, 0, xl, yl), aggdraw.Pen("#ffffff"), aggdraw.Brush("#ffffff"))
-        zero_pos_coefficient_x = self.manager.grid_manager.zero_point_dot.get_pos()[0] - abs(xs) - 20
-        zero_pos_coefficient_y = self.manager.grid_manager.zero_point_dot.get_pos()[1] - abs(ys) - 20
-        data_for_text = []
+        draw.rectangle((0, 0, x, y), aggdraw.Pen("#ffffff"), aggdraw.Brush("#ffffff"))
+        draw.flush()
+
+    def draw_arrows(self, im, zero_pos_coefficient_x, zero_pos_coefficient_y, file_to_save):
+        draw = aggdraw.Draw(im)
         for arrow in self.arrow_manager.get_all_arrows():
             pen = aggdraw.Pen(arrow.color, 2)
             draw.line((arrow.start_pos[0] - zero_pos_coefficient_x,
@@ -77,8 +75,10 @@ class ImageManager:
                 ), pen)
         draw.flush()
         im.save(file_to_save)
+
+    def draw_widgets(self, file, zero_pos_coefficient_x, zero_pos_coefficient_y):
         for widget in self.widget_manager.get_all_widgets():
-            im = Image.open(file_to_save)
+            im = Image.open(file)
             draw = aggdraw.Draw(im)
             draw_pillow = ImageDraw.Draw(im)
             pen = aggdraw.Pen(WIDGET_BORDER_COLOR, int(widget.call_set_border()[0]))
@@ -146,7 +146,24 @@ class ImageManager:
                               widget.edit_line.height() // 2 - text_size[1] // 2),
                              widget.data(), font=font, fill="#000000")
 
-            im.save(file_to_save)
+            im.save(file)
+
+    def create_image(self):
+        file_to_save = self.get_name_file()
+        if not file_to_save:
+            return
+        with open(file_to_save, "w") as f:
+            f.close()
+        xs, ys, xl, yl = self.find_size_of_image()
+
+        zero_pos_coefficient_x = self.manager.grid_manager.zero_point_dot.get_pos()[0] - abs(xs) - 20
+        zero_pos_coefficient_y = self.manager.grid_manager.zero_point_dot.get_pos()[1] - abs(ys) - 20
+
+        im = Image.new("RGB", (xl, yl))
+
+        self.draw_back(im, xl, yl)
+        self.draw_arrows(im, zero_pos_coefficient_x, zero_pos_coefficient_y, file_to_save)
+        self.draw_widgets(file_to_save, zero_pos_coefficient_x, zero_pos_coefficient_y)
 
     def get_name_file(self) -> str or None:
         """
