@@ -170,7 +170,7 @@ class ImageManager:
         handler for calling dialog, which asks for name for new file
         :return: name of new file or None if user closes dialog
         """
-        name = QtWidgets.QFileDialog.getSaveFileName(self.manager.core, 'Имя для изображения',
+        name = QtWidgets.QFileDialog.getSaveFileName(self.manager.core, 'Название изображения',
                                                      filter="*.png",
                                                      directory="new pic.png")
         if name[0]:

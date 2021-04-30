@@ -57,7 +57,7 @@ class FileManager:
             if dialog.exec_():
                 self.opened_file = None
         file = QtWidgets.QFileDialog().getOpenFileName(
-            self.manager.core, "open file", filter="*.tbl")
+            self.manager.core, "открыть файл", filter="*.tbl")
         if not file[0]:
             return
         widgets = tuple(self.widget_manager.widgets.keys())
@@ -104,7 +104,8 @@ class FileManager:
         handler for calling dialog, which asks for name for new file
         :return: name of new file or None if user closes dialog
         """
-        name = QtWidgets.QFileDialog.getSaveFileName(self.manager.core, 'Save File', filter="*.tbl",
+        name = QtWidgets.QFileDialog.getSaveFileName(self.manager.core,
+                                                     'Сохранить файл', filter="*.tbl",
                                                      directory="new scheme.tbl")
         if name[0]:
             return name[0]
