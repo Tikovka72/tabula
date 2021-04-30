@@ -11,6 +11,7 @@ import aggdraw
 from PIL import Image, ImageDraw, ImageFont
 
 from objects.text_widget import TextWidget
+from objects.warning_window import WarningWindow
 
 from constants import WIDGET_BORDER_COLOR, WHITE, BLACK
 
@@ -147,13 +148,20 @@ class ImageManager:
             im.save(file)
 
     def create_image(self):
+        xs, ys, xl, yl = self.find_size_of_image()
+
+        dialog = WarningWindow(text=f"Размер изображения будет составлять {xl}x{yl} пикселей")
+        if not dialog.exec_():
+            return
+
         file_to_save = self.get_name_file()
         if not file_to_save:
             return
+
         self.manager.core.setEnabled(False)
+
         with open(file_to_save, "w") as f:
             f.close()
-        xs, ys, xl, yl = self.find_size_of_image()
 
         zero_pos_coefficient_x = self.manager.grid_manager.zero_point_dot.get_pos()[0] - abs(xs) - 20
         zero_pos_coefficient_y = self.manager.grid_manager.zero_point_dot.get_pos()[1] - abs(ys) - 20
