@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Tuple, Dict, Union, Optional, Any
 
 if TYPE_CHECKING:
     from main import Manager
@@ -44,12 +44,12 @@ class WidgetManager:
         self.manager.settings_window.show_sett(widget)
         return widget
 
-    def get_all_widgets(self):
+    def get_all_widgets(self) -> List[TextWidget]:
         """
         returns all of widgets that it contains self.widgets
         :return: all widgets
         """
-        return self.widgets.keys()
+        return list(self.widgets.keys())
 
     def delete_widget(self, obj: TextWidget):
         """
@@ -113,7 +113,8 @@ class WidgetManager:
         self.drag_or_resize = dor
 
     def resize_magnet_checker(self, obj: TextWidget, pos: QtCore.QPoint) \
-            -> (int, int, int, int, dict):
+            -> Tuple[int, int, int, int, bool, bool, Dict[
+                TextWidget, Tuple[Union[Optional[int], Any], Union[Optional[int], Any]]]]:
         """
         checks whether object has magnetic lines to other objects while resizing
         :param obj: object for check
@@ -122,10 +123,10 @@ class WidgetManager:
                  dict with struct widget = (way by x line, way by y line)
         """
         self.manager.magnet_lines = []
-        obj_x1 = obj.x()
-        obj_y1 = obj.y()
-        obj_x2 = pos.x()
-        obj_y2 = pos.y()
+        obj_x1: int = obj.x()
+        obj_y1: int = obj.y()
+        obj_x2: int = pos.x()
+        obj_y2: int = pos.y()
         x_mod = y_mod = False
         widgets = {}
         for widget in self.get_all_widgets():
@@ -174,7 +175,8 @@ class WidgetManager:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets
 
-    def drag_magnet_checker(self, obj: TextWidget) -> (int, int, int, int, bool, bool, dict):
+    def drag_magnet_checker(self, obj: TextWidget) -> Tuple[int, int, int, int, bool, bool, Dict[
+                TextWidget, Tuple[Union[Optional[int], Any], Union[Optional[int], Any]]]]:
         """
         checks whether object has magnetic lines to other objects while moving
         :param obj: object for check
@@ -303,7 +305,7 @@ class WidgetManager:
                 return w
         return None
 
-    def confirm_widget_size_change(self, widget: TextWidget):
+    def confirm_widget_size_change(self, widget: TextWidget) -> Tuple[int, int]:
         text = widget.edit_line.text()
         self.test_widget.setText(text)
         self.test_widget.setFont(widget.edit_line.font())

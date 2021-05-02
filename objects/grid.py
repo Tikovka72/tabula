@@ -1,3 +1,5 @@
+from typing import List, Tuple, Dict
+
 from PyQt5 import QtCore, QtGui
 
 from objects.zero_point import ZeroPointWidget
@@ -16,7 +18,7 @@ class Grid:
                  step: int = GRID_STEP,
                  offset: tuple or list = (20, 20),
                  zero_pos: ZeroPointWidget = None,
-                 special_lines_color=SPECIAL_LINE_COLOR):
+                 special_lines_color: str = SPECIAL_LINE_COLOR):
         """
         :param color: color of grid in hex format: #......
         :param line: code of line's type: QtCore.Qt.CodeLine
@@ -41,7 +43,7 @@ class Grid:
         self.special_lines_for_drag_obj = []
         self.grid = self.generate_grid()
 
-    def generate_grid(self) -> dict:
+    def generate_grid(self) -> Dict[str, List[QtCore.QLine]] or dict:
         """
         creates grid lines and returns them
         :return: dict with "x" and "y" keys,
@@ -111,7 +113,7 @@ class Grid:
         """
         self.offset_left, self.offset_top = offset_left, offset_top
 
-    def get_offset(self) -> tuple:
+    def get_offset(self) -> Tuple[int, int]:
         """
         :return: offset from left and top
         """
@@ -130,7 +132,7 @@ class Grid:
         if step > 0:
             self.step = step
 
-    def get_special_lines(self) -> dict:
+    def get_special_lines(self) -> Dict[str, List[QtCore.QLine]] or dict:
         """
         creates special lines and returns them
         :return: dict with "x" and "y" keys,
@@ -138,11 +140,11 @@ class Grid:
         """
         zero = self.zero_pos.get_pos()
 
-        x_lines = list(filter(
+        x_lines: List[QtCore.QLine] = list(filter(
             lambda line: True if line.y1() == line.y2() == zero[
                 1] else False, self.grid.get("x", [])))
 
-        y_lines = list(filter(
+        y_lines: List[QtCore.QLine] = list(filter(
             lambda line: True if line.x1() == line.x2() == zero[
                 0] else False, self.grid.get("y", [])))
 
@@ -155,7 +157,7 @@ class Grid:
         self.offset_left = self.zero_pos.get_pos()[0] % self.step
         self.offset_top = self.zero_pos.get_pos()[1] % self.step
 
-    def get_nearest_x_line_by_offset(self, y: int, offset: int = 5) -> QtCore.QLine:
+    def get_nearest_x_line_by_offset(self, y: int, offset: int = 5) -> QtCore.QLine or None:
         """
         gets nearest horizontal line by y coordinate
         :param y: y coordinate
@@ -166,7 +168,7 @@ class Grid:
                              else False, self.grid.get("x", [])))
         return x_line[0] if x_line else None
 
-    def get_nearest_y_line_by_offset(self, x: int, offset=5) -> QtCore.QLine:
+    def get_nearest_y_line_by_offset(self, x: int, offset: int = 5) -> QtCore.QLine or None:
         """
         gets nearest vertical line by x coordinate
         :param x: x coordinate

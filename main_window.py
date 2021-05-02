@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
+    from objects.arrow import Arrow
     from main import Manager
 
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -100,7 +101,7 @@ class GraphicCore(QtWidgets.QWidget):
         self.manager.grid_manager.grid.regenerate_grid()
         self.update()
 
-    def call_set_zero_pos(self) -> tuple:
+    def call_set_zero_pos(self) -> Tuple[int, int]:
         """
         gives right zero point position to settings window
         core -> settings window
@@ -132,7 +133,7 @@ class GraphicCore(QtWidgets.QWidget):
         self.manager.grid_manager.grid.regenerate_grid()
         self.update()
 
-    def call_set_grid(self) -> tuple:
+    def call_set_grid(self) -> Tuple[bool, int]:
         """
         gives grid's showing and step
         core -> settings window
@@ -183,7 +184,7 @@ class GraphicCore(QtWidgets.QWidget):
         context_menu.setWindowFlags(context_menu.windowFlags() | Qt.NoDropShadowWindowHint)
         context_menu.exec_(QtGui.QCursor.pos())
 
-    def arrow_menu_show(self, arrow):
+    def arrow_menu_show(self, arrow: Arrow):
         """
         arrow's context menu
         :param arrow: arrow_class.Arrow class

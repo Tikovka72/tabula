@@ -5,7 +5,7 @@ class WarningWindow(QtWidgets.QDialog):
     """
     dialog window for warnings with "ok" and "cancel" buttons
     """
-    def __init__(self, text: str = "", parent=None):
+    def __init__(self, text: str = "", parent: QtWidgets.QWidget = None):
         """
         :param text: warning message
         :param parent: parent widget

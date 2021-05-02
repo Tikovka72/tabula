@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class Mouse:
     """
     class for mouse. contains position of mouse
@@ -6,13 +9,13 @@ class Mouse:
         self.mouse_x = x
         self.mouse_y = y
 
-    def change_pos(self, x, y):
+    def change_pos(self, x: int, y: int):
         """
         changes position of mouse to (x, y) coordinate
         """
         self.mouse_x, self.mouse_y = x, y
 
-    def get_pos(self) -> tuple:
+    def get_pos(self) -> Tuple[int, int]:
         """
         returns mouse position in tuple format (x, y)
         """

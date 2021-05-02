@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import sys
 
 
@@ -57,7 +55,7 @@ def pass_f(*args, **kwargs) -> None:
     _ = args, kwargs
 
 
-def test(func: Callable) -> Callable:
+def test(func: callable) -> callable:
     """
     decorator for check if function or method ran successful that do:
     1. prints "start <your function>"

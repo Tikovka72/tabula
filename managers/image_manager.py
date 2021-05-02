@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     from main import Manager
@@ -22,7 +22,7 @@ class ImageManager:
         self.widget_manager = manager.widget_manager
         self.arrow_manager = manager.arrow_manager
 
-    def find_size_of_image(self):
+    def find_size_of_image(self) -> Tuple[int, int, int, int]:
         xs, ys = float("inf"), float("inf")
         xl, yl = -float("inf"), -float("inf")
         for widget in self.widget_manager.get_all_widgets():
@@ -44,12 +44,15 @@ class ImageManager:
         return xs, ys, xl, yl
 
     @staticmethod
-    def draw_back(im, x, y):
+    def draw_back(im: Image, x: int, y: int):
         draw = aggdraw.Draw(im)
         draw.rectangle((0, 0, x, y), aggdraw.Pen(WHITE), aggdraw.Brush(WHITE))
         draw.flush()
 
-    def draw_arrows(self, im, zero_pos_coefficient_x, zero_pos_coefficient_y, file_to_save):
+    def draw_arrows(self, im: Image,
+                    zero_pos_coefficient_x: int,
+                    zero_pos_coefficient_y: int,
+                    file_to_save: str):
         draw = aggdraw.Draw(im)
         for arrow in self.arrow_manager.get_all_arrows():
             pen = aggdraw.Pen(arrow.color, 2)
@@ -82,7 +85,9 @@ class ImageManager:
         draw.flush()
         im.save(file_to_save)
 
-    def draw_widgets(self, file, zero_pos_coefficient_x, zero_pos_coefficient_y):
+    def draw_widgets(self, file: str,
+                     zero_pos_coefficient_x: int,
+                     zero_pos_coefficient_y: int):
         for widget in self.widget_manager.get_all_widgets():
             im = Image.open(file)
             draw = aggdraw.Draw(im)

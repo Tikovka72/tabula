@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from main import Manager
@@ -32,14 +32,14 @@ class ArrowManager:
         if obj2:
             self.widget_manager.widgets[obj2]["in"].append(arrow)
 
-    def get_all_arrows(self):
+    def get_all_arrows(self) -> List[Arrow]:
         """
         returns all of arrows that it contains self.arrows
         :return: all arrows
         """
-        return self.arrows.keys()
+        return list(self.arrows.keys())
 
-    def toggle_active_arrow(self, arrow=None):
+    def toggle_active_arrow(self, arrow: Arrow = None):
         """
         toggles active arrow (arrow for which settings window is enabled)
         :param arrow: arrow, for which you want to enable settings
@@ -54,7 +54,7 @@ class ArrowManager:
         """
         return self.active_arrow
 
-    def get_all_arrows_from_object(self, obj: TextWidget) -> list:
+    def get_all_arrows_from_object(self, obj: TextWidget) -> List[Arrow]:
         """
         gets all arrows linked  with "obj" widget
         :param obj: widget for which you need to get arrows
@@ -65,7 +65,7 @@ class ArrowManager:
                    self.widget_manager.widgets.get(obj)["out"]
         return []
 
-    def get_arrows_with(self, obj1, obj2):
+    def get_arrows_with(self, obj1: TextWidget, obj2: TextWidget) -> bool:
         """
         checks if objects are linked
         :return: True if objects are linked else False

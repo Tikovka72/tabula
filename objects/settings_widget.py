@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from main import Manager
@@ -46,8 +46,8 @@ class BackButton(QtWidgets.QPushButton):
 
         self.update()
 
-    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
-        super().resizeEvent(a0)
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
         self.setText(self.text_field.text())
 
 
@@ -55,8 +55,8 @@ class SettingsLineEdit(QtWidgets.QLineEdit):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def focusOutEvent(self, a0: QtGui.QFocusEvent) -> None:
-        super().focusOutEvent(a0)
+    def focusOutEvent(self, event: QtGui.QFocusEvent) -> None:
+        super().focusOutEvent(event)
         self.parent().value_changed(self)
 
 
@@ -222,7 +222,8 @@ class SettingsWindow(QtWidgets.QWidget):
             if self.callback[0] and new_value1:
                 self.callback[0](self.value1_get())
 
-        def value_changed(self, sender):
+        def value_changed(self, sender: SettingsLineEdit):
+            print(sender, type(sender))
             if self.value1 is sender:
                 self.value1_changed()
             elif self.value2 is sender:
@@ -241,7 +242,7 @@ class SettingsWindow(QtWidgets.QWidget):
             if self.callback[1]:
                 self.callback[1](self.value2_get())
 
-        def value1_get(self):
+        def value1_get(self) -> int or str:
             value = self.value1.text()
             if self.int_only:
                 if is_dig(value):
@@ -251,7 +252,7 @@ class SettingsWindow(QtWidgets.QWidget):
                 return value
             return self.default_values_to_return[0]
 
-        def value2_get(self):
+        def value2_get(self) -> int or str:
             value = self.value2.text()
             if self.int_only:
                 if is_dig(value):
@@ -310,8 +311,8 @@ class SettingsWindow(QtWidgets.QWidget):
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
                      callback: tuple = tuple(),
-                     call_update_all=None,
-                     lock_line_edit=True):
+                     call_update_all: callable = None,
+                     lock_line_edit: bool = True):
             super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
@@ -384,10 +385,10 @@ class SettingsWindow(QtWidgets.QWidget):
             if self.callback[1] and (not self.value1_get() and self.lock_line_edit or True):
                 self.callback[1](self.value2_get())
 
-        def value1_get(self):
+        def value1_get(self) -> bool:
             return self.value1.isChecked()
 
-        def value2_get(self):
+        def value2_get(self) -> int or str:
             value = self.value2.text()
             if self.int_only:
                 if value.isdigit():
@@ -397,7 +398,7 @@ class SettingsWindow(QtWidgets.QWidget):
                 return value
             return self.standard_values[1]
 
-        def value1_set(self, value):
+        def value1_set(self, value: bool):
             if value:
                 if not self.value1.isChecked():
                     self.value1.toggle()
@@ -405,7 +406,7 @@ class SettingsWindow(QtWidgets.QWidget):
                 if self.value1.isChecked():
                     self.value1.toggle()
 
-        def value2_set(self, value):
+        def value2_set(self, value: str):
             self.value2.setText(str(value))
 
         def wheelEvent(self, event: QWheelEvent) -> None:
@@ -441,7 +442,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size: tuple,
                      default_values_to_return: tuple = tuple(),
                      callback: tuple = tuple(),
-                     call_update_all=None,
+                     call_update_all: callable = None,
                      *other, **other_):
             _ = other, other_
             super().__init__(parent, n, size)
@@ -487,10 +488,10 @@ class SettingsWindow(QtWidgets.QWidget):
             if self.callback[0]:
                 self.callback[0](self.value1_get())
 
-        def value1_get(self):
+        def value1_get(self) -> bool:
             return self.value1.isChecked()
 
-        def value1_set(self, value):
+        def value1_set(self, value: bool):
             if value:
                 if not self.value1.isChecked():
                     self.value1.toggle()
@@ -518,7 +519,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
                      callback: tuple = tuple(),
-                     call_update_all=None):
+                     call_update_all: callable = None):
             super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
@@ -725,7 +726,7 @@ class SettingsWindow(QtWidgets.QWidget):
                                           callback=callback,
                                           call_update_all=call_update_all, **kwargs)]]
 
-    def show_sett(self, obj) -> None:
+    def show_sett(self, obj: Any) -> None:
         for sett in self.objects[obj][1]:
             sett.update()
             sett.show()

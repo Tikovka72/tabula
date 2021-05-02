@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, List
 
 if TYPE_CHECKING:
     from managers.widget_manager import WidgetManager
@@ -159,7 +159,7 @@ class TextWidget(QWidget):
         self.move_animation((self.x() - self.zero_dot.get_pos()[0] + self.zero_dot.zero[0],
                              self.y() - self.zero_dot.get_pos()[1] + self.zero_dot.zero[1]))
 
-    def move_animation(self, end_pos: tuple or list):
+    def move_animation(self, end_pos: Tuple[int, int] or List[int, int]):
         """
         sets move animation to end_pos
         :param end_pos: point to go to
@@ -176,14 +176,14 @@ class TextWidget(QWidget):
         """
         self.resize_event(width, self.height(), False)
 
-    def callback_size_height(self, height):
+    def callback_size_height(self, height: int):
         """
         callback for settings window. This is necessary to change height of object
         settings window -> ObjectClass
         """
         self.resize_event(self.width(), height, False)
 
-    def call_set_size(self) -> tuple:
+    def call_set_size(self) -> Tuple[int, int]:
         """
         gives self size
         ObjectClass -> settings window
@@ -204,7 +204,7 @@ class TextWidget(QWidget):
         """
         self.move_event(self.x(), self.zero_dot.get_pos()[1] + y - self.height() // 2, False)
 
-    def call_set_pos(self) -> tuple:
+    def call_set_pos(self) -> Tuple[int, int]:
         """
         gives self position
         ObjectClass -> settings window
@@ -229,7 +229,7 @@ class TextWidget(QWidget):
         self.edit_line.change_auto(st)
         self.edit_line.update_text_size()
 
-    def call_set_text_size(self):
+    def call_set_text_size(self) -> Tuple[int, int]:
         """
         callback for settings window. This is necessary to change text size
         settings window -> ObjectClass
@@ -250,7 +250,7 @@ class TextWidget(QWidget):
         """
         self.edit_line.set_border(size=size)
 
-    def call_set_border(self) -> tuple:
+    def call_set_border(self) -> Tuple[str, str]:
         """
         gives self border size and radius
         ObjectClass -> settings window
@@ -343,7 +343,7 @@ class TextWidget(QWidget):
         self.move(a0.pos().x(), a0.pos().y())
         self.update_arrows()
 
-    def set_size_or_pos_label(self, text):
+    def set_size_or_pos_label(self, text: str):
         """
         sets text on center of widget
         """
@@ -444,7 +444,7 @@ class TextWidget(QWidget):
         if self.drag_angle:
             self.drag_angle.hide()
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent):
         if event.buttons() == Qt.LeftButton:
             if self.widget_manager.drag_or_resize is NONE:
                 mime = QMimeData()
@@ -455,7 +455,7 @@ class TextWidget(QWidget):
         else:
             self.change_parent_mouse_pos(event)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent):
         if self.underMouse():
             self.show_angles()
         if event.button() == Qt.LeftButton:
@@ -635,7 +635,7 @@ class LineEdit(QLineEdit):
         self.border_radius = radius
         self.border_size = size
 
-    def get_border(self) -> tuple:
+    def get_border(self) -> Tuple[str, str]:
         """
         :return: size and radius of borer in size: str, radius: str
         """

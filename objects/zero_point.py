@@ -1,3 +1,8 @@
+from typing import TYPE_CHECKING, Tuple, List
+
+if TYPE_CHECKING:
+    from main_window import GraphicCore
+
 from PyQt5 import QtWidgets, QtCore
 
 
@@ -6,7 +11,7 @@ class ZeroPointWidget(QtWidgets.QWidget):
     point in centre of screen. This needs for moving canvas and knowing where real center.
     (point moves with canvas)
     """
-    def __init__(self, parent, manager=None):
+    def __init__(self, parent: QtWidgets.QWidget or GraphicCore, manager=None):
         """
         :param parent: widget on which point is located
         :param manager: main class containing all information
@@ -24,7 +29,7 @@ class ZeroPointWidget(QtWidgets.QWidget):
         """
         self.move(x, y)
 
-    def get_pos(self) -> tuple:
+    def get_pos(self) -> Tuple[int, int]:
         """
         gives real center position
         :return: position of center point
@@ -50,14 +55,14 @@ class ZeroPointWidget(QtWidgets.QWidget):
         """
         self.zero = x, y
 
-    def get_zero(self) -> tuple:
+    def get_zero(self) -> Tuple[int, int]:
         """
         gets real center
         :return: coordinate in tuple (x, y)
         """
         return self.zero
 
-    def move_animation(self, end_pos: tuple or list):
+    def move_animation(self, end_pos: Tuple[int, int] or List[int, int]):
         """
         handler for move animation. This needs for zero class (self), grid and settings window
         :param end_pos: position where you want to move center

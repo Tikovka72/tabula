@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, List
 
 if TYPE_CHECKING:
     from managers.arrow_manager import ArrowManager
@@ -166,7 +166,7 @@ class Arrow:
         self.end_pos_by_obj = self.end_pos_by_obj[0], y2
         self.set_start_and_end()
 
-    def call_set_xy1(self) -> tuple:
+    def call_set_xy1(self) -> Tuple[int, int]:
         """
         gives line's start position by self.obj1 object
         arrow -> settings window
@@ -175,7 +175,7 @@ class Arrow:
             return 0, 0
         return self.start_pos_by_obj
 
-    def call_set_xy2(self) -> tuple:
+    def call_set_xy2(self) -> Tuple[int, int]:
         """
         gives line's end position by self.obj2 object
         arrow -> settings window
@@ -184,7 +184,7 @@ class Arrow:
             return 0, 0
         return self.end_pos_by_obj
 
-    def set_start_and_end(self):
+    def set_start_and_end(self) -> Tuple[Tuple[int, int], Tuple[int, int]] or None:
         """
         sets self.start_pos and self.end_pos by position on objects
         :return: start and end pos in tuple like ((x start, y start), (x end, y end))
@@ -201,7 +201,8 @@ class Arrow:
 
         return self.start_pos, self.end_pos
 
-    def get_start_and_end(self, end_pos: tuple or list) -> tuple:
+    def get_start_and_end(self, end_pos: Tuple[int, int] or List[int, int]) \
+            -> Tuple[Tuple[int, int], Tuple[int, int]]:
         """
         generates start_pos by position on object1 and end pos by parameter end_pos
         :param end_pos: your end position
@@ -213,7 +214,7 @@ class Arrow:
         return (self.obj1.x() + self.obj1.width() // 2 + self.start_pos_by_obj[0],
                 self.obj1.y() + self.obj1.height() // 2 + self.start_pos_by_obj[1]), end_pos
 
-    def create_arrow(self, end_pos: tuple or list = None) -> tuple:
+    def create_arrow(self, end_pos: Tuple[int, int] or List[int, int] = None) -> Tuple[QLine, QLine]:
         """
         creates arrow's lines and returns them in QLine format
         :param end_pos: position of line's top
@@ -243,13 +244,13 @@ class Arrow:
         """
         self.selected = False
 
-    def get_color(self):
+    def get_color(self) -> str:
         """
         :return: color of line at the moment
         """
         return self.selected_color if self.selected else self.color
 
-    def draw(self, qp: QPainter, end_pos: tuple or list = None):
+    def draw(self, qp: QPainter, end_pos: tuple or list = None) -> bool:
         """
         draws line in core object
         :param qp: QPainter of main UI object (core)
