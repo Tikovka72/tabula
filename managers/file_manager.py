@@ -28,15 +28,18 @@ class FileManager:
         text_file = []
         widget_ids = {}
         for i, widget in enumerate(self.widget_manager.widgets):
+
             text_file.append(
                 "U+FB4x13c".join(map(
                     str,
                     (i, widget.x(), widget.y(), widget.width(), widget.height(), widget.data()))
                 )
             )
+
             widget_ids[widget] = i
         text_arrows = []
         for i, arrow in enumerate(self.arrow_manager.arrows):
+
             text_arrows.append(
                 "U+FB4x16c".join(map(
                     str, (i, widget_ids[arrow.obj1], widget_ids[arrow.obj2], int(arrow.need_arrow),
@@ -44,6 +47,7 @@ class FileManager:
                           f"{arrow.end_pos_by_obj[0]}x{arrow.end_pos_by_obj[1]}"))
                 )
             )
+
         with open(self.opened_file, "w", encoding="UTF-8") as f:
             f.write("U+FB4x18c".join(("U+FB4x15c".join(text_file), "U+FB4x17c".join(text_arrows))))
         self.manager.core.setWindowTitle(f"tabula - {self.opened_file.split('/')[-1]}")
@@ -90,9 +94,11 @@ class FileManager:
                 self.arrow_manager.add_arrow(arr)
                 self.arrow_manager.set_obj1_arrow(arr, widgets_total[int(obj1)])
                 self.arrow_manager.set_obj2_arrow(arr, widgets_total[int(obj2)])
+
                 arr.start_pos_by_obj, arr.end_pos_by_obj = \
                     tuple(map(int, start_pos_bo.split("x"))), \
                     tuple(map(int, end_pos_bo.split("x")))
+
                 arr.set_start_and_end()
                 self.manager.widget_manager.clear_focus()
                 self.manager.arrow_manager.clear_focus_arrows()

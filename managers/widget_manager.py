@@ -77,6 +77,7 @@ class WidgetManager:
         for widget, (way_x, way_y) in widgets.items():
             if way_x or way_y:
                 widget.show_size_or_pos_label()
+
                 widget.set_size_or_pos_label(
                     "{} {}".format(str(str(abs((x + event.source().width() // 2) - way_x)
                                            if way_x else '') + '↔') if way_x else '',
@@ -138,27 +139,34 @@ class WidgetManager:
                 obj_x2 = x1
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
                 ))
+
             if x2 - OFFSET_MAGNET <= obj_x2 <= x2 + OFFSET_MAGNET:
                 obj_x2 = x2
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
                 ))
+
             if y1 - OFFSET_MAGNET <= obj_y2 <= y1 + OFFSET_MAGNET:
                 obj_y2 = y1
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
                 ))
+
             if y2 - OFFSET_MAGNET <= obj_y2 <= y2 + OFFSET_MAGNET:
                 obj_y2 = y2
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
                 ))
@@ -192,74 +200,96 @@ class WidgetManager:
                 obj_x1 = x1
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
                 ))
+
             if x1 - OFFSET_MAGNET <= obj_x2 <= x1 + OFFSET_MAGNET:
                 obj_x1 = x1 - obj.geometry().width()
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x1, (y1 + y2) // 2, x1, (obj_y1 + obj_y2) // 2
                 ))
+
             if x2 - OFFSET_MAGNET <= obj_x1 <= x2 + OFFSET_MAGNET:
                 obj_x1 = x2
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x2, (y1 + y2) // 2, obj_x1, (obj_y1 + obj_y2) // 2
                 ))
+
             if x2 - OFFSET_MAGNET <= obj_x2 <= x2 + OFFSET_MAGNET:
                 obj_x1 = x2 - obj.geometry().width()
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     x2, (y1 + y2) // 2, x2, (obj_y1 + obj_y2) // 2
                 ))
+
             if (x1 + x2) // 2 - OFFSET_MAGNET <= (obj_x1 + obj_x2) // 2 \
                     <= (x1 + x2) // 2 + OFFSET_MAGNET:
+
                 obj_x1 = (x1 + x2) // 2 - obj.geometry().width() // 2
                 way_y = (y2 + y1) // 2
                 x_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, (y1 + y2) // 2, (x1 + x2) // 2, (obj_y1 + obj_y2) // 2
                 ))
+
             if y1 - OFFSET_MAGNET <= obj_y1 <= y1 + OFFSET_MAGNET:
                 obj_y1 = y1
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
                 ))
+
             if y1 - OFFSET_MAGNET <= obj_y2 <= y1 + OFFSET_MAGNET:
                 obj_y1 = y1 - obj.geometry().height()
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y1, (obj_x1 + obj_x2) // 2, y1
                 ))
+
             if y2 - OFFSET_MAGNET <= obj_y1 <= y2 + OFFSET_MAGNET:
                 obj_y1 = y2
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
                 ))
+
             if y2 - OFFSET_MAGNET <= obj_y2 <= y2 + OFFSET_MAGNET:
                 obj_y1 = y2 - obj.geometry().height()
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, y2, (obj_x1 + obj_x2) // 2, y2
                 ))
+
             if (y1 + y2) // 2 - OFFSET_MAGNET <= (obj_y1 + obj_y2) // 2 \
                     <= (y1 + y2) // 2 + OFFSET_MAGNET:
+
                 obj_y1 = (y1 + y2) // 2 - obj.geometry().height() // 2
                 way_x = (x2 + x1) // 2
                 y_mod = True
+
                 self.manager.magnet_lines.append(QtCore.QLine(
                     (x1 + x2) // 2, (y1 + y2) // 2, (obj_x1 + obj_x2) // 2, (y1 + y2) // 2
                 ))
+
             if way_y or way_x:
                 widgets[widget] = way_x, way_y
         return obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets

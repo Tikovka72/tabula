@@ -40,8 +40,10 @@ class BackButton(QtWidgets.QPushButton):
     def setText(self, text: str) -> None:
         self.text_field.setText(text)
         self.text_field.adjustSize()
+
         self.text_field.move(self.width() // 2 - self.text_field.width() // 2 - 1,
                              self.height() // 2 - self.text_field.height() // 2 - 1)
+
         self.update()
 
     def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
@@ -106,8 +108,10 @@ class SettingsWindow(QtWidgets.QWidget):
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.height() * self.n)
+
             self.line = QtWidgets.QWidget(self)
             self.line.move(self.OFFSET, self.height() // 2 - self.LINE_HEIGHT // 2)
             self.line.resize(self.width() - 2 * self.OFFSET, self.LINE_HEIGHT)
@@ -130,14 +134,17 @@ class SettingsWindow(QtWidgets.QWidget):
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.SIZE[1] * self.n)
+
             self.text = QtWidgets.QLabel(self)
             self.text.setText(str(self.name))
             f = self.text.font()
             f.setPixelSize(self.height() - 2)
             self.text.setFont(f)
             self.text.adjustSize()
+
             self.text.move(
                 self.width() // 2 - self.text.width() // 2,
                 self.height() // 2 - self.text.height() // 2
@@ -163,8 +170,10 @@ class SettingsWindow(QtWidgets.QWidget):
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
             self.int_only = int_only
+
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (pass_f, pass_f)
+
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.min_max_values = min_max_values
@@ -172,8 +181,10 @@ class SettingsWindow(QtWidgets.QWidget):
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.SIZE[1] * self.n)
+
             self.text = QtWidgets.QLabel(self)
             self.text.setText(str(self.name))
             self.text.adjustSize()
@@ -185,19 +196,24 @@ class SettingsWindow(QtWidgets.QWidget):
             self.value1 = SettingsLineEdit(self)
             self.value1.resize(*self.FIELDS_SIZE)
             self.value1.setText(str(value1))
+
             self.value1.move(self.width() - self.FIELDS_SIZE[0] * 2 - self.OFFSET * 2,
                              self.height() // 2 - self.value1.height() // 2)
+
             self.value2 = SettingsLineEdit(self)
             self.value2.resize(*self.FIELDS_SIZE)
             self.value2.setText(str(value2))
+
             self.value2.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value2.height() // 2)
+
             self.show()
 
         def value1_changed(self):
             new_value1 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
                                           if self.int_only else True)
                                   else "" for i, sym in enumerate(self.value1.text())])
+
             if self.int_only:
                 if self.min_max_values:
                     if not self.min_max_values[0][0] <= int(new_value1) <= self.min_max_values[0][1]:
@@ -216,6 +232,7 @@ class SettingsWindow(QtWidgets.QWidget):
             new_value2 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
                                           if self.int_only else True)
                                   else "" for i, sym in enumerate(self.value2.text())])
+
             if self.int_only:
                 if self.min_max_values:
                     if not self.min_max_values[1][0] <= int(new_value2) <= self.min_max_values[1][1]:
@@ -265,14 +282,18 @@ class SettingsWindow(QtWidgets.QWidget):
             else:
                 p = 1
             if self.value1.underMouse():
+
                 self.value1.setText(
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
+
                 self.value1_changed()
             elif self.value2.underMouse():
+
                 self.value2.setText(
                     str(int(self.value2.text() if self.value2.text() else
                             self.standard_values[1]) + p))
+
                 self.value2_changed()
 
     class SettCheckboxLineEdit(ParentSett):
@@ -295,8 +316,10 @@ class SettingsWindow(QtWidgets.QWidget):
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
             self.int_only = int_only
+
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
+
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.lock_line_edit = lock_line_edit
@@ -304,8 +327,10 @@ class SettingsWindow(QtWidgets.QWidget):
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.SIZE[1] * self.n)
+
             self.text = QtWidgets.QLabel(self)
             self.text.setText(str(self.name))
             self.text.adjustSize()
@@ -324,15 +349,19 @@ class SettingsWindow(QtWidgets.QWidget):
             else:
                 if self.value1.isChecked():
                     self.value1.toggle()
+
             self.value1.move(self.width() - self.FIELDS_SIZE[0] * 2 - self.OFFSET * 2,
                              self.height() // 2 - self.value1.height() // 2)
+
             self.value1.stateChanged.connect(self.value1_changed)
 
             self.value2 = QtWidgets.QLineEdit(self)
             self.value2.resize(*self.FIELDS_SIZE)
             self.value2.setText(str(value2))
+
             self.value2.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value2.height() // 2)
+
             self.value2.textChanged.connect(self.value2_changed)
             if self.value1 and self.lock_line_edit:
                 self.value2.setEnabled(False)
@@ -350,6 +379,7 @@ class SettingsWindow(QtWidgets.QWidget):
         def value2_changed(self):
             new_value2 = "".join([i if (i.isdigit() if self.int_only else True)
                                   else "" for i in self.value2.text()])
+
             self.value2_set(new_value2)
             if self.call_back[1] and (not self.value1_get() and self.lock_line_edit or True):
                 self.call_back[1](self.value2_get())
@@ -386,6 +416,7 @@ class SettingsWindow(QtWidgets.QWidget):
             else:
                 p = 1
             if self.value2.underMouse():
+
                 self.value2.setText(
                     str(int(self.value2.text() if self.value2.text() else
                             self.standard_values[1]) + p))
@@ -416,16 +447,20 @@ class SettingsWindow(QtWidgets.QWidget):
             super().__init__(parent, n, size)
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
+
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
+
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.SIZE[1] * self.n)
+
             self.text = QtWidgets.QLabel(self)
             self.text.setText(str(self.name))
             self.text.adjustSize()
@@ -488,16 +523,20 @@ class SettingsWindow(QtWidgets.QWidget):
             self.name = name
             self.standard_values = standard_values if len(standard_values) == self.VALUES_N else None
             self.int_only = int_only
+
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
+
             self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, None)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
         def __init_ui__(self):
             self.resize(*self.size)
+
             self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
                       + self.SIZE[1] * self.n)
+
             self.text = QtWidgets.QLabel(self)
             self.text.setText(str(self.name))
             self.text.adjustSize()
@@ -509,14 +548,17 @@ class SettingsWindow(QtWidgets.QWidget):
             self.value1 = QtWidgets.QLineEdit(self)
             self.value1.resize(*self.FIELDS_SIZE)
             self.value1.setText(str(value1))
+
             self.value1.move(self.width() - self.FIELDS_SIZE[0] * 2 - self.OFFSET * 2,
                              self.height() // 2 - self.value1.height() // 2)
+
             self.value1.textChanged.connect(self.value1_changed)
             self.show()
 
         def value1_changed(self):
             new_value1 = "".join([i if (i.isdigit() if self.int_only else True)
                                   else "" for i in self.value1.text()])
+
             self.value1.setText(new_value1)
             if self.call_back[0]:
                 self.call_back[0](self.value1_get())
@@ -548,6 +590,7 @@ class SettingsWindow(QtWidgets.QWidget):
             else:
                 p = 1
             if self.value1.underMouse():
+
                 self.value1.setText(
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
@@ -565,52 +608,69 @@ class SettingsWindow(QtWidgets.QWidget):
         self.anim = QtCore.QPropertyAnimation(self, b"geometry")
         self.anim.setDuration(300)
         self.hide_menu_button = BackButton(self.parent())
+
         self.hide_menu_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
                                             "border-radius: 15%;}"
                                             "QPushButton::hover {background-color: #eee}")
+
         self.hide_menu_button.setText("→")
         self.hide_menu_button.show()
         self.hide_menu_button.clicked.connect(self.toggle_show)
 
         self.open_button = QtWidgets.QPushButton(self)
+
         self.open_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
+
         self.open_button.setText("Открыть")
         self.open_button.clicked.connect(self.manager.file_manager.open_file)
 
         self.save_button = QtWidgets.QPushButton(self)
+
         self.save_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
+
         self.save_button.setText("Сохранить")
         self.image_button = QtWidgets.QPushButton(self)
+
         self.image_button.setStyleSheet("QPushButton {border: 1px solid #ddd; "
                                         "border-radius: 15%;}"
                                         "QPushButton::hover {background-color: #eee}")
+
         self.image_button.setText("В картинку")
         self.image_button.clicked.connect(self.manager.image_manager.create_image)
         self.set_geometry()
 
     def set_geometry(self):
         if self.show_:
+
             self.setGeometry(self.parent().width() - self.MENU_SIZE_X, 0,
                              self.MENU_SIZE_X, self.parent().height())
+
             self.widget.setGeometry(0, 0, self.width(), self.height())
             self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
         else:
+
             self.setGeometry(self.parent().width(), 0,
                              self.MENU_SIZE_X, self.parent().height())
+
             self.widget.setGeometry(0, 0, self.width(), self.height())
             self.hide_menu_button.setGeometry(self.parent().width() - 10 - 30, 10, 30, 30)
         self.open_button.adjustSize()
+
         self.open_button.setGeometry(10, self.height() - 30 - self.open_button.height(),
                                      self.open_button.width() + 20, self.open_button.height() + 20)
+
         self.save_button.adjustSize()
+
         self.save_button.setGeometry(10 + self.open_button.width() + 10,
                                      self.height() - 30 - self.save_button.height(),
                                      self.save_button.width() + 20, self.save_button.height() + 20)
+
         self.image_button.adjustSize()
+
         self.image_button.setGeometry(10 + self.open_button.width() + 10 +
                                       self.save_button.width() + 10,
                                       self.height() - 30 - self.image_button.height(),
@@ -641,6 +701,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      call_back=tuple(),
                      call_update_all=None, **kwargs):
         if obj in self.objects:
+
             self.objects[obj][1].append(sett(self,
                                              self.objects[obj][0],
                                              name=name,
@@ -650,8 +711,10 @@ class SettingsWindow(QtWidgets.QWidget):
                                              default_values_to_return=default_values_to_return,
                                              call_back=call_back,
                                              call_update_all=call_update_all, **kwargs))
+
             self.objects[obj][0] += 1
         else:
+
             self.objects[obj] = [3, [sett(self,
                                           2,
                                           name=name,

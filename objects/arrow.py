@@ -57,10 +57,12 @@ class Arrow:
         self.need_arrow = need_arrow
         self.arrow_type = arrow_type
         self.arrow_manager.manager.settings_window.hide_all_sett()
+
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
             name="Положение стрелки")
+
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
@@ -70,6 +72,7 @@ class Arrow:
             default_values_to_return=(0, 0),
             call_back=(self.call_back_x1, self.call_back_y1),
             call_update_all=self.call_set_xy1)
+
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
@@ -79,6 +82,7 @@ class Arrow:
             default_values_to_return=(0, 0),
             call_back=(self.call_back_x2, self.call_back_y2),
             call_update_all=self.call_set_xy2)
+
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettCheckbox,
@@ -87,6 +91,7 @@ class Arrow:
             default_values_to_return=(True,),
             call_back=(self.call_back_arrow,),
             call_update_all=self.call_set_arrow)
+
         self.arrow_manager.manager.settings_window.show_sett(self)
 
     # TODO почему я написал call_back вместо callback
@@ -188,10 +193,13 @@ class Arrow:
         """
         if not (self.obj1 and self.obj2):
             return
+
         self.start_pos = (self.obj1.x() + self.obj1.width() // 2 + self.start_pos_by_obj[0],
                           self.obj1.y() + self.obj1.height() // 2 + self.start_pos_by_obj[1])
+
         self.end_pos = (self.obj2.x() + self.obj2.width() // 2 + self.end_pos_by_obj[0],
                         self.obj2.y() + self.obj2.height() // 2 + self.end_pos_by_obj[1])
+
         return self.start_pos, self.end_pos
 
     def get_start_and_end(self, end_pos: tuple or list) -> tuple:
@@ -262,38 +270,3 @@ class Arrow:
                 ar1, ar2 = self.create_arrow(end_pos=end_pos)
                 qp.drawLines(ar1, ar2)
             return True
-
-    @staticmethod
-    def get_nearest_side(w, h, x, y):
-        """
-        someday it will come in handy...
-        """
-        #   0
-        # 3   1
-        #   2
-        x, y = x + w // 2, y + h // 2
-        x1, x2 = x, w - x
-        y1, y2 = y, h - y
-
-        if y1 < y2:
-            if x1 < x2:
-                if x1 < y1:
-                    return LEFT
-                else:
-                    return UP
-            else:
-                if x2 < y1:
-                    return RIGHT
-                else:
-                    return UP
-        else:
-            if x1 < x2:
-                if x1 < y2:
-                    return LEFT
-                else:
-                    return DOWN
-            else:
-                if x2 < y2:
-                    return RIGHT
-                else:
-                    return DOWN

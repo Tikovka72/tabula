@@ -51,9 +51,11 @@ class TextWidget(QWidget):
 
         self.edit_line = LineEdit(self)
         self.edit_line.setText("Sample text")
+
         self.edit_line.setGeometry(self.OFFSET, self.OFFSET,
                                    self.size().width() - self.OFFSET * 2,
                                    self.size().height() - self.OFFSET * 2)
+
         self.edit_line_font = self.edit_line.font()
         self.edit_line.setAlignment(Qt.AlignCenter)
         self.size_or_pos_label = QLabel(self)
@@ -72,18 +74,23 @@ class TextWidget(QWidget):
 
         self.drag_angle = QWidget(self)
         self.drag_angle.setGeometry(0, 0, self.OFFSET, self.OFFSET)
+
         self.drag_angle.setStyleSheet(
             "background-color: black"
         )
 
         self.resize_angle = QWidget(self)
+
         self.resize_angle.setGeometry(self.size().width() - self.OFFSET,
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
+
         self.resize_angle.setStyleSheet("background-color: black")
+
         self.widget_manager.manager.settings_window.add_settings(
             self, SettingsWindow.Title, name="Размер и расположение объекта"
         )
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
@@ -94,6 +101,7 @@ class TextWidget(QWidget):
             call_back=(self.call_back_size_width, self.call_back_size_height),
             call_update_all=self.call_set_size
         )
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
@@ -104,12 +112,15 @@ class TextWidget(QWidget):
             call_back=(self.call_back_pos_x, self.call_back_pos_y),
             call_update_all=self.call_set_pos
         )
+
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
             name="Текст"
         )
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettCheckboxLineEdit,
@@ -119,12 +130,15 @@ class TextWidget(QWidget):
             default_values_to_return=(True, self.edit_line.get_text_size()),
             call_back=(self.call_back_text_auto, self.call_back_text_size),
             call_update_all=self.call_set_text_size)
+
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
             name="Рамка"
         )
+
         self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettTwoLineEdit,
@@ -134,6 +148,7 @@ class TextWidget(QWidget):
             default_values_to_return=(0, 1),
             call_back=(self.call_back_border_size, self.call_back_border_radius),
             call_update_all=self.call_set_border)
+
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
         self.widget_manager.manager.settings_window.show_sett(self)
 
@@ -258,8 +273,10 @@ class TextWidget(QWidget):
         copy = TextWidget(self.parent(), self.widget_manager, self.zero_dot)
         copy.resize_event(self.width(), self.height())
         copy.edit_line.setText(self.edit_line.text())
+
         copy.move_event(self.geometry().x() + self.geometry().width() // 2 - 10,
                         self.geometry().y() + self.geometry().height() + 10, show_pos=False)
+
         copy.hide_size_or_pos_label()
         self.widget_manager.add_widget(widget=copy)
         copy.show()
@@ -292,11 +309,14 @@ class TextWidget(QWidget):
         self.resize(width, height)
         min_width, min_height = self.widget_manager.confirm_widget_size_change(self)
         self.resize(min_width, min_height)
+
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.size().height() - self.OFFSET * 2)
+
         self.resize_angle.setGeometry(self.size().width() - self.OFFSET,
                                       self.size().height() - self.OFFSET,
                                       self.size().width(), self.size().height())
+
         if show_size:
             self.show_size_or_pos_label()
             self.set_size_or_pos_label(f"{width}x{height}")
@@ -313,8 +333,10 @@ class TextWidget(QWidget):
         self.move(x, y)
         if show_pos:
             self.show_size_or_pos_label()
+
             self.set_size_or_pos_label(f"{x - self.zero_dot.get_pos()[0] + self.width() // 2} "
                                        f"{y - self.zero_dot.get_pos()[1] + self.height() // 2}")
+
         self.widget_manager.manager.settings_window.update_obj_settings(self)
 
     def moveEvent(self, a0) -> None:
@@ -327,6 +349,7 @@ class TextWidget(QWidget):
         """
         self.size_or_pos_label.setText(text)
         self.size_or_pos_label.adjustSize()
+
         self.size_or_pos_label.move(
             self.width() // 2 - self.size_or_pos_label.width() // 2,
             self.height() // 2 - self.size_or_pos_label.height() // 2
@@ -365,10 +388,12 @@ class TextWidget(QWidget):
         :param need_arrow: needs arrow on end (---- or --->)
         :param arrow_type: type of arrow
         """
+
         arrow = Arrow(
             manager=self.widget_manager.manager.arrow_manager,
             need_arrow=need_arrow, arrow_type=arrow_type
         )
+
         self.widget_manager.manager.arrow_manager.toggle_active_arrow(arrow)
         self.widget_manager.manager.arrow_manager.add_arrow(arrow)
         self.widget_manager.manager.arrow_manager.set_obj1_arrow(arrow, self)
@@ -459,8 +484,10 @@ class TextWidget(QWidget):
                 self.on_back()
                 self.widget_manager.manager.update_core()
             elif event.key() in (Qt.Key_N, 1058):
+
                 w = self.widget_manager.add_widget(
                     self.widget_manager.manager.mouse_manager.get_mouse_pos())
+
                 self.update()
                 self.widget_manager.clear_focus()
                 w.setFocus()
@@ -492,12 +519,14 @@ class LineEdit(QLineEdit):
         self.__init_ui__()
 
     def __init_ui__(self):
+
         self.setStyleSheet(
             "QLineEdit {"
             f"border-radius: {self.border_radius}%;"
             f"border: {self.border_size}px solid {WIDGET_BORDER_COLOR};"
             "}"
         )
+
         self.setFont(QFont("fonts/arial.ttf"))
         self.font_ = self.font()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -509,14 +538,19 @@ class LineEdit(QLineEdit):
         self.menu.addAction("Дублировать объект", self.parent().copy_self, shortcut="Ctrl+D")
         self.menu.addAction("На задний план", self.on_back, shortcut="Ctrl+B")
         self.menu.addSeparator()
+
         self.menu.addAction("Добавить связь",
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
+
         line_menu = self.menu.addMenu("Добавить связь...")
+
         line_menu.addAction("от центра до центра",
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
+
         self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
         self.menu.addSeparator()
         self.menu.addAction("Удалить", self.parent().del_self, shortcut="Shift+Del")
+
         self.menu.setStyleSheet(
             "QMenu {"
             f"font-size: {self.text_size_menu}px;"
@@ -528,6 +562,7 @@ class LineEdit(QLineEdit):
             f"background-color: {self.background_color_menu_selected};"
             "};"
         )
+
         self.menu.setWindowFlags(self.menu.windowFlags() | Qt.NoDropShadowWindowHint)
         self.text_size = int(self.size().height() * self.FONT_SIZE_FACTOR)
         self.update_text_size()
@@ -587,13 +622,16 @@ class LineEdit(QLineEdit):
         radius = radius if radius is not None else int(default[1])
         size = size if size is not None and size >= 0 else int(default[0])
         size = size if size >= 0 else default[0]
+
         radius = radius if min(self.width(), self.height()) // 2 >= radius \
             else min(self.width(), self.height()) // 2
+
         self.setStyleSheet(
             "QLineEdit {"
             f"border-radius: {radius}%;"
             f"{'border: ' + str(size) + f'px solid {WIDGET_BORDER_COLOR};' if int(size) > 0 else ''}"
             "}")
+
         self.border_radius = radius
         self.border_size = size
 

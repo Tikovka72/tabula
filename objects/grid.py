@@ -141,9 +141,11 @@ class Grid:
         x_lines = list(filter(
             lambda line: True if line.y1() == line.y2() == zero[
                 1] else False, self.grid.get("x", [])))
+
         y_lines = list(filter(
             lambda line: True if line.x1() == line.x2() == zero[
                 0] else False, self.grid.get("y", [])))
+
         return {"x": x_lines, "y": y_lines}
 
     def set_offset_by_zero_point(self):
@@ -171,8 +173,10 @@ class Grid:
         :param offset: max distance between y coordinate and grid's line
         :return: nearest line or None
         """
+
         y_line = list(filter(lambda line: True if line.x1() - offset < x < line.x1() + offset
                              else False, self.grid.get("y", [])))
+
         return y_line[0] if y_line else None
 
     def add_line_to_special_lines(self, line: QtCore.QLine):

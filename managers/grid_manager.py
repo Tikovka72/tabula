@@ -14,11 +14,14 @@ class GridManager:
     def __init__(self, manager: Manager):
         self.manager = manager
         self.zero_point_dot = ZeroPointWidget(parent=self.manager.core, manager=self.manager)
+
         self.zero_point_dot.setGeometry(
             self.manager.core.width() // 2, self.manager.core.height() // 2, 1, 1)
+
         self.grid = Grid(
             show=True, core_size=(self.manager.core.width(), self.manager.core.height()),
             zero_pos=self.zero_point_dot)
+
         self.magnet_lines = []
 
     # TODO doc for this
@@ -46,8 +49,10 @@ class GridManager:
         x_center = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width() // 2)
         x_right = self.grid.get_nearest_y_line_by_offset(obj.x() + obj.width())
         y_left = self.grid.get_nearest_x_line_by_offset(obj.y())
+
         y_center = self.grid.get_nearest_x_line_by_offset(
             obj.y() + obj.height() // 2)
+
         y_right = self.grid.get_nearest_x_line_by_offset(obj.y() + obj.height())
         self.grid.clear_special_lines()
         if x_left or x_center or x_right:
@@ -55,6 +60,7 @@ class GridManager:
             x_t = (x_left.x1() if x_left else False) or \
                   (x_center.x1() - obj.width() // 2 if x_center else False) or \
                   (x_right.x1() - obj.width() if x_right else False)
+
             x = x_t or x
             if y_mod:
                 for widget in widgets:
@@ -69,9 +75,11 @@ class GridManager:
             if x_right and x + obj.width() == x_right.x1():
                 self.grid.add_line_to_special_lines(x_right)
         if y_left or y_center or y_right:
+
             y_t = (y_left.y1() if y_left else False) or (
                 y_center.y1() - obj.height() // 2 if y_center else False) or \
                   (y_right.y1() - obj.height() if y_right else False)
+
             y = y_t or y
             if x_mod:
                 for widget in widgets:

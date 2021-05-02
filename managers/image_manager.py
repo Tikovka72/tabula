@@ -27,12 +27,14 @@ class ImageManager:
         xl, yl = -float("inf"), -float("inf")
         for widget in self.widget_manager.get_all_widgets():
             widget: TextWidget = widget
+
             x_left, y_top, x_right, y_bottom = (
                 widget.x() - self.manager.grid_manager.zero_point_dot.get_pos()[0],
                 widget.y() - self.manager.grid_manager.zero_point_dot.get_pos()[1],
                 widget.x() + widget.width() - self.manager.grid_manager.zero_point_dot.get_pos()[0],
                 widget.y() + widget.height() - self.manager.grid_manager.zero_point_dot.get_pos()[1]
             )
+
             xs = x_left if x_left < xs else xs
             xl = x_right if x_right > xl else xl
             ys = y_top if y_top < ys else ys
@@ -51,27 +53,32 @@ class ImageManager:
         draw = aggdraw.Draw(im)
         for arrow in self.arrow_manager.get_all_arrows():
             pen = aggdraw.Pen(arrow.color, 2)
+
             draw.line((arrow.start_pos[0] - zero_pos_coefficient_x,
                        arrow.start_pos[1] - zero_pos_coefficient_y,
                        arrow.end_pos[0] - zero_pos_coefficient_x,
                        arrow.end_pos[1] - zero_pos_coefficient_y
                        ), pen)
+
             if arrow.need_arrow:
                 arrow_line_1, arrow_line_2 = arrow.create_arrow()
                 arrow_line_1: QLine = arrow_line_1
                 arrow_line_2: QLine = arrow_line_2
+
                 draw.line((
                     arrow_line_1.p1().x() - zero_pos_coefficient_x,
                     arrow_line_1.p1().y() - zero_pos_coefficient_y,
                     arrow_line_1.p2().x() - zero_pos_coefficient_x,
                     arrow_line_1.p2().y() - zero_pos_coefficient_y,
                 ), pen)
+
                 draw.line((
                     arrow_line_2.p1().x() - zero_pos_coefficient_x,
                     arrow_line_2.p1().y() - zero_pos_coefficient_y,
                     arrow_line_2.p2().x() - zero_pos_coefficient_x,
                     arrow_line_2.p2().y() - zero_pos_coefficient_y,
                 ), pen)
+
         draw.flush()
         im.save(file_to_save)
 
@@ -87,7 +94,9 @@ class ImageManager:
                 (0, rad, widget.edit_line.width(), widget.edit_line.height() - rad),
                 (rad, 0, widget.edit_line.width() - rad, widget.edit_line.height())
             )
+
             for x1, y1, x2, y2 in data_for_back:
+
                 draw.rectangle((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
@@ -106,12 +115,14 @@ class ImageManager:
             )
 
             for (x1, y1, x2, y2), (start, end) in data_for_arcs:
+
                 draw.ellipse((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2,
                 ), aggdraw.Pen(WHITE, 1), aggdraw.Brush(WHITE))
+
                 draw.arc((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
@@ -129,16 +140,21 @@ class ImageManager:
             )
 
             for x1, y1, x2, y2 in data_for_lines:
+
                 draw.line((
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x1,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y1,
                     widget.x() + widget.OFFSET - zero_pos_coefficient_x + x2,
                     widget.y() + widget.OFFSET - zero_pos_coefficient_y + y2
                 ), pen)
+
             draw.flush()
+
             font = ImageFont.truetype(f"fonts/arial.ttf", widget.edit_line.text_size,
                                       layout_engine=ImageFont.LAYOUT_BASIC)
+
             text_size = draw_pillow.textsize(widget.data(), font=font)
+
             draw_pillow.text((widget.x() + widget.OFFSET - zero_pos_coefficient_x +
                               widget.edit_line.width() // 2 - text_size[0] // 2,
                               widget.y() + widget.OFFSET - zero_pos_coefficient_y +
@@ -178,9 +194,11 @@ class ImageManager:
         handler for calling dialog, which asks for name for new file
         :return: name of new file or None if user closes dialog
         """
+
         name = QtWidgets.QFileDialog.getSaveFileName(self.manager.core, 'Название изображения',
                                                      filter="*.png",
                                                      directory="new pic.png")
+
         if name[0]:
             return name[0]
         return None
