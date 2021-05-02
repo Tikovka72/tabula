@@ -57,10 +57,9 @@ class WidgetManager:
         """
         arrows = self.manager.arrow_manager.get_all_arrows_from_object(obj)
         for arrow in arrows:
-            # TODO check exception
             try:
                 self.manager.arrow_manager.delete_arrow(arrow)
-            except Exception:
+            except KeyError:
                 ...
         self.widgets.pop(obj)
 
