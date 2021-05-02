@@ -164,7 +164,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
                      min_max_values: tuple = tuple(),
-                     call_back: tuple = tuple(),
+                     callback: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent, n, size)
             self.name = name
@@ -174,7 +174,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (pass_f, pass_f)
 
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
+            self.callback = callback if len(callback) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.min_max_values = min_max_values
             self.__init_ui__()
@@ -219,8 +219,8 @@ class SettingsWindow(QtWidgets.QWidget):
                     if not self.min_max_values[0][0] <= int(new_value1) <= self.min_max_values[0][1]:
                         new_value1 = str(self.standard_values[0])
             self.value1.setText(new_value1)
-            if self.call_back[0] and new_value1:
-                self.call_back[0](self.value1_get())
+            if self.callback[0] and new_value1:
+                self.callback[0](self.value1_get())
 
         def value_changed(self, sender):
             if self.value1 is sender:
@@ -238,8 +238,8 @@ class SettingsWindow(QtWidgets.QWidget):
                     if not self.min_max_values[1][0] <= int(new_value2) <= self.min_max_values[1][1]:
                         new_value2 = str(self.standard_values[1])
             self.value2.setText(new_value2)
-            if self.call_back[1]:
-                self.call_back[1](self.value2_get())
+            if self.callback[1]:
+                self.callback[1](self.value2_get())
 
         def value1_get(self):
             value = self.value1.text()
@@ -309,7 +309,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size: tuple,
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
-                     call_back: tuple = tuple(),
+                     callback: tuple = tuple(),
                      call_update_all=None,
                      lock_line_edit=True):
             super().__init__(parent, n, size)
@@ -320,7 +320,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
 
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
+            self.callback = callback if len(callback) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.lock_line_edit = lock_line_edit
             self.__init_ui__()
@@ -373,16 +373,16 @@ class SettingsWindow(QtWidgets.QWidget):
                     self.value2.setEnabled(False)
                 else:
                     self.value2.setEnabled(True)
-            if self.call_back[0]:
-                self.call_back[0](self.value1_get())
+            if self.callback[0]:
+                self.callback[0](self.value1_get())
 
         def value2_changed(self):
             new_value2 = "".join([i if (i.isdigit() if self.int_only else True)
                                   else "" for i in self.value2.text()])
 
             self.value2_set(new_value2)
-            if self.call_back[1] and (not self.value1_get() and self.lock_line_edit or True):
-                self.call_back[1](self.value2_get())
+            if self.callback[1] and (not self.value1_get() and self.lock_line_edit or True):
+                self.callback[1](self.value2_get())
 
         def value1_get(self):
             return self.value1.isChecked()
@@ -440,7 +440,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      standard_values: tuple,
                      size: tuple,
                      default_values_to_return: tuple = tuple(),
-                     call_back: tuple = tuple(),
+                     callback: tuple = tuple(),
                      call_update_all=None,
                      *other, **other_):
             _ = other, other_
@@ -451,7 +451,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
 
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, pass_f)
+            self.callback = callback if len(callback) == self.VALUES_N else (pass_f, pass_f)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
@@ -484,8 +484,8 @@ class SettingsWindow(QtWidgets.QWidget):
             self.show()
 
         def value1_changed(self):
-            if self.call_back[0]:
-                self.call_back[0](self.value1_get())
+            if self.callback[0]:
+                self.callback[0](self.value1_get())
 
         def value1_get(self):
             return self.value1.isChecked()
@@ -517,7 +517,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size: tuple,
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
-                     call_back: tuple = tuple(),
+                     callback: tuple = tuple(),
                      call_update_all=None):
             super().__init__(parent, n, size)
             self.name = name
@@ -527,7 +527,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.default_values_to_return = default_values_to_return if \
                 len(default_values_to_return) == self.VALUES_N else (None, None)
 
-            self.call_back = call_back if len(call_back) == self.VALUES_N else (pass_f, None)
+            self.callback = callback if len(callback) == self.VALUES_N else (pass_f, None)
             self.call_update_all = call_update_all
             self.__init_ui__()
 
@@ -560,8 +560,8 @@ class SettingsWindow(QtWidgets.QWidget):
                                   else "" for i in self.value1.text()])
 
             self.value1.setText(new_value1)
-            if self.call_back[0]:
-                self.call_back[0](self.value1_get())
+            if self.callback[0]:
+                self.callback[0](self.value1_get())
 
         def value1_get(self):
             value = self.value1.text()
@@ -698,7 +698,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size=STANDARD_SIZE_FOR_WIDGETS,
                      int_only=False,
                      default_values_to_return=tuple(),
-                     call_back=tuple(),
+                     callback=tuple(),
                      call_update_all=None, **kwargs):
         if obj in self.objects:
 
@@ -709,7 +709,7 @@ class SettingsWindow(QtWidgets.QWidget):
                                              int_only=int_only,
                                              size=size,
                                              default_values_to_return=default_values_to_return,
-                                             call_back=call_back,
+                                             callback=callback,
                                              call_update_all=call_update_all, **kwargs))
 
             self.objects[obj][0] += 1
@@ -722,7 +722,7 @@ class SettingsWindow(QtWidgets.QWidget):
                                           int_only=int_only,
                                           size=size,
                                           default_values_to_return=default_values_to_return,
-                                          call_back=call_back,
+                                          callback=callback,
                                           call_update_all=call_update_all, **kwargs)]]
 
     def show_sett(self, obj) -> None:

@@ -98,7 +98,7 @@ class TextWidget(QWidget):
             standard_values=(self.size().width(), self.size().height()),
             int_only=True,
             default_values_to_return=(self.size().width(), self.size().height()),
-            call_back=(self.call_back_size_width, self.call_back_size_height),
+            callback=(self.callback_size_width, self.callback_size_height),
             call_update_all=self.call_set_size
         )
 
@@ -109,7 +109,7 @@ class TextWidget(QWidget):
             standard_values=(self.x(), self.y()),
             int_only=True,
             default_values_to_return=(self.x(), self.y()),
-            call_back=(self.call_back_pos_x, self.call_back_pos_y),
+            callback=(self.callback_pos_x, self.callback_pos_y),
             call_update_all=self.call_set_pos
         )
 
@@ -128,7 +128,7 @@ class TextWidget(QWidget):
             standard_values=(("Авто", True), self.edit_line.get_text_size()),
             int_only=True,
             default_values_to_return=(True, self.edit_line.get_text_size()),
-            call_back=(self.call_back_text_auto, self.call_back_text_size),
+            callback=(self.callback_text_auto, self.callback_text_size),
             call_update_all=self.call_set_text_size)
 
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
@@ -146,7 +146,7 @@ class TextWidget(QWidget):
             standard_values=self.edit_line.get_border(),
             int_only=True,
             default_values_to_return=(0, 1),
-            call_back=(self.call_back_border_size, self.call_back_border_radius),
+            callback=(self.callback_border_size, self.callback_border_radius),
             call_update_all=self.call_set_border)
 
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
@@ -169,14 +169,14 @@ class TextWidget(QWidget):
 
         self.anim.start()
 
-    def call_back_size_width(self, width: int):
+    def callback_size_width(self, width: int):
         """
         callback for settings window. This is necessary to change width of object
         settings window -> ObjectClass
         """
         self.resize_event(width, self.height(), False)
 
-    def call_back_size_height(self, height):
+    def callback_size_height(self, height):
         """
         callback for settings window. This is necessary to change height of object
         settings window -> ObjectClass
@@ -190,14 +190,14 @@ class TextWidget(QWidget):
         """
         return self.width(), self.height()
 
-    def call_back_pos_x(self, x: int):
+    def callback_pos_x(self, x: int):
         """
         callback for settings window. This is necessary to change x position of object
         settings window -> ObjectClass
         """
         self.move_event(self.zero_dot.get_pos()[0] + x - self.width() // 2, self.y(), False)
 
-    def call_back_pos_y(self, y: int):
+    def callback_pos_y(self, y: int):
         """
         callback for settings window. This is necessary to change y position of object
         settings window -> ObjectClass
@@ -212,7 +212,7 @@ class TextWidget(QWidget):
         return -self.zero_dot.get_pos()[0] + self.x() + self.width() // 2, \
                -self.zero_dot.get_pos()[1] + self.y() + self.height() // 2
 
-    def call_back_text_size(self, size: int):
+    def callback_text_size(self, size: int):
         """
         callback for settings window. This is necessary to change text size
         settings window -> ObjectClass
@@ -220,7 +220,7 @@ class TextWidget(QWidget):
         self.edit_line.change_text_size(size)
         self.edit_line.update_text_size()
 
-    def call_back_text_auto(self, st: bool):
+    def callback_text_auto(self, st: bool):
         """
         callback for settings window. This is necessary
         to change whether the font size is set automatically
@@ -236,14 +236,14 @@ class TextWidget(QWidget):
         """
         return self.edit_line.get_auto(), self.edit_line.get_text_size()
 
-    def call_back_border_radius(self, radius: int):
+    def callback_border_radius(self, radius: int):
         """
         callback for settings window. This is necessary to change border radius
         settings window -> ObjectClass
         """
         self.edit_line.set_border(radius=radius)
 
-    def call_back_border_size(self, size: int):
+    def callback_border_size(self, size: int):
         """
         callback for settings window. This is necessary to change text size
         settings window -> ObjectClass

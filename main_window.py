@@ -51,8 +51,8 @@ class GraphicCore(QtWidgets.QWidget):
                                                   default_values_to_return=(
                                                       self.size().width() // 2,
                                                       self.size().height() // 2),
-                                                  call_back=(self.call_back_zero_pos_width,
-                                                             self.call_back_zero_pos_height),
+                                                  callback=(self.call_back_zero_pos_width,
+                                                            self.call_back_zero_pos_height),
                                                   call_update_all=self.call_set_zero_pos)
 
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
@@ -67,8 +67,8 @@ class GraphicCore(QtWidgets.QWidget):
                                                   default_values_to_return=(
                                                       True, self.manager.
                                                       grid_manager.grid.get_step()),
-                                                  call_back=(self.call_back_grid_show,
-                                                             self.call_back_grid_size),
+                                                  callback=(self.call_back_grid_show,
+                                                            self.call_back_grid_size),
                                                   call_update_all=self.call_set_grid,
                                                   lock_line_edit=False)
 

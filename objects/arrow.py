@@ -70,7 +70,7 @@ class Arrow:
             standard_values=(0, 0),
             int_only=True,
             default_values_to_return=(0, 0),
-            call_back=(self.call_back_x1, self.call_back_y1),
+            callback=(self.callback_x1, self.callback_y1),
             call_update_all=self.call_set_xy1)
 
         self.arrow_manager.manager.settings_window.add_settings(
@@ -80,7 +80,7 @@ class Arrow:
             standard_values=(0, 0),
             int_only=True,
             default_values_to_return=(0, 0),
-            call_back=(self.call_back_x2, self.call_back_y2),
+            callback=(self.callback_x2, self.callback_y2),
             call_update_all=self.call_set_xy2)
 
         self.arrow_manager.manager.settings_window.add_settings(
@@ -89,13 +89,12 @@ class Arrow:
             name="Стрелка",
             standard_values=(("вкл", True),),
             default_values_to_return=(True,),
-            call_back=(self.call_back_arrow,),
+            callback=(self.callback_arrow,),
             call_update_all=self.call_set_arrow)
 
         self.arrow_manager.manager.settings_window.show_sett(self)
 
-    # TODO почему я написал call_back вместо callback
-    def call_back_arrow(self, need: bool):
+    def callback_arrow(self, need: bool):
         """
         callback for settings window. This is necessary to change arrow type:
         ---> to ---- and back
@@ -110,7 +109,7 @@ class Arrow:
         """
         return self.need_arrow
 
-    def call_back_x1(self, x1: int):
+    def callback_x1(self, x1: int):
         """
         callback for settings window. This is necessary to change x coordinate of line's starting
         settings window -> arrow
@@ -125,7 +124,7 @@ class Arrow:
         self.start_pos_by_obj = x1, self.start_pos_by_obj[1]
         self.set_start_and_end()
 
-    def call_back_y1(self, y1: int):
+    def callback_y1(self, y1: int):
         """
         callback for settings window. This is necessary to change Y coordinate of line's starting
         settings window -> arrow
@@ -139,7 +138,7 @@ class Arrow:
         self.start_pos_by_obj = self.start_pos_by_obj[0], y1
         self.set_start_and_end()
 
-    def call_back_x2(self, x2: int):
+    def callback_x2(self, x2: int):
         """
         callback for settings window. This is necessary to change x coordinate of line's ending
         settings window -> arrow
@@ -153,7 +152,7 @@ class Arrow:
         self.end_pos_by_obj = x2, self.end_pos_by_obj[1]
         self.set_start_and_end()
 
-    def call_back_y2(self, y2: int):
+    def callback_y2(self, y2: int):
         """
         callback for settings window. This is necessary to change y coordinate of line's ending
         settings window -> arrow
