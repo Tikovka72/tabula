@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QPen
 
 from objects.settings_widget import SettingsWindow
+from objects.text_widget import TextWidget
 
 from utils import check_on_arrow
 
@@ -192,20 +193,23 @@ class GraphicCore(QtWidgets.QWidget):
     def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         if event.buttons() == QtCore.Qt.LeftButton and self.hasFocus():
             x, y = self.manager.mouse_manager.get_mouse_pos()
+
             [widget.move_event(
                 widget.x() + (event.pos().x() - x), widget.y() +
                 (event.pos().y() - y),
-                show_pos=False
-            )
+                show_pos=False)
                 for widget in self.manager.widget_manager.get_all_widgets()]
+
             self.manager.grid_manager.zero_point_dot.move_event(
                 self.manager.grid_manager.zero_point_dot.x() +
                 (event.pos().x() - x),
                 self.manager.grid_manager.zero_point_dot.y() + (event.pos().y() - y)
             )
+
             if self.manager.grid_manager.grid.show:
                 self.manager.grid_manager.grid.set_offset_by_zero_point()
                 self.manager.grid_manager.grid.regenerate_grid()
+
             self.manager.settings_window.update_obj_settings(self)
             self.update()
         self.manager.mouse_manager.change_mouse_pos(event.x(), event.y())
@@ -314,11 +318,11 @@ class GraphicCore(QtWidgets.QWidget):
         self.update()
 
     def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
-        obj = event.source()
+        obj: TextWidget = event.source()
         modifier_pressed = QtWidgets.QApplication.keyboardModifiers()
         shift_pressed = (int(modifier_pressed) & QtCore.Qt.ShiftModifier) == QtCore.Qt.ShiftModifier
         if self.manager.widget_manager.get_dor() == DRAG:
-            event.source().move(
+            obj.move(
                 event.pos().x() - self.manager.widget_manager.drag_dot[0],
                 event.pos().y() - self.manager.widget_manager.drag_dot[1]
             )
@@ -337,8 +341,8 @@ class GraphicCore(QtWidgets.QWidget):
                          obj, x, y, x_mod, y_mod, widgets
                     )
             self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
-            event.source().move_event(x, y)
-            event.source().update_arrows()
+            obj.move_event(x, y)
+            obj.update_arrows()
         elif self.manager.widget_manager.get_dor() == RESIZE:
             obj_x1, obj_y1, obj_x2, obj_y2, x_mod, y_mod, widgets = \
                 self.manager.widget_manager.resize_magnet_checker(obj, event.pos())
@@ -349,7 +353,8 @@ class GraphicCore(QtWidgets.QWidget):
                 if not y_mod:
                     y = max(y - y % (OFFSET_MAGNET * 2), 0)
             self.manager.widget_manager.set_coords_on_widgets(widgets, event, x, y)
-            event.source().resize_event(x, y)
+            obj.resize_event(x, y)
+
         self.update()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:

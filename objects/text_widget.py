@@ -289,9 +289,9 @@ class TextWidget(QWidget):
         :param show_size: shows size in small window
                in widget's center in {width}x{height} format or not
         """
-        if width < 1 or height < 1:
-            return
         self.resize(width, height)
+        min_width, min_height = self.widget_manager.confirm_widget_size_change(self)
+        self.resize(min_width, min_height)
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.size().height() - self.OFFSET * 2)
         self.resize_angle.setGeometry(self.size().width() - self.OFFSET,
