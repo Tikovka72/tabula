@@ -87,30 +87,56 @@ class TextWidget(QWidget):
 
         self.resize_angle.setStyleSheet("background-color: black")
 
+        self.create_settings()
+        self.widget_manager.manager.settings_window.show_sett(self)
+
+    def create_settings(self):
         self.widget_manager.manager.settings_window.add_settings(
             self, SettingsWindow.Title, name="Размер и расположение объекта"
         )
 
         self.widget_manager.manager.settings_window.add_settings(
             self,
-            SettingsWindow.SettTwoLineEdit,
-            name="Размер",
-            standard_values=(self.size().width(), self.size().height()),
+            SettingsWindow.SettOneLineEdit,
+            name="Ширина",
+            standard_values=(self.size().width(),),
             int_only=True,
-            default_values_to_return=(self.size().width(), self.size().height()),
-            callback=(self.callback_size_width, self.callback_size_height),
-            call_update_all=self.call_set_size
+            default_values_to_return=(self.size().width(),),
+            callback=(self.callback_size_width,),
+            call_update_all=self.call_set_size_width
         )
 
         self.widget_manager.manager.settings_window.add_settings(
             self,
-            SettingsWindow.SettTwoLineEdit,
-            name="Положение",
-            standard_values=(self.x(), self.y()),
+            SettingsWindow.SettOneLineEdit,
+            name="Высота",
+            standard_values=(self.size().height(),),
             int_only=True,
-            default_values_to_return=(self.x(), self.y()),
-            callback=(self.callback_pos_x, self.callback_pos_y),
-            call_update_all=self.call_set_pos
+            default_values_to_return=(self.size().height(),),
+            callback=(self.callback_size_height,),
+            call_update_all=self.call_set_size_height
+        )
+
+        self.widget_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneLineEdit,
+            name="Положение по горизонтали",
+            standard_values=(self.x(),),
+            int_only=True,
+            default_values_to_return=(self.x(),),
+            callback=(self.callback_pos_x,),
+            call_update_all=self.call_set_pos_x
+        )
+
+        self.widget_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneLineEdit,
+            name="Положение по вертикали",
+            standard_values=(self.y(),),
+            int_only=True,
+            default_values_to_return=(self.y(),),
+            callback=(self.callback_pos_y,),
+            call_update_all=self.call_set_pos_y
         )
 
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
@@ -141,16 +167,23 @@ class TextWidget(QWidget):
 
         self.widget_manager.manager.settings_window.add_settings(
             self,
-            SettingsWindow.SettTwoLineEdit,
-            name="Размер и радиус рамки",
-            standard_values=self.edit_line.get_border(),
+            SettingsWindow.SettOneLineEdit,
+            name="Размер рамки",
+            standard_values=(self.edit_line.get_border()[0],),
             int_only=True,
-            default_values_to_return=(0, 1),
-            callback=(self.callback_border_size, self.callback_border_radius),
-            call_update_all=self.call_set_border)
+            default_values_to_return=(0,),
+            callback=(self.callback_border_size,),
+            call_update_all=self.call_set_border_size)
 
-        self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
-        self.widget_manager.manager.settings_window.show_sett(self)
+        self.widget_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneLineEdit,
+            name="Радиус рамки",
+            standard_values=(self.edit_line.get_border()[1],),
+            int_only=True,
+            default_values_to_return=(1,),
+            callback=(self.callback_border_radius,),
+            call_update_all=self.call_set_border_radius)
 
     def return_to_fact_pos(self):
         """
@@ -190,6 +223,12 @@ class TextWidget(QWidget):
         """
         return self.width(), self.height()
 
+    def call_set_size_width(self) -> int:
+        return self.call_set_size()[0]
+
+    def call_set_size_height(self) -> int:
+        return self.call_set_size()[1]
+
     def callback_pos_x(self, x: int):
         """
         callback for settings window. This is necessary to change x position of object
@@ -209,8 +248,14 @@ class TextWidget(QWidget):
         gives self position
         ObjectClass -> settings window
         """
-        return -self.zero_dot.get_pos()[0] + self.x() + self.width() // 2, \
-               -self.zero_dot.get_pos()[1] + self.y() + self.height() // 2
+        return (-self.zero_dot.get_pos()[0] + self.x() + self.width() // 2,
+                -self.zero_dot.get_pos()[1] + self.y() + self.height() // 2)
+
+    def call_set_pos_x(self) -> int:
+        return self.call_set_pos()[0]
+
+    def call_set_pos_y(self) -> int:
+        return self.call_set_pos()[1]
 
     def callback_text_size(self, size: int):
         """
@@ -256,6 +301,12 @@ class TextWidget(QWidget):
         ObjectClass -> settings window
         """
         return self.edit_line.get_border()
+
+    def call_set_border_size(self) -> int:
+        return self.call_set_border()[0]
+
+    def call_set_border_radius(self) -> int:
+        return self.call_set_border()[1]
 
     def del_self(self):
         """

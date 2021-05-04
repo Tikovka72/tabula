@@ -518,6 +518,7 @@ class SettingsWindow(QtWidgets.QWidget):
                      size: tuple,
                      int_only: bool = False,
                      default_values_to_return: tuple = tuple(),
+                     min_max_values: tuple = tuple(),
                      callback: tuple = tuple(),
                      call_update_all: callable = None):
             super().__init__(parent, n, size)
@@ -530,6 +531,7 @@ class SettingsWindow(QtWidgets.QWidget):
 
             self.callback = callback if len(callback) == self.VALUES_N else (pass_f, None)
             self.call_update_all = call_update_all
+            self.min_max_values = min_max_values
             self.__init_ui__()
 
         def __init_ui__(self):
@@ -557,22 +559,27 @@ class SettingsWindow(QtWidgets.QWidget):
             self.show()
 
         def value1_changed(self):
-            new_value1 = "".join([i if (i.isdigit() if self.int_only else True)
-                                  else "" for i in self.value1.text()])
+            new_value1 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
+                                          if self.int_only else True)
+                                  else "" for i, sym in enumerate(self.value1.text())])
 
+            if self.int_only:
+                if self.min_max_values:
+                    if not self.min_max_values[0][0] <= int(new_value1) <= self.min_max_values[0][1]:
+                        new_value1 = str(self.standard_values[0])
             self.value1.setText(new_value1)
-            if self.callback[0]:
+            if self.callback[0] and new_value1:
                 self.callback[0](self.value1_get())
 
         def value1_get(self):
             value = self.value1.text()
             if self.int_only:
-                if value.isdigit():
+                if is_dig(value):
                     return int(value)
-                return self.standard_values[0]
+                return self.default_values_to_return[0]
             if value:
                 return value
-            return self.standard_values[0]
+            return self.default_values_to_return[0]
 
         def value1_set(self, value):
             self.value1.setText(str(value))
