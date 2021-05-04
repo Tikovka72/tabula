@@ -41,21 +41,36 @@ class GraphicCore(QtWidgets.QWidget):
         self.setStyleSheet("QWidget#core {background-color: white}")
         self.setFocus()
 
+        self.create_settings()
+        self.manager.settings_window.show_sett(self)
+
+    def create_settings(self):
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
                                                   name="Положение экрана")
 
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettTwoLineEdit,
-                                                  name="Положение центра",
-                                                  standard_values=self.manager.grid_manager.
-                                                  zero_point_dot.get_pos(),
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettOneLineEdit,
+                                                  name="Положение центра по горизонтали",
+                                                  standard_values=(
+                                                      self.manager.grid_manager.
+                                                      zero_point_dot.get_pos()[0],),
                                                   int_only=True,
                                                   default_values_to_return=(
-                                                      self.size().width() // 2,
-                                                      self.size().height() // 2),
-                                                  callback=(self.call_back_zero_pos_width,
-                                                            self.call_back_zero_pos_height),
-                                                  call_update_all=self.call_set_zero_pos)
+                                                      self.size().width() // 2,),
+                                                  callback=(self.call_back_zero_pos_width,),
+                                                  call_update_all=self.call_set_zero_pos_x)
 
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettOneLineEdit,
+                                                  name="Положение центра по вертикали",
+                                                  standard_values=(
+                                                      self.manager.grid_manager.
+                                                      zero_point_dot.get_pos()[1],),
+                                                  int_only=True,
+                                                  default_values_to_return=(
+                                                      self.size().height() // 2,),
+                                                  callback=(self.call_back_zero_pos_height,),
+                                                  call_update_all=self.call_set_zero_pos_y)
+
+        self.manager.settings_window.add_settings(self, SettingsWindow.Line,)
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
                                                   name="Сетка")
 
@@ -67,13 +82,11 @@ class GraphicCore(QtWidgets.QWidget):
                                                   int_only=True,
                                                   default_values_to_return=(
                                                       True, self.manager.
-                                                      grid_manager.grid.get_step()),
+                                                          grid_manager.grid.get_step()),
                                                   callback=(self.call_back_grid_show,
                                                             self.call_back_grid_size),
                                                   call_update_all=self.call_set_grid,
                                                   lock_line_edit=False)
-
-        self.manager.settings_window.show_sett(self)
 
     def call_back_zero_pos_width(self, x: int):
         """
@@ -111,6 +124,12 @@ class GraphicCore(QtWidgets.QWidget):
         x = x_left - self.width() // 2
         y = y_up - self.height() // 2
         return x, y
+
+    def call_set_zero_pos_x(self) -> int:
+        return self.call_set_zero_pos()[0]
+
+    def call_set_zero_pos_y(self) -> int:
+        return self.call_set_zero_pos()[1]
 
     def call_back_grid_show(self, show: bool):
         """
@@ -257,6 +276,7 @@ class GraphicCore(QtWidgets.QWidget):
 
         if event.key() in (QtCore.Qt.Key_G, 1055):
             self.manager.grid_manager.grid.toggle_show()
+            self.manager.settings_window.update_obj_settings(self)
         if event.key() == QtCore.Qt.Key_Plus:
             self.manager.grid_manager.grid.change_step(self.manager.grid_manager.grid.get_step() * 2)
             self.manager.grid_manager.grid.set_offset_by_zero_point()

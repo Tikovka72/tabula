@@ -550,7 +550,7 @@ class SettingsWindow(QtWidgets.QWidget):
             self.value1.resize(*self.FIELDS_SIZE)
             self.value1.setText(str(value1))
 
-            self.value1.move(self.width() - self.FIELDS_SIZE[0] * 2 - self.OFFSET * 2,
+            self.value1.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value1.height() // 2)
 
             self.value1.textChanged.connect(self.value1_changed)
