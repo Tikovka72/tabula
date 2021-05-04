@@ -422,6 +422,8 @@ class SettingsWindow(QtWidgets.QWidget):
                     str(int(self.value2.text() if self.value2.text() else
                             self.standard_values[1]) + p))
 
+                self.value2_changed()
+
         def update(self) -> None:
             super().update()
             if self.call_update_all:

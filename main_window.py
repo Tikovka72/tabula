@@ -74,19 +74,22 @@ class GraphicCore(QtWidgets.QWidget):
         self.manager.settings_window.add_settings(self, SettingsWindow.Title,
                                                   name="Сетка")
 
-        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckboxLineEdit,
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettOneLineEdit,
                                                   name="Размер сетки",
-                                                  standard_values=(("вкл", True),
-                                                                   self.manager.
-                                                                   grid_manager.grid.get_step()),
+                                                  standard_values=(
+                                                      self.manager.grid_manager.grid.get_step(),),
                                                   int_only=True,
                                                   default_values_to_return=(
-                                                      True, self.manager.
-                                                          grid_manager.grid.get_step()),
-                                                  callback=(self.call_back_grid_show,
-                                                            self.call_back_grid_size),
-                                                  call_update_all=self.call_set_grid,
-                                                  lock_line_edit=False)
+                                                      self.manager.grid_manager.grid.get_step(),),
+                                                  callback=(self.call_back_grid_size,),
+                                                  call_update_all=self.call_set_grid_size)
+
+        self.manager.settings_window.add_settings(self, SettingsWindow.SettCheckbox,
+                                                  name="Сетка",
+                                                  standard_values=(("вкл", True),),
+                                                  default_values_to_return=(True,),
+                                                  callback=(self.call_back_grid_show,),
+                                                  call_update_all=self.call_set_grid_show)
 
     def call_back_zero_pos_width(self, x: int):
         """
@@ -159,6 +162,12 @@ class GraphicCore(QtWidgets.QWidget):
         :return: tuple: (show, step)
         """
         return self.manager.grid_manager.grid.show, self.manager.grid_manager.grid.get_step()
+
+    def call_set_grid_show(self) -> int:
+        return self.call_set_grid()[0]
+
+    def call_set_grid_size(self) -> int:
+        return self.call_set_grid()[1]
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         super().resizeEvent(event)

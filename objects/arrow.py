@@ -58,41 +58,67 @@ class Arrow:
         self.arrow_type = arrow_type
         self.arrow_manager.manager.settings_window.hide_all_sett()
 
+        self.create_settings()
+        self.arrow_manager.manager.settings_window.show_sett(self)
+
+    def create_settings(self):
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.Title,
-            name="Положение стрелки")
+            name="Положение связи")
 
         self.arrow_manager.manager.settings_window.add_settings(
             self,
-            SettingsWindow.SettTwoLineEdit,
-            name="Позиция на первом объекте",
-            standard_values=(0, 0),
+            SettingsWindow.SettOneLineEdit,
+            name="на первом объекте по горизонтали",
+            standard_values=(0,),
             int_only=True,
-            default_values_to_return=(0, 0),
-            callback=(self.callback_x1, self.callback_y1),
-            call_update_all=self.call_set_xy1)
+            default_values_to_return=(0,),
+            callback=(self.callback_x1,),
+            call_update_all=self.call_set_x1)
 
         self.arrow_manager.manager.settings_window.add_settings(
             self,
-            SettingsWindow.SettTwoLineEdit,
-            name="Позиция на втором объекте",
-            standard_values=(0, 0),
+            SettingsWindow.SettOneLineEdit,
+            name="на первом объекте по вертикали",
+            standard_values=(0,),
             int_only=True,
-            default_values_to_return=(0, 0),
-            callback=(self.callback_x2, self.callback_y2),
-            call_update_all=self.call_set_xy2)
+            default_values_to_return=(0,),
+            callback=(self.callback_y1,),
+            call_update_all=self.call_set_y1)
+
+        self.arrow_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
+
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneLineEdit,
+            name="на втором объекте по горизонтали",
+            standard_values=(0,),
+            int_only=True,
+            default_values_to_return=(0,),
+            callback=(self.callback_x2,),
+            call_update_all=self.call_set_x2)
+
+        self.arrow_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneLineEdit,
+            name="на втором объекте по вертикали",
+            standard_values=(0,),
+            int_only=True,
+            default_values_to_return=(0,),
+            callback=(self.callback_y2,),
+            call_update_all=self.call_set_y2)
+
+        self.arrow_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
 
         self.arrow_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettCheckbox,
-            name="Стрелка",
+            name="стрелка",
             standard_values=(("вкл", True),),
             default_values_to_return=(True,),
             callback=(self.callback_arrow,),
             call_update_all=self.call_set_arrow)
-
-        self.arrow_manager.manager.settings_window.show_sett(self)
 
     def callback_arrow(self, need: bool):
         """
@@ -101,6 +127,7 @@ class Arrow:
         settings window -> arrow
         """
         self.need_arrow = bool(need)
+        self.arrow_manager.manager.update_core()
 
     def call_set_arrow(self) -> bool:
         """
@@ -123,6 +150,7 @@ class Arrow:
 
         self.start_pos_by_obj = x1, self.start_pos_by_obj[1]
         self.set_start_and_end()
+        self.arrow_manager.manager.update_core()
 
     def callback_y1(self, y1: int):
         """
@@ -137,6 +165,7 @@ class Arrow:
             y1 = self.obj1.size().height() // 2
         self.start_pos_by_obj = self.start_pos_by_obj[0], y1
         self.set_start_and_end()
+        self.arrow_manager.manager.update_core()
 
     def callback_x2(self, x2: int):
         """
@@ -151,6 +180,7 @@ class Arrow:
             x2 = self.obj2.size().width() // 2
         self.end_pos_by_obj = x2, self.end_pos_by_obj[1]
         self.set_start_and_end()
+        self.arrow_manager.manager.update_core()
 
     def callback_y2(self, y2: int):
         """
@@ -165,6 +195,7 @@ class Arrow:
             y2 = self.obj2.size().height() // 2
         self.end_pos_by_obj = self.end_pos_by_obj[0], y2
         self.set_start_and_end()
+        self.arrow_manager.manager.update_core()
 
     def call_set_xy1(self) -> Tuple[int, int]:
         """
@@ -175,6 +206,12 @@ class Arrow:
             return 0, 0
         return self.start_pos_by_obj
 
+    def call_set_x1(self) -> int:
+        return self.call_set_xy1()[0]
+
+    def call_set_y1(self) -> int:
+        return self.call_set_xy1()[1]
+
     def call_set_xy2(self) -> Tuple[int, int]:
         """
         gives line's end position by self.obj2 object
@@ -183,6 +220,12 @@ class Arrow:
         if not self.end_pos or not self.obj2:
             return 0, 0
         return self.end_pos_by_obj
+
+    def call_set_x2(self) -> int:
+        return self.call_set_xy2()[0]
+
+    def call_set_y2(self) -> int:
+        return self.call_set_xy2()[1]
 
     def set_start_and_end(self) -> Tuple[Tuple[int, int], Tuple[int, int]] or None:
         """
