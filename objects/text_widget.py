@@ -302,10 +302,10 @@ class TextWidget(QWidget):
         """
         return self.edit_line.get_border()
 
-    def call_set_border_size(self) -> int:
+    def call_set_border_size(self) -> str:
         return self.call_set_border()[0]
 
-    def call_set_border_radius(self) -> int:
+    def call_set_border_radius(self) -> str:
         return self.call_set_border()[1]
 
     def del_self(self):
@@ -592,11 +592,6 @@ class LineEdit(QLineEdit):
 
         self.menu.addAction("Добавить связь",
                             lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_NEAREST_LINE))
-
-        line_menu = self.menu.addMenu("Добавить связь...")
-
-        line_menu.addAction("от центра до центра",
-                            lambda: self.parent().add_arrow_f(arrow_type=FROM_AND_TO_CENTER))
 
         self.menu.addAction("Добавить стрелку", lambda: self.parent().add_arrow_f(True))
         self.menu.addSeparator()
