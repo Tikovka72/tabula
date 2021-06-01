@@ -223,7 +223,6 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.callback[0](self.value1_get())
 
         def value_changed(self, sender: SettingsLineEdit):
-            print(sender, type(sender))
             if self.value1 is sender:
                 self.value1_changed()
             elif self.value2 is sender:
@@ -297,6 +296,16 @@ class SettingsWindow(QtWidgets.QWidget):
 
                 self.value2_changed()
 
+        def keyReleaseEvent(self, event):
+            if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
+                self.value_changed((self.value1, self.value2, None)[
+                                       (
+                                           self.value1.hasFocus(),
+                                           self.value2.hasFocus(),
+                                           True
+                                       ).index(True)
+                                   ])
+
     class SettCheckboxLineEdit(ParentSett):
         VALUES_N = 2
         SIZE = (450, 20)
@@ -356,17 +365,24 @@ class SettingsWindow(QtWidgets.QWidget):
 
             self.value1.stateChanged.connect(self.value1_changed)
 
-            self.value2 = QtWidgets.QLineEdit(self)
+            self.value2 = SettingsLineEdit(self)
             self.value2.resize(*self.FIELDS_SIZE)
             self.value2.setText(str(value2))
 
             self.value2.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value2.height() // 2)
 
-            self.value2.textChanged.connect(self.value2_changed)
             if self.value1 and self.lock_line_edit:
                 self.value2.setEnabled(False)
             self.show()
+
+        def value_changed(self, sender: SettingsLineEdit):
+            if self.value2 is sender:
+                self.value2_changed()
+
+        def keyReleaseEvent(self, event):
+            if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
+                self.value_changed(self.value2 if self.value2.hasFocus() else None)
 
         def value1_changed(self):
             if self.lock_line_edit:
@@ -607,6 +623,10 @@ class SettingsWindow(QtWidgets.QWidget):
                 self.value1.setText(
                     str(int(self.value1.text() if self.value1.text() else
                             self.standard_values[0]) + p))
+
+        def keyReleaseEvent(self, event):
+            if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
+                self.value_changed(self.value1 if self.value1.hasFocus() else None)
 
     def __init__(self, parent: QtWidgets.QWidget, manager: Manager):
         super().__init__(parent)
