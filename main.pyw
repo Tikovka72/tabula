@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QFontDatabase
 
 import sys
 
@@ -13,14 +14,14 @@ from managers.widget_manager import WidgetManager
 
 from objects.settings_widget import SettingsWindow
 
-from utils import except_hook
+from utils import except_hook, get_fonts
 
 
 class Manager:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
         self.core = GraphicCore(self)
-
+        self.font_db = get_fonts(QFontDatabase())
         self.mouse_manager = MouseManager(self)
         self.widget_manager = WidgetManager(self)
         self.arrow_manager = ArrowManager(self)

@@ -154,9 +154,9 @@ class ImageManager:
                 ), pen)
 
             draw.flush()
-
-            font = ImageFont.truetype(f"fonts/arial.ttf", widget.edit_line.text_size,
-                                      layout_engine=ImageFont.LAYOUT_BASIC)
+            font_path = 'c:/windows/fonts/{}.ttf'.format(widget.edit_line.get_font())
+            print(font_path)
+            font = ImageFont.truetype(font_path, widget.edit_line.text_size)
 
             text_size = draw_pillow.textsize(widget.data(), font=font)
 

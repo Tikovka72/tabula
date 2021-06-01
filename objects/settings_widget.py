@@ -1,5 +1,5 @@
 ﻿from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Iterable
 
 if TYPE_CHECKING:
     from main import Manager
@@ -627,6 +627,68 @@ class SettingsWindow(QtWidgets.QWidget):
         def keyReleaseEvent(self, event):
             if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
                 self.value_changed(self.value1 if self.value1.hasFocus() else None)
+
+    class SettOneComboBox(ParentSett):
+        VALUES_N = 1
+        SIZE = (450, 20)
+        FIELDS_SIZE = 110, 20
+        STANDARD_SIZE = 150, 40
+
+        def __init__(self, parent,
+                     n: int,
+                     name: str,
+                     standard_values: tuple,
+                     size: tuple,
+                     default_values_to_return: tuple = tuple(),
+                     callback: tuple = tuple(),
+                     call_update_all: callable = None,
+                     items: Iterable[str] = tuple(),
+                     *other, **other_):
+            _ = other, other_
+            super().__init__(parent, n, size)
+            self.name = name
+            self.standard_values = standard_values if len(standard_values) == self.VALUES_N \
+                else (None, )
+
+            self.default_values_to_return = default_values_to_return if \
+                len(default_values_to_return) == self.VALUES_N else (None, )
+
+            self.callback = callback if len(callback) == self.VALUES_N else (pass_f, )
+            self.call_update_all = call_update_all
+            self.items = tuple(items)
+            self.__init_ui__()
+
+        def __init_ui__(self):
+            self.resize(*self.size)
+
+            self.move(self.parent.width() // 2 - self.width() // 2, self.OFFSET * (self.n + 1)
+                      + self.SIZE[1] * self.n)
+
+            self.text = QtWidgets.QLabel(self)
+            self.text.setText(str(self.name))
+            self.text.adjustSize()
+            self.text.move(self.OFFSET, self.height() // 2 - self.text.height() // 2)
+
+            self.value1 = QtWidgets.QComboBox(self)
+            self.value1.resize(*self.FIELDS_SIZE)
+            self.value1.addItems(self.items)
+
+            self.value1.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
+                             self.height() // 2 - self.value1.height() // 2)
+            self.value1.activated[str].connect(self.value1_changed)
+            self.show()
+
+        def value1_changed(self, text):
+            self.callback[0](text)
+
+        def value1_set(self, value):
+            self.value1.setCurrentIndex(self.items.index(value))
+
+        def update(self) -> None:
+            super().update()
+            if self.call_update_all:
+                value = self.call_update_all()
+                self.value1_set(value)
 
     def __init__(self, parent: QtWidgets.QWidget, manager: Manager):
         super().__init__(parent)

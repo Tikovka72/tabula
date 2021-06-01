@@ -5,8 +5,10 @@ if TYPE_CHECKING:
     from managers.widget_manager import WidgetManager
 
 from PyQt5.QtCore import Qt, QMimeData, pyqtSignal, QPropertyAnimation, QRect
-from PyQt5.QtGui import QDrag, QCursor, QMouseEvent, QKeyEvent, QFont
+from PyQt5.QtGui import QDrag, QCursor, QMouseEvent, QKeyEvent, QFont, QFontDatabase
 from PyQt5.QtWidgets import QLineEdit, QWidget, QMenu, QLabel, QApplication
+
+from PIL import ImageFont
 
 from objects.arrow import Arrow
 from objects.settings_widget import SettingsWindow
@@ -14,6 +16,8 @@ from objects.zero_point import ZeroPointWidget
 
 from constants import FROM_AND_TO_NEAREST_LINE, NONE, \
     WIDGET_BORDER_COLOR, CONTEXT_MENU_BORDER_COLOR
+
+from utils import get_fonts
 
 
 class TextWidget(QWidget):
@@ -92,10 +96,6 @@ class TextWidget(QWidget):
 
     def create_settings(self):
         self.widget_manager.manager.settings_window.add_settings(
-            self, SettingsWindow.Title, name="Размер и расположение объекта"
-        )
-
-        self.widget_manager.manager.settings_window.add_settings(
             self,
             SettingsWindow.SettOneLineEdit,
             name="Ширина",
@@ -156,6 +156,17 @@ class TextWidget(QWidget):
             default_values_to_return=(True, self.edit_line.get_text_size()),
             callback=(self.callback_text_auto, self.callback_text_size),
             call_update_all=self.call_set_text_size)
+
+        self.widget_manager.manager.settings_window.add_settings(
+            self,
+            SettingsWindow.SettOneComboBox,
+            name="Шрифт",
+            standard_values=("Arial", ),
+            default_values_to_return=("Arial", ),
+            callback=(self.callback_font, ),
+            call_update_all=self.call_set_font,
+            items=self.widget_manager.manager.font_db
+        )
 
         self.widget_manager.manager.settings_window.add_settings(self, SettingsWindow.Line)
 
@@ -264,6 +275,12 @@ class TextWidget(QWidget):
         """
         self.edit_line.change_text_size(size)
         self.edit_line.update_text_size()
+
+    def callback_font(self, font: str):
+        self.edit_line.change_font(font)
+
+    def call_set_font(self):
+        return self.edit_line.get_font()
 
     def callback_text_auto(self, st: bool):
         """
@@ -576,7 +593,7 @@ class LineEdit(QLineEdit):
             "}"
         )
 
-        self.setFont(QFont("fonts/arial.ttf"))
+        self.setFont(QFont("Arial"))
         self.font_ = self.font()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.self_menu_show)
@@ -616,6 +633,14 @@ class LineEdit(QLineEdit):
         sends signal to parent for move widget on back
         """
         self.parent().on_back()
+
+    def get_font(self):
+        return self.font().key()[:self.font().key().index(",")]
+
+    def change_font(self, font):
+        self.setFont(QFont(font))
+        self.font_ = self.font()
+        self.update_text_size()
 
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
         self.parent().keyReleaseEvent(event)

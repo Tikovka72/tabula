@@ -1,5 +1,9 @@
 import sys
 
+from PyQt5.QtGui import QFontDatabase
+
+from PIL import ImageFont
+
 
 def is_dig(s: str) -> bool:
     """
@@ -76,3 +80,16 @@ def test(func: callable) -> callable:
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
+
+
+def get_fonts(fdb: QFontDatabase):
+    fonts = fdb.families()
+    fonts_final = []
+    for font in fonts:
+        try:
+            ImageFont.truetype('c:/windows/fonts/{}.ttf'.format(font))
+            fonts_final.append(font)
+        except OSError:
+            ...
+
+    return fonts_final

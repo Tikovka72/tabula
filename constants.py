@@ -1,5 +1,7 @@
 from matplotlib import font_manager
+import os
 
+print()
 # drag or resize constants
 NONE = 0
 DRAG = 1
@@ -25,10 +27,3 @@ OFFSET_MAGNET = 5
 # grid
 GRID_STEP = 20
 
-# fonts
-FONTS = tuple(
-    map(
-        lambda font_path: font_path[font_path.rfind("\\") + 1:font_path.rfind(".")],
-        font_manager.win32InstalledFonts()
-    )
-)
