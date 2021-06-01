@@ -12,7 +12,7 @@ from objects.arrow import Arrow
 from objects.settings_widget import SettingsWindow
 from objects.zero_point import ZeroPointWidget
 
-from constants import FROM_AND_TO_CENTER, FROM_AND_TO_NEAREST_LINE, NONE, \
+from constants import FROM_AND_TO_NEAREST_LINE, NONE, \
     WIDGET_BORDER_COLOR, CONTEXT_MENU_BORDER_COLOR
 
 
@@ -358,8 +358,6 @@ class TextWidget(QWidget):
                in widget's center in {width}x{height} format or not
         """
         self.resize(width, height)
-        min_width, min_height = self.widget_manager.confirm_widget_size_change(self)
-        self.resize(min_width, min_height)
 
         self.edit_line.resize(self.size().width() - self.OFFSET * 2,
                               self.size().height() - self.OFFSET * 2)

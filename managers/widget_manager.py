@@ -304,21 +304,3 @@ class WidgetManager:
             if w.hasFocus():
                 return w
         return None
-
-    def confirm_widget_size_change(self, widget: TextWidget) -> Tuple[int, int]:
-        text = widget.edit_line.text()
-        self.test_widget.setText(text)
-        self.test_widget.setFont(widget.edit_line.font())
-        self.test_widget.adjustSize()
-        min_size = self.test_widget.size()
-
-        size = widget.size()
-        new_width, new_height = size.width(), size.height()
-
-        if min_size.width() + widget.OFFSET * 2 > size.width():
-            new_width = min_size.width() + widget.OFFSET * 2
-
-        if min_size.height() + widget.OFFSET * 2 > size.height():
-            new_height = min_size.height() + widget.OFFSET * 2
-
-        return new_width, new_height
