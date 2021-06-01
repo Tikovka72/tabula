@@ -550,15 +550,18 @@ class SettingsWindow(QtWidgets.QWidget):
             value1 = None
             if self.standard_values:
                 value1 = self.standard_values[0]
-            self.value1 = QtWidgets.QLineEdit(self)
+            self.value1 = SettingsLineEdit(self)
             self.value1.resize(*self.FIELDS_SIZE)
             self.value1.setText(str(value1))
 
             self.value1.move(self.width() - self.FIELDS_SIZE[0] - self.OFFSET,
                              self.height() // 2 - self.value1.height() // 2)
 
-            self.value1.textChanged.connect(self.value1_changed)
             self.show()
+
+        def value_changed(self, sender: SettingsLineEdit):
+            if self.value1 is sender:
+                self.value1_changed()
 
         def value1_changed(self):
             new_value1 = "".join([sym if (sym.isdigit() or (sym == "-" and i == 0)
