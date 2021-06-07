@@ -1,7 +1,3 @@
-from matplotlib import font_manager
-import os
-
-print()
 # drag or resize constants
 NONE = 0
 DRAG = 1
