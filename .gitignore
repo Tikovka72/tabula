@@ -1,2 +1,5 @@
 .idea
 trash
+dist
+build
+main.spec
