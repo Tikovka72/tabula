@@ -727,6 +727,8 @@ class SettingsWindow(QtWidgets.QWidget):
                                        "border-radius: 15%;}"
                                        "QPushButton::hover {background-color: #eee}")
 
+        self.save_button.clicked.connect(self.manager.file_manager.save_file)
+
         self.save_button.setText("Сохранить")
         self.image_button = QtWidgets.QPushButton(self)
 
